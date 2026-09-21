@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   X, 
   Camera, 
@@ -23,7 +23,7 @@ import {
   Lightbulb
 } from 'lucide-react';
 import CameraCapture from './CameraCapture';
-import { analyzePlantImage, getDefaultPropagationForPlant } from '../services/geminiService';
+import { analyzePlantImage, getDefaultPropagationForPlant, normalizeImageForAi } from '../services/geminiService';
 import { getStoredApiKey } from '../services/storageService';
 
 export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, hasApiKey }) {
@@ -32,6 +32,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [step, setStep] = useState('choose_photo'); // 'choose_photo' | 'form'
   const [aiNotice, setAiNotice] = useState(null);
+  const nativeCameraInputRef = useRef(null);
   
   // Dados completos do formulário da planta
   const [plantData, setPlantData] = useState({
@@ -78,13 +79,32 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
   });
 
   const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhoto(reader.result);
+      reader.onloadend = async () => {
+        const rawResult = reader.result;
+        try {
+          const normalized = await normalizeImageForAi(rawResult);
+          setPhoto(normalized ? normalized.dataUrl : rawResult);
+        } catch (normErr) {
+          setPhoto(rawResult);
+        }
       };
       reader.readAsDataURL(file);
+    }
+    if (e.target) {
+      e.target.value = '';
+    }
+  };
+
+  const handleCameraZoneClick = () => {
+    // Se for dispositivo móvel (Android / iOS), aciona a câmera nativa do sistema diretamente
+    const isMobileDevice = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+    if (isMobileDevice && nativeCameraInputRef.current) {
+      nativeCameraInputRef.current.click();
+    } else {
+      setShowCamera(true);
     }
   };
 
@@ -322,19 +342,43 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                 ) : (
                   /* Zona de Escolha de Foto (Câmera ou Arquivo) */
                   <div>
-                    <div className="upload-zone" onClick={() => setShowCamera(true)}>
+                    {/* Input invisível para acionamento direto da câmera nativa via ref */}
+                    <input 
+                      ref={nativeCameraInputRef}
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment" 
+                      onChange={handleFileUpload} 
+                      style={{ display: 'none' }}
+                    />
+
+                    <div className="upload-zone" onClick={handleCameraZoneClick} style={{ cursor: 'pointer' }}>
                       <Camera className="upload-icon" />
                       <h4 style={{ color: 'var(--primary-900)', marginBottom: '4px' }}>Tirar Foto da Planta</h4>
                       <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        Use a câmera do celular ou computador para foto instantânea
+                        Toque para abrir a câmera do seu celular ou webcam
                       </p>
                     </div>
 
                     <div style={{ textAlign: 'center', margin: '16px 0', color: 'var(--text-light)', fontSize: '0.85rem' }}>
-                      OU SELECIONE DO SEU DISPOSITIVO
+                      OU ESCOLHA UMA OPÇÃO
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {/* Botão Câmera do Aparelho (100% nativa) */}
+                      <label className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', cursor: 'pointer' }}>
+                        <Camera size={18} />
+                        <span>Tirar Foto com a Câmera</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          capture="environment" 
+                          onChange={handleFileUpload} 
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+
+                      {/* Botão Escolher da Galeria */}
                       <label className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '12px', cursor: 'pointer' }}>
                         <Upload size={18} />
                         <span>Escolher Imagem da Galeria</span>
@@ -346,6 +390,18 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                         />
                       </label>
 
+                      {/* Botão Câmera ao Vivo na Tela */}
+                      <button 
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setShowCamera(true)}
+                        style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: '8px' }}
+                      >
+                        <Camera size={16} />
+                        <span>Abrir Câmera ao Vivo na Tela</span>
+                      </button>
+
+                      {/* Google Lens */}
                       <button 
                         type="button"
                         className="btn btn-secondary"
