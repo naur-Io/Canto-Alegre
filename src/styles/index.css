@@ -3,9 +3,9 @@
    ========================================================================== */
 
 :root {
-  /* Typography */
-  --font-serif: 'Source Sans 3', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  /* Typography: Source Sans 3 */
+  --font-serif: "Source Sans 3", sans-serif;
+  --font-sans: "Source Sans 3", sans-serif;
 
   /* Radius */
   --radius-sm: 8px;
@@ -163,6 +163,8 @@
 
 body {
   font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-style: normal;
   background: var(--bg-gradient);
   color: var(--text-main);
   min-height: 100vh;
