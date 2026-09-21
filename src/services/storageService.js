@@ -40,6 +40,14 @@ export async function getStoredPlants() {
       }
     }
     if (idbData !== undefined && idbData !== null && Array.isArray(idbData)) {
+      // Filtrar plantas de demonstração antigas, mantendo apenas a Jiboia e plantas customizadas
+      const cleaned = idbData.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
+      if (cleaned.length !== idbData.length) {
+        // Se após a limpeza não sobrar nada e não foi deletado explicitamente, insere a Jiboia
+        const finalPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
+        await persistToAllStorages(finalPlants);
+        return finalPlants;
+      }
       return idbData;
     }
   } catch (error) {
@@ -52,10 +60,11 @@ export async function getStoredPlants() {
     if (localData) {
       const parsed = JSON.parse(localData);
       if (Array.isArray(parsed)) {
-        // Sincronizar de volta para o IndexedDB
-        set(PLANTS_STORAGE_KEY, parsed).catch(() => {});
-        localStorage.setItem(PLANTS_STORAGE_KEY, localData);
-        return parsed;
+        const cleaned = parsed.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
+        const finalPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
+        set(PLANTS_STORAGE_KEY, finalPlants).catch(() => {});
+        localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(finalPlants));
+        return finalPlants;
       }
     }
   } catch (error) {
@@ -67,7 +76,7 @@ export async function getStoredPlants() {
     return [];
   }
 
-  // 4. Primeiro acesso absoluto: semear com plantas iniciais de demonstração
+  // 4. Primeiro acesso absoluto: semear apenas com a Jiboia
   await persistToAllStorages(INITIAL_PLANTS);
   return INITIAL_PLANTS;
 }
@@ -192,3 +201,20 @@ export async function importGardenBackup(jsonString) {
   await persistToAllStorages(plants);
   return plants;
 }
+
+// Gerenciamento de Tema Visual (Dark / Light)
+const THEME_STORAGE_KEY = 'cantoalegre_theme';
+
+export function getStoredTheme() {
+  return localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+}
+
+export function saveTheme(theme) {
+  const selected = theme === 'light' ? 'light' : 'dark';
+  localStorage.setItem(THEME_STORAGE_KEY, selected);
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('data-theme', selected);
+  }
+  return selected;
+}
+

@@ -8,6 +8,7 @@ import AddPlantModal from './components/AddPlantModal';
 import ApiKeyModal from './components/ApiKeyModal';
 import IntroGuideModal from './components/IntroGuideModal';
 import UpdatesNotificationModal from './components/UpdatesNotificationModal';
+import SettingsModal from './components/SettingsModal';
 
 import { 
   getStoredPlants, 
@@ -17,7 +18,9 @@ import {
   getStoredApiKey, 
   hasSeenIntroGuide,
   hasUnreadUpdates,
-  markVersionAsSeen
+  markVersionAsSeen,
+  getStoredTheme,
+  saveTheme
 } from './services/storageService';
 import { LATEST_VERSION } from './services/updatesData';
 
@@ -31,6 +34,8 @@ export default function App() {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [showUpdatesModal, setShowUpdatesModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
   const [unreadUpdates, setUnreadUpdates] = useState(false);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
@@ -38,6 +43,7 @@ export default function App() {
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
+    saveTheme(currentTheme);
     loadPlants();
     setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''));
     setUnreadUpdates(hasUnreadUpdates(LATEST_VERSION));
@@ -80,11 +86,20 @@ export default function App() {
     } else {
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       if (isIos) {
-        alert("Para instalar no iPhone/iPad:\n1. Toque no ícone Compartilhar (⎋) no Safari;\n2. Toque em 'Adicionar à Tela de Início' 🌿.");
+        alert("Para instalar no iPhone/iPad:\n1. Toque no ícone Compartilhar (⎋) no Safari;\n2. Toque em 'Adicionar à Tela de Início'.");
       } else {
         alert("Para instalar:\nAbra o menu do navegador (⋮) e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
       }
     }
+  };
+
+  const handleThemeChange = (newTheme) => {
+    const applied = saveTheme(newTheme);
+    setCurrentTheme(applied);
+  };
+
+  const handleToggleTheme = () => {
+    handleThemeChange(currentTheme === 'dark' ? 'light' : 'dark');
   };
 
   const loadPlants = async () => {
@@ -189,6 +204,9 @@ export default function App() {
           markVersionAsSeen(LATEST_VERSION);
         }}
         hasUnreadUpdates={unreadUpdates}
+        currentTheme={currentTheme}
+        onToggleTheme={handleToggleTheme}
+        onOpenSettings={() => setShowSettingsModal(true)}
         isInstallable={isInstallable}
         onInstallApp={handleInstallPwa}
       />
@@ -197,7 +215,7 @@ export default function App() {
         {/* Banner Hero / Dashboard */}
         <section className="hero-header">
           <div className="hero-text">
-            <h1>Meu Jardim Inteligente 🌿</h1>
+            <h1>Meu Jardim Inteligente</h1>
             <p>Guia botânico completo com quantidade de luz, rega, origem, clima, tipo de solo e guia passo a passo para tirar mudas e cultivar.</p>
           </div>
 
@@ -339,6 +357,21 @@ export default function App() {
           onClose={() => setShowUpdatesModal(false)}
           swUpdateAvailable={swUpdateAvailable}
           onReloadApp={() => window.location.reload()}
+        />
+      )}
+
+      {showSettingsModal && (
+        <SettingsModal 
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          currentTheme={currentTheme}
+          onThemeChange={handleThemeChange}
+          hasApiKey={hasApiKey}
+          onOpenKeyModal={() => setShowKeyModal(true)}
+          onOpenGuide={() => setShowGuideModal(true)}
+          isInstallable={isInstallable}
+          onInstallApp={handleInstallPwa}
+          onReloadPlants={loadPlants}
         />
       )}
     </div>

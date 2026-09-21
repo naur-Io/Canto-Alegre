@@ -304,8 +304,8 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                     </div>
 
                     {/* Dica para iPhone */}
-                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 14px', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: '#475569', marginBottom: '14px' }}>
-                      💡 <strong>Dica no iPhone:</strong> Você também pode abrir a foto no app <em>Fotos</em> do iPhone e tocar no botão ℹ️ (com estrelas/folha) para ver o nome da espécie identificado nativamente pela Apple!
+                    <div style={{ background: 'var(--primary-50)', border: '1px solid var(--border-color)', padding: '10px 14px', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                      <strong>Dica no iPhone:</strong> Você também pode abrir a foto no aplicativo Fotos do iPhone e tocar no botão de informações para ver o nome da espécie identificado nativamente pelo iOS.
                     </div>
 
                     <div style={{ textAlign: 'center' }}>
@@ -443,9 +443,9 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                           sunlight: { ...plantData.sunlight, lightType: e.target.value }
                         })}
                       >
-                        <option value="direta">☀️ Luz Direta (Sol Pleno / Sol Forte)</option>
-                        <option value="indireta">⛅ Luz Indireta (Meia Sombra / Luz Difusa)</option>
-                        <option value="sombra">☁️ Sombra (Luz Baixa / Filtrada)</option>
+                        <option value="direta">Luz Direta (Sol Pleno / Sol Forte)</option>
+                        <option value="indireta">Luz Indireta (Meia Sombra / Luz Difusa)</option>
+                        <option value="sombra">Sombra (Luz Baixa / Filtrada)</option>
                       </select>
                     </div>
 

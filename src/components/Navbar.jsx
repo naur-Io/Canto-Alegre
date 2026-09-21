@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ 
   hasApiKey, 
@@ -8,6 +8,9 @@ export default function Navbar({
   onOpenGuide, 
   onOpenUpdates,
   hasUnreadUpdates,
+  currentTheme,
+  onToggleTheme,
+  onOpenSettings,
   isInstallable, 
   onInstallApp 
 }) {
@@ -83,6 +86,24 @@ export default function Navbar({
                 <span className="nav-btn-text-short">Simulado</span>
               </>
             )}
+          </button>
+
+          {/* Botão de Alternar Tema Rápido */}
+          <button 
+            className="btn btn-secondary btn-sm nav-btn-theme"
+            onClick={onToggleTheme}
+            title={currentTheme === 'dark' ? "Mudar para Tema Claro" : "Mudar para Tema Escuro"}
+          >
+            {currentTheme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#3b82f6" />}
+          </button>
+
+          {/* Botão de Configurações */}
+          <button 
+            className="btn btn-secondary btn-sm nav-btn-settings"
+            onClick={onOpenSettings}
+            title="Configurações do Canto Alegre"
+          >
+            <Settings size={15} />
           </button>
 
           <button 

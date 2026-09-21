@@ -97,12 +97,12 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
   const getLightInfo = (lightType, period) => {
     const type = lightType || (period?.toLowerCase().includes('direto') ? 'direta' : period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
     if (type === 'direta') {
-      return { label: '☀️ Luz Direta (Sol Pleno)', color: '#b45309', bg: '#fef3c7', border: '#fde68a' };
+      return { label: 'Luz Direta (Sol Pleno)', color: '#b45309', bg: '#fef3c7', border: '#fde68a' };
     }
     if (type === 'sombra') {
-      return { label: '☁️ Sombra (Luz Baixa / Filtrada)', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
+      return { label: 'Sombra (Luz Baixa / Filtrada)', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
     }
-    return { label: '⛅ Luz Indireta (Meia Sombra / Difusa)', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' };
+    return { label: 'Luz Indireta (Meia Sombra / Difusa)', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' };
   };
 
   const lightStyle = getLightInfo(plant.sunlight?.lightType, plant.sunlight?.period);
@@ -202,9 +202,9 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                       value={formData.sunlight?.lightType || 'indireta'}
                       onChange={e => handleNestedChange('sunlight', 'lightType', e.target.value)}
                     >
-                      <option value="direta">☀️ Luz Direta (Sol Pleno / Sol Forte)</option>
-                      <option value="indireta">⛅ Luz Indireta (Meia Sombra / Luz Difusa)</option>
-                      <option value="sombra">☁️ Sombra (Luz Baixa / Filtrada)</option>
+                      <option value="direta">Luz Direta (Sol Pleno / Sol Forte)</option>
+                      <option value="indireta">Luz Indireta (Meia Sombra / Luz Difusa)</option>
+                      <option value="sombra">Sombra (Luz Baixa / Filtrada)</option>
                     </select>
                   </div>
 
@@ -617,15 +617,15 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   {/* Metadados rápidos de Propagação */}
                   <div className="propagation-meta-grid">
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">🌱 Método Recomendado</span>
+                      <span className="prop-meta-label">Método Recomendado</span>
                       <span className="prop-meta-value">{activePropagation.method || 'Estaquia de caule / folha'}</span>
                     </div>
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">🗓️ Melhor Época</span>
+                      <span className="prop-meta-label">Melhor Época</span>
                       <span className="prop-meta-value">{activePropagation.bestSeason || 'Primavera e Verão'}</span>
                     </div>
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">⏳ Tempo de Enraizamento</span>
+                      <span className="prop-meta-label">Tempo de Enraizamento</span>
                       <span className="prop-meta-value">{activePropagation.rootingTime || '2 a 4 semanas'}</span>
                     </div>
                   </div>

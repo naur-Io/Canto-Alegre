@@ -1,23 +1,23 @@
-# Guia de Contribuição - Canto Alegre 🌿
+# Guia de Contribuição - Canto Alegre
 
-Seja muito bem-vindo(a)! Ficamos muito felizes pelo seu interesse em contribuir com o **Canto Alegre**. Este é um projeto de código aberto dedicado a conectar a paixão por plantas, jardinagem sustentável e tecnologia acessível com inteligência artificial.
+Seja muito bem-vindo(a). Ficamos felizes pelo seu interesse em contribuir com o **Canto Alegre**. Este é um projeto de código aberto dedicado a conectar a paixão por plantas, jardinagem sustentável e tecnologia acessível com inteligência artificial.
 
 Se você tem uma ideia de nova funcionalidade, correção de bug, melhoria de design ou documentação, este guia detalha o passo a passo para colaborar.
 
 ---
 
-## 🧭 Sumário
+## Sumário
 
-1. [Como Começar](#-como-começar)
-2. [Fluxo de Trabalho com Fork & Pull Request](#-fluxo-de-trabalho-com-fork--pull-request)
-3. [Estrutura do Projeto](#-estrutura-do-projeto)
-4. [Padrões de Código e Commits](#-padrões-de-código-e-commits)
-5. [Como Reportar Bugs ou Sugerir Ideias](#-como-reportar-bugs-ou-sugerir-ideias)
-6. [Reconhecimento](#-reconhecimento)
+1. [Como Começar](#como-começar)
+2. [Fluxo de Trabalho com Fork e Pull Request](#fluxo-de-trabalho-com-fork-e-pull-request)
+3. [Estrutura do Projeto](#estrutura-do-projeto)
+4. [Padrões de Código e Commits](#padrões-de-código-e-commits)
+5. [Como Reportar Bugs ou Sugerir Ideias](#como-reportar-bugs-ou-sugerir-ideias)
+6. [Agradecimentos](#agradecimentos)
 
 ---
 
-## 🚀 Como Começar
+## Como Começar
 
 ### Pré-requisitos
 - **Node.js**: Versão 18 ou superior.
@@ -26,7 +26,7 @@ Se você tem uma ideia de nova funcionalidade, correção de bug, melhoria de de
 
 ### Clonando seu Fork
 
-1. No topo desta página no GitHub, clique no botão **Fork** no canto superior direito para criar uma cópia do repositório na sua conta.
+1. No topo da página do repositório no GitHub, clique no botão **Fork** no canto superior direito para criar uma cópia na sua conta.
 2. No seu terminal, clone o seu fork:
    ```bash
    git clone https://github.com/SEU-USUARIO/FloraCare.git
@@ -48,7 +48,7 @@ Se você tem uma ideia de nova funcionalidade, correção de bug, melhoria de de
 
 ---
 
-## 🌿 Fluxo de Trabalho com Fork & Pull Request
+## Fluxo de Trabalho com Fork e Pull Request
 
 Para manter o histórico organizado e facilitar a revisão, siga este fluxo:
 
@@ -70,10 +70,10 @@ git checkout -b fix/correcao-do-bug
   ```
 
 ### 3. Faça o commit das alterações
-Escreva mensagens de commit claras e objetivas. Recomendamos o padrão **Conventional Commits**:
-- `feat:` Nova funcionalidade (ex: `feat: adicionar filtro de plantas por rega`)
-- `fix:` Correção de bug (ex: `fix: ajustar responsividade no safari ios`)
-- `docs:` Alterações em documentação (ex: `docs: atualizar guia de instalacao`)
+Escreva mensagens de commit claras e objetivas no padrão **Conventional Commits**:
+- `feat:` Nova funcionalidade
+- `fix:` Correção de bug
+- `docs:` Alterações em documentação
 - `style:` Formatação visual sem alteração de lógica
 - `refactor:` Refatoração de código
 
@@ -101,14 +101,14 @@ git push origin feature/minha-nova-funcionalidade
 3. Preencha a descrição do PR explicando:
    - Qual problema foi resolvido ou qual funcionalidade foi criada.
    - Como testar a alteração.
-   - Screenshots ou gifs (se houver alterações visuais na interface).
-4. Clique em **Create pull request**!
+   - Screenshots (se houver alterações visuais na interface).
+4. Clique em **Create pull request**.
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
-Para ajudar você a se localizar rapidamente no código:
+Guia rápido dos diretórios do código:
 
 ```text
 FloraCare/
@@ -126,6 +126,7 @@ FloraCare/
 │   │   ├── Navbar.jsx                   # Cabeçalho com status e navegação
 │   │   ├── PlantCard.jsx                # Cartão de exibição da planta
 │   │   ├── PlantDetailModal.jsx         # Detalhes, mudas e edição
+│   │   ├── SettingsModal.jsx            # Configurações de tema e preferências
 │   │   └── UpdatesNotificationModal.jsx # Central de novidades & releases
 │   ├── services/            # Serviços de integração e dados
 │   │   ├── geminiService.js             # Chamadas à API Google Gemini Flash
@@ -133,7 +134,7 @@ FloraCare/
 │   │   ├── storageService.js            # Armazenamento IndexedDB e LocalStorage
 │   │   └── updatesData.js               # Histórico de versões e changelog in-app
 │   ├── styles/
-│   │   └── index.css                    # Design System Botânico com variáveis CSS
+│   │   └── index.css                    # Design System Botânico com suporte a temas
 │   ├── App.jsx              # Componente raiz da aplicação
 │   └── main.jsx             # Ponto de entrada com registro do Service Worker
 ├── CHANGELOG.md             # Histórico formal de mudanças de versão
@@ -144,9 +145,9 @@ FloraCare/
 
 ---
 
-## 💡 Ideias do Backlog para Contribuir
+## Ideias do Backlog para Contribuir
 
-Se você quer ajudar mas não sabe por onde começar, veja algumas ideias abertas:
+Sugestões abertas para colaboração:
 - [ ] **Lembretes Locais com Notificações do Navegador**: Usar a API nativa `Notification` para alertar quando uma planta estiver com sede.
 - [ ] **Caderno do Voluntário Worldpackers**: Aba para registrar plantas catalogadas por viagem/fazenda/hostel.
 - [ ] **Exportação em PDF do Guia de Cultivo**: Gerar fichas botânicas para impressão ou compartilhamento.
@@ -154,18 +155,15 @@ Se você quer ajudar mas não sabe por onde começar, veja algumas ideias aberta
 
 ---
 
-## 🐞 Como Reportar Bugs ou Sugerir Ideias
+## Como Reportar Bugs ou Sugerir Ideias
 
 Encontrou um erro ou tem uma sugestão?
 1. Acesse a aba **[Issues](https://github.com/naur-Io/FloraCare/issues)** do repositório.
 2. Antes de abrir uma nova issue, pesquise se outra pessoa já não relatou o mesmo assunto.
-3. Se for um novo bug, informe:
-   - Passos para reproduzir o problema.
-   - Navegador e sistema operacional (ex: Chrome no Android 14, Safari no iOS 17).
-   - Comportamento esperado vs. Comportamento observado.
+3. Se for um novo bug, informe os passos para reproduzir o problema, navegador e sistema operacional.
 
 ---
 
-## 💚 Obrigado!
+## Agradecimentos
 
-Toda contribuição — seja uma vírgula na documentação, uma ideia de design ou uma grande funcionalidade — faz o **Canto Alegre** florescer. Muito obrigado por cultivar este projeto conosco!
+Toda contribuição faz o **Canto Alegre** florescer. Muito obrigado por cultivar este projeto conosco!

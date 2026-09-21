@@ -92,7 +92,7 @@ export default function IntroGuideModal({
             </div>
             <div>
               <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.25rem', fontWeight: '700', color: '#fff' }}>
-                Canto Alegre 🌿
+                Canto Alegre
               </div>
               <div style={{ fontSize: '0.78rem', color: 'var(--primary-400)' }}>
                 Guia de Introdução & Configurações Rápidas
@@ -312,7 +312,7 @@ export default function IntroGuideModal({
 
                 {configSuccess && (
                   <div style={{ color: '#86efac', fontSize: '0.85rem', marginBottom: '12px' }}>
-                    ✓ Chave configurada com sucesso! IA Gemini ativada.
+                    Chave configurada com sucesso. IA Gemini ativada.
                   </div>
                 )}
 
