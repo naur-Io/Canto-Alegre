@@ -238,11 +238,41 @@ button, input, select, textarea {
   display: block;
 }
 
-/* Navbar Actions */
-.nav-actions {
+.navbar-main-row {
+  display: contents;
+}
+
+.brand {
+  order: 1;
+}
+
+/* Secondary Actions Group (Novidades, Guia, Instalar, IA) */
+.nav-secondary-actions {
+  order: 2;
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+/* Primary Actions Group (Tema, Configurações, Nova Planta) */
+.nav-primary-actions {
+  order: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn-theme,
+.nav-btn-settings {
+  width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
 }
 
 .btn {
@@ -1173,13 +1203,120 @@ html, body {
 }
 
 /* Responsive Breakpoints */
-@media (max-width: 768px) {
+@media (max-width: 860px) {
   .nav-btn-text-full {
     display: none;
   }
   .nav-btn-text-short {
     display: inline;
   }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 0 8px 0;
+    margin-bottom: 16px;
+  }
+
+  .navbar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .navbar-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .brand {
+    order: unset;
+    gap: 8px;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+  }
+
+  .brand-title {
+    font-size: 1.18rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .nav-primary-actions {
+    order: unset;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .nav-primary-actions .btn {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+
+  .nav-btn-theme,
+  .nav-btn-settings {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-secondary-actions {
+    order: unset;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 1px 0 3px 0;
+  }
+
+  .nav-secondary-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-secondary-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding: 7px 6px;
+    font-size: 0.76rem;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .nav-secondary-actions .btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-secondary-actions .btn svg {
+    flex-shrink: 0;
+  }
+
   .plant-details-grid {
     grid-template-columns: 1fr;
   }
@@ -1188,32 +1325,6 @@ html, body {
 @media (max-width: 640px) {
   .app-container {
     padding: 0 12px;
-  }
-  .navbar {
-    padding: 10px 0;
-    margin-bottom: 16px;
-  }
-  .navbar-content {
-    gap: 8px;
-  }
-  .brand-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: var(--radius-sm);
-  }
-  .brand-title {
-    font-size: 1.2rem;
-  }
-  .brand-subtitle {
-    display: none;
-  }
-  .nav-actions {
-    gap: 6px;
-  }
-  .nav-actions .btn {
-    padding: 7px 10px;
-    font-size: 0.78rem;
-    gap: 5px;
   }
   .hero-header {
     padding: 18px 16px;
@@ -1278,7 +1389,7 @@ html, body {
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 480px) {
   .brand-title {
     font-size: 1.05rem;
   }
@@ -1286,14 +1397,42 @@ html, body {
     width: 30px;
     height: 30px;
   }
-  .nav-actions .btn {
-    padding: 6px 8px;
-    font-size: 0.725rem;
+  .nav-btn-theme,
+  .nav-btn-settings {
+    width: 32px;
+    height: 32px;
+  }
+  .nav-primary-actions {
     gap: 4px;
   }
-  .nav-actions .btn svg {
+  .nav-primary-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+  .nav-secondary-actions {
+    gap: 4px;
+  }
+  .nav-secondary-actions .btn {
+    padding: 6px 4px;
+    font-size: 0.72rem;
+    gap: 3px;
+  }
+  .nav-secondary-actions .btn svg {
     width: 13px;
     height: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand-title {
+    font-size: 0.95rem;
+  }
+  .nav-secondary-actions .btn span {
+    display: none;
+  }
+  .nav-secondary-actions .btn {
+    padding: 7px 0;
   }
 }
 

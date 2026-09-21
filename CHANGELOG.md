@@ -45,6 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Open-Source Contribution Guide:
   - Created `CONTRIBUTING.md` with step-by-step Fork & Pull Request instructions, project directory breakdown, and development guidelines.
   - Created `.gitignore` to prevent committing build artifacts and dependencies.
+- Responsive Mobile Header & Action Bar:
+  - Redesigned top navigation into a two-tier responsive layout on screens <= 768px.
+  - Row 1 displays Brand, Quick Theme Toggle, Settings, and Primary "+ Nova Planta" CTA.
+  - Row 2 provides a fluid action bar for Updates/Notifications, Guide & PWA, Install, and Gemini AI status.
+  - Zero horizontal overflow on any smartphone display (tested down to 320px).
 
 ---
 

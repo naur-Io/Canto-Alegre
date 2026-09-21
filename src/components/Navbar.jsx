@@ -17,17 +17,55 @@ export default function Navbar({
   return (
     <header className="navbar">
       <div className="app-container navbar-content">
-        <div className="brand" onClick={onOpenGuide} style={{ cursor: 'pointer' }} title="Clique para ver o Guia do Canto Alegre">
-          <div className="brand-icon">
-            <Leaf size={20} />
+        {/* Linha Principal (ou Esquerda/Direita integrados no Desktop) */}
+        <div className="navbar-main-row">
+          <div className="brand" onClick={onOpenGuide} style={{ cursor: 'pointer' }} title="Clique para ver o Guia do Canto Alegre">
+            <div className="brand-icon">
+              <Leaf size={20} />
+            </div>
+            <div className="brand-info">
+              <span className="brand-title">Canto Alegre</span>
+              <span className="brand-subtitle">IA Botânica & Mudas</span>
+            </div>
           </div>
-          <div className="brand-info">
-            <span className="brand-title">Canto Alegre</span>
-            <span className="brand-subtitle">IA Botânica & Mudas</span>
+
+          {/* Grupo de Ações Primárias (Tema, Configurações e Nova Planta) */}
+          <div className="nav-primary-actions">
+            {/* Botão de Alternar Tema Rápido */}
+            <button 
+              className="btn btn-secondary btn-sm nav-btn-theme"
+              onClick={onToggleTheme}
+              title={currentTheme === 'dark' ? "Mudar para Tema Claro" : "Mudar para Tema Escuro"}
+              aria-label="Alternar Tema"
+            >
+              {currentTheme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#3b82f6" />}
+            </button>
+
+            {/* Botão de Configurações */}
+            <button 
+              className="btn btn-secondary btn-sm nav-btn-settings"
+              onClick={onOpenSettings}
+              title="Configurações do Canto Alegre"
+              aria-label="Configurações"
+            >
+              <Settings size={15} />
+            </button>
+
+            {/* Botão Adicionar Planta (CTA Principal) */}
+            <button 
+              className="btn btn-primary btn-sm nav-btn-add"
+              onClick={onAddClick}
+              title="Adicionar nova planta ao jardim"
+            >
+              <Plus size={16} />
+              <span className="nav-btn-text-full">Nova Planta</span>
+              <span className="nav-btn-text-short">Planta</span>
+            </button>
           </div>
         </div>
 
-        <div className="nav-actions">
+        {/* Grupo de Ações Secundárias (Novidades, Guia, Instalar PWA, Status IA) */}
+        <div className="nav-secondary-actions">
           {/* Botão Notificações / Atualizações */}
           <button 
             className="btn btn-secondary btn-sm nav-btn-updates"
@@ -40,6 +78,7 @@ export default function Navbar({
               <span className="unread-dot-badge" />
             )}
             <span className="nav-btn-text-full">Novidades</span>
+            <span className="nav-btn-text-short">Novidades</span>
           </button>
 
           {/* Botão Guia / Apresentação */}
@@ -66,6 +105,7 @@ export default function Navbar({
             </button>
           )}
 
+          {/* Botão Status do Motor de IA */}
           <button 
             className={`btn ${hasApiKey ? 'btn-key-active' : 'btn-secondary'} btn-sm nav-btn-key`}
             onClick={onOpenKeyModal}
@@ -86,33 +126,6 @@ export default function Navbar({
                 <span className="nav-btn-text-short">Simulado</span>
               </>
             )}
-          </button>
-
-          {/* Botão de Alternar Tema Rápido */}
-          <button 
-            className="btn btn-secondary btn-sm nav-btn-theme"
-            onClick={onToggleTheme}
-            title={currentTheme === 'dark' ? "Mudar para Tema Claro" : "Mudar para Tema Escuro"}
-          >
-            {currentTheme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#3b82f6" />}
-          </button>
-
-          {/* Botão de Configurações */}
-          <button 
-            className="btn btn-secondary btn-sm nav-btn-settings"
-            onClick={onOpenSettings}
-            title="Configurações do Canto Alegre"
-          >
-            <Settings size={15} />
-          </button>
-
-          <button 
-            className="btn btn-primary btn-sm nav-btn-add"
-            onClick={onAddClick}
-          >
-            <Plus size={16} />
-            <span className="nav-btn-text-full">Nova Planta</span>
-            <span className="nav-btn-text-short">Adicionar</span>
           </button>
         </div>
       </div>

@@ -42,6 +42,11 @@ export const APP_UPDATES = [
         type: 'web',
         title: 'Página de Apresentação Web',
         desc: 'Nova landing page em /about.html com botão de download do PWA e resumo dos recursos para compartilhar.'
+      },
+      {
+        type: 'responsive',
+        title: 'Navbar Totalmente Responsiva no Mobile',
+        desc: 'Organização adaptativa em duas camadas para todos os botões e recursos, eliminando qualquer estouro lateral em celulares.'
       }
     ]
   },
