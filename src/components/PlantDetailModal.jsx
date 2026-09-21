@@ -97,12 +97,12 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
   const getLightInfo = (lightType, period) => {
     const type = lightType || (period?.toLowerCase().includes('direto') ? 'direta' : period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
     if (type === 'direta') {
-      return { label: 'Luz Direta (Sol Pleno)', color: '#b45309', bg: '#fef3c7', border: '#fde68a' };
+      return { label: 'Luz Direta (Sol Pleno)', badgeClass: 'badge-sun-direct' };
     }
     if (type === 'sombra') {
-      return { label: 'Sombra (Luz Baixa / Filtrada)', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
+      return { label: 'Sombra (Luz Baixa / Filtrada)', badgeClass: 'badge-shade' };
     }
-    return { label: 'Luz Indireta (Meia Sombra / Difusa)', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' };
+    return { label: 'Luz Indireta (Meia Sombra / Difusa)', badgeClass: 'badge-sun-indirect' };
   };
 
   const lightStyle = getLightInfo(plant.sunlight?.lightType, plant.sunlight?.period);
@@ -279,10 +279,10 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
               </div>
 
               {/* 4. GUIA DE MUDAS & PROPAGAÇÃO */}
-              <div className="form-section" style={{ background: '#f0fdf4', borderColor: '#bbf7d0' }}>
+              <div className="form-section">
                 <div className="form-section-header">
-                  <Sprout size={18} className="section-icon" color="#059669" />
-                  <h4 style={{ color: '#065f46' }}>Como Tirar Mudas (Propagação & Cultivo)</h4>
+                  <Sprout size={18} className="section-icon" />
+                  <h4>Como Tirar Mudas (Propagação & Cultivo)</h4>
                 </div>
 
                 <div className="form-row">
@@ -514,11 +514,8 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   
                   <div style={{ marginBottom: '8px' }}>
                     <span 
-                      className="badge" 
+                      className={`badge ${lightStyle.badgeClass}`}
                       style={{ 
-                        background: lightStyle.bg, 
-                        color: lightStyle.color, 
-                        border: `1px solid ${lightStyle.border}`,
                         fontSize: '0.78rem',
                         padding: '4px 10px'
                       }}

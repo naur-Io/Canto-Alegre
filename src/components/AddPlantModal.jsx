@@ -532,10 +532,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                 </div>
 
                 {/* 4. GUIA DE MUDAS & PROPAGAÇÃO */}
-                <div className="form-section" style={{ background: '#f0fdf4', borderColor: '#bbf7d0' }}>
+                <div className="form-section">
                   <div className="form-section-header">
-                    <Sprout size={18} className="section-icon" color="#059669" />
-                    <h4 style={{ color: '#065f46' }}>Como Tirar Mudas (Propagação & Cultivo)</h4>
+                    <Sprout size={18} className="section-icon" />
+                    <h4>Como Tirar Mudas (Propagação & Cultivo)</h4>
                   </div>
 
                   <div className="form-row">

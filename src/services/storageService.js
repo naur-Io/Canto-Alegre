@@ -206,7 +206,7 @@ export async function importGardenBackup(jsonString) {
 const THEME_STORAGE_KEY = 'cantoalegre_theme';
 
 export function getStoredTheme() {
-  return localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+  return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
 }
 
 export function saveTheme(theme) {
