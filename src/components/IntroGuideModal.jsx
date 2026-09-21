@@ -91,7 +91,7 @@ export default function IntroGuideModal({
               <Leaf size={20} color="#fff" />
             </div>
             <div>
-              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.25rem', fontWeight: '700', color: '#fff' }}>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: '1.25rem', fontWeight: '700', color: '#fff' }}>
                 Canto Alegre
               </div>
               <div style={{ fontSize: '0.78rem', color: 'var(--primary-400)' }}>
@@ -141,7 +141,7 @@ export default function IntroGuideModal({
           {activeTab === 0 && (
             <div className="intro-step-content">
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', color: '#fff', marginBottom: '6px' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.4rem', color: '#fff', marginBottom: '6px' }}>
                   Bem-vindo ao seu diário botânico inteligente!
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -245,7 +245,7 @@ export default function IntroGuideModal({
           {activeTab === 1 && (
             <div className="intro-step-content">
               <div style={{ marginBottom: '18px' }}>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.3rem', color: '#fff', marginBottom: '6px' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.3rem', color: '#fff', marginBottom: '6px' }}>
                   Configuração Imediata da IA
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
@@ -353,7 +353,7 @@ export default function IntroGuideModal({
                 }}>
                   <Smartphone size={28} color="#fff" />
                 </div>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.35rem', color: '#fff', marginBottom: '6px' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.35rem', color: '#fff', marginBottom: '6px' }}>
                   Instalar Canto Alegre no seu Aparelho
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
