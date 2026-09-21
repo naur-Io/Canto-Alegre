@@ -415,6 +415,23 @@
     }
 
     @media (max-width: 768px) {
+      header {
+        padding: 10px 14px;
+      }
+      .nav-container {
+        gap: 10px;
+      }
+      .brand-name {
+        font-size: 1.18rem;
+      }
+      .brand-tag {
+        display: none;
+      }
+      .nav-actions .btn {
+        padding: 8px 14px;
+        font-size: 0.84rem;
+        gap: 6px;
+      }
       .hero h1 {
         font-size: 2.2rem;
       }
@@ -424,6 +441,24 @@
       .pwa-banner {
         flex-direction: column;
         align-items: stretch;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand-logo {
+        width: 32px;
+        height: 32px;
+      }
+      .brand-logo img {
+        width: 20px;
+        height: 20px;
+      }
+      .brand-name {
+        font-size: 1.05rem;
+      }
+      .nav-actions .btn {
+        padding: 7px 10px;
+        font-size: 0.78rem;
       }
     }
   </style>
@@ -447,8 +482,13 @@
         <button id="btnInstallPwaTop" class="btn btn-install btn-sm" style="display: none;">
           Instalar App
         </button>
-        <a href="/" class="btn btn-primary">
-          Abrir Aplicativo
+        <a href="/" class="btn btn-primary" title="Acessar o aplicativo Canto Alegre">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Ir para o App</span>
         </a>
       </div>
     </div>
