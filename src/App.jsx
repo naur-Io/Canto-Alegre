@@ -6,8 +6,20 @@ import PlantCard from './components/PlantCard';
 import PlantDetailModal from './components/PlantDetailModal';
 import AddPlantModal from './components/AddPlantModal';
 import ApiKeyModal from './components/ApiKeyModal';
+import IntroGuideModal from './components/IntroGuideModal';
+import UpdatesNotificationModal from './components/UpdatesNotificationModal';
 
-import { getStoredPlants, savePlant, deletePlant, markAsWatered, getStoredApiKey } from './services/storageService';
+import { 
+  getStoredPlants, 
+  savePlant, 
+  deletePlant, 
+  markAsWatered, 
+  getStoredApiKey, 
+  hasSeenIntroGuide,
+  hasUnreadUpdates,
+  markVersionAsSeen
+} from './services/storageService';
+import { LATEST_VERSION } from './services/updatesData';
 
 export default function App() {
   const [plants, setPlants] = useState([]);
@@ -17,12 +29,63 @@ export default function App() {
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
+  const [showUpdatesModal, setShowUpdatesModal] = useState(false);
+  const [unreadUpdates, setUnreadUpdates] = useState(false);
+  const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
     loadPlants();
     setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''));
+    setUnreadUpdates(hasUnreadUpdates(LATEST_VERSION));
+
+    // Exibir Guia de Introdução no primeiro acesso
+    if (!hasSeenIntroGuide()) {
+      setShowGuideModal(true);
+    }
+
+    // Capturar suporte a instalação PWA
+    const handleBeforeInstall = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    const handleAppInstalled = () => {
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+      console.log('Canto Alegre PWA instalado com sucesso!');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
+
+  const handleInstallPwa = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsInstallable(false);
+      }
+      setDeferredPrompt(null);
+    } else {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIos) {
+        alert("Para instalar no iPhone/iPad:\n1. Toque no ícone Compartilhar (⎋) no Safari;\n2. Toque em 'Adicionar à Tela de Início' 🌿.");
+      } else {
+        alert("Para instalar:\nAbra o menu do navegador (⋮) e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+      }
+    }
+  };
 
   const loadPlants = async () => {
     const data = await getStoredPlants();
@@ -119,6 +182,15 @@ export default function App() {
         plantCount={totalCount}
         onAddClick={() => setShowAddModal(true)}
         onOpenKeyModal={() => setShowKeyModal(true)}
+        onOpenGuide={() => setShowGuideModal(true)}
+        onOpenUpdates={() => {
+          setShowUpdatesModal(true);
+          setUnreadUpdates(false);
+          markVersionAsSeen(LATEST_VERSION);
+        }}
+        hasUnreadUpdates={unreadUpdates}
+        isInstallable={isInstallable}
+        onInstallApp={handleInstallPwa}
       />
 
       <main className="app-container">
@@ -247,6 +319,26 @@ export default function App() {
         <ApiKeyModal 
           onClose={() => setShowKeyModal(false)}
           onKeySaved={(hasKey) => setHasApiKey(hasKey)}
+        />
+      )}
+
+      {showGuideModal && (
+        <IntroGuideModal 
+          isOpen={showGuideModal}
+          onClose={() => setShowGuideModal(false)}
+          hasApiKey={hasApiKey}
+          onKeySaved={(hasKey) => setHasApiKey(hasKey)}
+          installPrompt={deferredPrompt}
+          onInstallApp={handleInstallPwa}
+        />
+      )}
+
+      {showUpdatesModal && (
+        <UpdatesNotificationModal 
+          isOpen={showUpdatesModal}
+          onClose={() => setShowUpdatesModal(false)}
+          swUpdateAvailable={swUpdateAvailable}
+          onReloadApp={() => window.location.reload()}
         />
       )}
     </div>

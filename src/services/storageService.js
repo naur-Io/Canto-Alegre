@@ -1,9 +1,12 @@
 import { get, set } from 'idb-keyval';
 import { INITIAL_PLANTS } from './mockData';
 
-const PLANTS_STORAGE_KEY = 'floracare_user_plants_v1';
-const API_KEY_STORAGE_KEY = 'floracare_gemini_api_key';
-const INITIALIZED_FLAG_KEY = 'floracare_has_initialized_v1';
+const PLANTS_STORAGE_KEY = 'cantoalegre_user_plants_v1';
+const LEGACY_PLANTS_KEY = 'floracare_user_plants_v1';
+const API_KEY_STORAGE_KEY = 'cantoalegre_gemini_api_key';
+const LEGACY_API_KEY = 'floracare_gemini_api_key';
+const INITIALIZED_FLAG_KEY = 'cantoalegre_has_initialized_v1';
+const INTRO_COMPLETED_KEY = 'cantoalegre_intro_completed';
 
 // Sincroniza dados em ambos os armazenamentos (IndexedDB + LocalStorage)
 async function persistToAllStorages(plants) {
@@ -25,11 +28,17 @@ async function persistToAllStorages(plants) {
 
 // Carregar todas as plantas salvas pelo usuário
 export async function getStoredPlants() {
-  const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true';
+  const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true' || localStorage.getItem('floracare_has_initialized_v1') === 'true';
 
-  // 1. Tentar ler do IndexedDB
+  // 1. Tentar ler do IndexedDB (chave nova ou antiga)
   try {
-    const idbData = await get(PLANTS_STORAGE_KEY);
+    let idbData = await get(PLANTS_STORAGE_KEY);
+    if (!idbData) {
+      idbData = await get(LEGACY_PLANTS_KEY);
+      if (idbData && Array.isArray(idbData)) {
+        await set(PLANTS_STORAGE_KEY, idbData);
+      }
+    }
     if (idbData !== undefined && idbData !== null && Array.isArray(idbData)) {
       return idbData;
     }
@@ -37,14 +46,15 @@ export async function getStoredPlants() {
     console.warn('IndexedDB não disponível, verificando localStorage:', error);
   }
 
-  // 2. Tentar ler do LocalStorage
+  // 2. Tentar ler do LocalStorage (chave nova ou antiga)
   try {
-    const localData = localStorage.getItem(PLANTS_STORAGE_KEY);
+    let localData = localStorage.getItem(PLANTS_STORAGE_KEY) || localStorage.getItem(LEGACY_PLANTS_KEY);
     if (localData) {
       const parsed = JSON.parse(localData);
       if (Array.isArray(parsed)) {
         // Sincronizar de volta para o IndexedDB
         set(PLANTS_STORAGE_KEY, parsed).catch(() => {});
+        localStorage.setItem(PLANTS_STORAGE_KEY, localData);
         return parsed;
       }
     }
@@ -118,7 +128,7 @@ export async function markAsWatered(plantId) {
 
 // Gerenciamento da Chave de API Gemini
 export function getStoredApiKey() {
-  const raw = localStorage.getItem(API_KEY_STORAGE_KEY) || '';
+  const raw = localStorage.getItem(API_KEY_STORAGE_KEY) || localStorage.getItem(LEGACY_API_KEY) || '';
   const matchAiza = raw.match(/AIzaSy[A-Za-z0-9_-]{30,}/);
   if (matchAiza) return matchAiza[0];
   const matchAQ = raw.match(/AQ\.[A-Za-z0-9_.-]{30,}/);
@@ -135,7 +145,33 @@ export function saveApiKey(key) {
     localStorage.setItem(API_KEY_STORAGE_KEY, clean);
   } else {
     localStorage.removeItem(API_KEY_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_API_KEY);
   }
+}
+
+// Controle de exibição do Guia de Introdução Onboarding
+export function hasSeenIntroGuide() {
+  return localStorage.getItem(INTRO_COMPLETED_KEY) === 'true';
+}
+
+export function markIntroGuideSeen() {
+  localStorage.setItem(INTRO_COMPLETED_KEY, 'true');
+}
+
+// Controle de Notificações de Atualizações / Novidades
+const LAST_SEEN_VERSION_KEY = 'cantoalegre_last_seen_version';
+
+export function getLastSeenVersion() {
+  return localStorage.getItem(LAST_SEEN_VERSION_KEY) || '';
+}
+
+export function markVersionAsSeen(version) {
+  localStorage.setItem(LAST_SEEN_VERSION_KEY, version);
+}
+
+export function hasUnreadUpdates(latestVersion) {
+  const seen = getLastSeenVersion();
+  return seen !== latestVersion;
 }
 
 // Exportar todos os dados do jardim (Backup)

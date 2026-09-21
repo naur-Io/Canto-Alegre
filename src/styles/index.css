@@ -1197,3 +1197,135 @@ html, body {
     height: 13px;
   }
 }
+
+/* =========================================
+   PWA & Intro Guide Modal Styles
+   ========================================= */
+.btn-install {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.35);
+  font-weight: 600;
+}
+.btn-install:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(245, 158, 11, 0.45);
+}
+
+.intro-modal-container {
+  background: radial-gradient(circle at 50% 0%, #17482c 0%, #0d281a 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.intro-tabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.intro-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.intro-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.intro-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+.intro-tab-btn.active {
+  color: #34d399;
+  border-bottom-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.intro-card-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease;
+}
+.intro-card-feature:hover {
+  transform: translateY(-2px);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.intro-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   Updates & Notification Styles
+   ========================================= */
+.unread-dot-badge {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 1.5px solid #0f271b;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.8;
+  }
+}
+
+.updates-modal-container {
+  background: radial-gradient(circle at 50% 0%, #17482c 0%, #0c2417 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.update-card {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.update-card:hover {
+  border-color: rgba(52, 211, 153, 0.45);
+}
+
+.spin-icon {
+  animation: spin 3s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+

@@ -18,6 +18,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-09-21
+
+### Added
+- 🏷️ **Canto Alegre Rebranding**:
+  - Renamed application to **Canto Alegre 🌿**, representing botanical joy, nature, and practical gardening.
+  - Updated `package.json`, `index.html`, `manifest.json`, `Navbar`, modals, and storage services with seamless backward-compatible data migration.
+- 📱 **Progressive Web App (PWA) & Offline Mode**:
+  - Native Service Worker (`sw.js`) with smart caching (Cache-First for assets, Network-First for navigation, and offline fallback for Gemini API).
+  - High-resolution icons generated from vector SVG: `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, and `favicon-64.png`.
+  - Native `beforeinstallprompt` event handler enabling 1-click installation from Navbar, Intro Modal, and About page.
+  - 100% offline data resilience powered by IndexedDB (`idb-keyval`).
+- 🧭 **Interactive Welcome & Onboarding Guide (`IntroGuideModal.jsx`)**:
+  - Step-by-step onboarding for first-time users explaining Photo AI Identification, Cutting & Propagation, Watering alerts, and Offline capabilities.
+  - **Immediate Configurations**: In-guide Google AI Studio API key validator or 1-click simulation mode selection.
+  - Re-accessible at any time directly from the Navbar.
+- 🔔 **In-App Updates & Notifications Center (`UpdatesNotificationModal.jsx`)**:
+  - Navbar bell icon with dynamic unread badge indicating new feature releases.
+  - Interactive release timeline and changelog accessible directly inside the app.
+  - Service Worker update detection banner with 1-click app reload.
+- 🌐 **Presentation Landing Page (`about.html`)**:
+  - Standalone, ultra-fast botanical landing page with feature cards, direct app launch, and PWA download actions.
+- 🤝 **Open-Source Contribution Guide**:
+  - Created `CONTRIBUTING.md` with step-by-step Fork & Pull Request instructions, project directory breakdown, and development guidelines.
+  - Created `.gitignore` to prevent committing build artifacts and dependencies.
+
+---
+
 ## [1.0.0] - 2026-08-13
 
 ### Added

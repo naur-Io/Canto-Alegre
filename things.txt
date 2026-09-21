@@ -1,0 +1,9 @@
+[x] Mudar o nome do aplicativo para Canto Alegre (Concluído)
+[x] Gerar ícones próprios PWA 192px e 512px (Concluído)
+[x] Configurar Service Worker nativo e cache offline (Concluído)
+[x] Criar Guia de Introdução Onboarding no app com Configurações Imediatas (Concluído)
+[x] Criar página de apresentação web (about.html) com botão de baixar PWA (Concluído)
+[x] Atualizar README com copy pronta para o LinkedIn (Concluído)
+[ ] Fazer commit e push para o GitHub (naur-Io/FloraCare)
+[ ] Configurar deploy na Vercel ou Netlify (vercel.json / _redirects já inclusos)
+[ ] Publicar post no LinkedIn com o link do app no ar

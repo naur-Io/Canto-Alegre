@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#143e27">
+  <meta name="description" content="Canto Alegre - Seu assistente pessoal de jardinagem inteligente com IA para identificar espécies, tirar mudas e cultivar plantas de forma 100% offline.">
+  <title>Sobre o Canto Alegre 🌿 - Guia & Apresentação</title>
+
+  <!-- iOS / Apple Web App Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Canto Alegre">
+
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-900: #08180f;
+      --primary-800: #0f271b;
+      --primary-700: #143e27;
+      --primary-600: #10b981;
+      --primary-500: #34d399;
+      --primary-400: #6ee7b7;
+      --accent-gold: #f59e0b;
+      --accent-yellow: #fef08a;
+      --bg-dark: #07150d;
+      --card-bg: rgba(20, 62, 39, 0.45);
+      --card-border: rgba(52, 211, 153, 0.2);
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #174d30 0%, var(--bg-dark) 70%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 39, 27, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 20px;
+    }
+
+    .nav-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10b981, #047857);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .brand-logo img {
+      width: 26px;
+      height: 26px;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .brand-tag {
+      font-size: 0.75rem;
+      color: var(--primary-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .btn-install {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-install:hover {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1100px;
+      margin: 40px auto 20px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary-400);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #6ee7b7, #34d399, #fef08a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      max-width: 720px;
+      margin: 0 auto 32px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .app-icon-showcase {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .app-icon-showcase img {
+      width: 110px;
+      height: 110px;
+      border-radius: 26px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.35);
+      transition: transform 0.3s ease;
+    }
+
+    .app-icon-showcase img:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    /* Feature Grid */
+    .features-section {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 36px;
+      color: #ffffff;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.5);
+      background: rgba(20, 62, 39, 0.65);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      color: #ffffff;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .feature-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Guide & Settings Section */
+    .guide-section {
+      max-width: 1100px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .guide-card {
+      background: linear-gradient(135deg, rgba(20, 62, 39, 0.7), rgba(12, 37, 23, 0.9));
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .step-item {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .step-badge {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary-600);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: center;
+      line-height: 28px;
+      margin-bottom: 12px;
+    }
+
+    .step-item h4 {
+      color: #fff;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+
+    .step-item p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* PWA Install Banner */
+    .pwa-banner {
+      background: linear-gradient(135deg, #1b4b32, #0d281a);
+      border: 1px solid var(--accent-gold);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-top: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .pwa-banner-text h3 {
+      font-size: 1.25rem;
+      color: var(--accent-yellow);
+      margin-bottom: 6px;
+    }
+
+    .pwa-banner-text p {
+      color: #e2e8f0;
+      font-size: 0.92rem;
+      max-width: 600px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      border-top: 1px solid var(--card-border);
+      background: rgba(7, 21, 13, 0.9);
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--primary-400);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      .guide-card {
+        padding: 24px 18px;
+      }
+      .pwa-banner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <div class="brand-logo">
+          <img src="/icons/icon.svg" alt="Canto Alegre Logo">
+        </div>
+        <div>
+          <div class="brand-name">Canto Alegre</div>
+          <div class="brand-tag">IA Botânica & Mudas</div>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <button id="btnInstallPwaTop" class="btn btn-install btn-sm" style="display: none;">
+          📲 Instalar App
+        </button>
+        <a href="/" class="btn btn-primary">
+          🌿 Abrir Aplicativo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="app-icon-showcase">
+      <img src="/icons/icon-192.png" alt="Ícone Canto Alegre" width="110" height="110">
+    </div>
+
+    <div class="hero-badge">
+      ✨ IA Multimodal Google Gemini + PWA 100% Offline
+    </div>
+
+    <h1>
+      Canto Alegre 🌿<br>
+      <span>Cultive a vida, planta por planta.</span>
+    </h1>
+
+    <p>
+      Seu assistente botânico inteligente no bolso: tire uma foto da folha ou vaso para identificar a espécie, descobrir a rega e sol ideais, e aprender o passo a passo seguro para fazer mudas e propagação.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="/" class="btn btn-primary" style="font-size: 1.05rem; padding: 14px 28px;">
+        🚀 Entrar no Canto Alegre
+      </a>
+      <button id="btnInstallPwaHero" class="btn btn-install" style="font-size: 1.05rem; padding: 14px 28px;">
+        📲 Baixar como App (PWA)
+      </button>
+      <a href="https://github.com/naur-Io/FloraCare" target="_blank" rel="noreferrer" class="btn btn-secondary">
+        📂 Ver no GitHub
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features-section">
+    <h2 class="section-title">O que o Canto Alegre faz por você?</h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📸</div>
+        <h3>Identificação por Foto</h3>
+        <p>Aponte a câmera para qualquer planta. A IA analisa as folhas, nervuras e flores para reconhecer nome botânico, família e origem.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🌱</div>
+        <h3>Guia Completo de Mudas</h3>
+        <p>Aprenda a multiplicar sua coleção com instruções de estaquia, divisão de touceira e enraizamento, incluindo a melhor época do ano.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💧</div>
+        <h3>Alerta de Sede & Regas</h3>
+        <p>Acompanhe o cronograma de regas. Veja num relance quais plantas estão com sede e registre cada cuidado com um toque.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">☀️</div>
+        <h3>Sol & Luminosidade</h3>
+        <p>Descubra se a espécie prefere sol pleno, luz filtrada ou sombra, além da temperatura e umidade recomendadas para prosperar.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📴</div>
+        <h3>100% Offline (PWA)</h3>
+        <p>Funciona mesmo sem internet na roça ou na horta. Seus dados e fotos ficam guardados no seu navegador via IndexedDB com total privacidade.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Gratuito & Imediato</h3>
+        <p>Use diretamente no navegador com dados simulados ou conecte sua chave gratuita da Google AI Studio sem pagar mensalidades.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to Start & Immediate Settings -->
+  <section class="guide-section">
+    <div class="guide-card">
+      <h2 style="font-family: 'Playfair Display', serif; color: #fff; font-size: 1.85rem; margin-bottom: 10px;">
+        Guia Rápido de Início & Configurações
+      </h2>
+      <p style="color: var(--text-muted); font-size: 1rem;">
+        Você pode começar a usar o Canto Alegre em menos de 1 minuto. Siga as orientações abaixo:
+      </p>
+
+      <div class="steps-grid">
+        <div class="step-item">
+          <span class="step-badge">1</span>
+          <h4>Acesse ou Instale o App</h4>
+          <p>Abra o Canto Alegre pelo navegador ou clique em "Instalar App" para criar o atalho com ícone na tela inicial do seu celular ou computador.</p>
+        </div>
+
+        <div class="step-item">
+          <span class="step-badge">2</span>
+          <h4>Configuração da IA (Opcional)</h4>
+          <p>O app já funciona imediatamente em <strong>Modo Simulado</strong>. Para ativar a IA em tempo real, basta gerar uma chave gratuita em <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" style="color: var(--primary-400);">Google AI Studio</a> e colar no app.</p>
+        </div>
+
+        <div class="step-item">
+          <span class="step-badge">3</span>
+          <h4>Tire Fotos e Cultive</h4>
+          <p>Cadastre suas mudas, batize suas plantas, acompanhe quando precisam de água e torne seu espaço um verdadeiro Canto Alegre!</p>
+        </div>
+      </div>
+
+      <!-- PWA Install Card -->
+      <div class="pwa-banner">
+        <div class="pwa-banner-text">
+          <h3>📲 Instale o Canto Alegre no seu Dispositivo</h3>
+          <p>Como Progressive Web App (PWA), ele não consome armazenamento excessivo e funciona como um aplicativo nativo no seu Android, iPhone ou PC.</p>
+        </div>
+        <div>
+          <button id="btnInstallPwaBanner" class="btn btn-install" style="font-size: 1rem; padding: 12px 24px;">
+            Instalar Canto Alegre
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      Canto Alegre 🌿 &copy; 2026. Feito com amor botânico e inteligência artificial.
+      <br>
+      <a href="/">Entrar no App</a> &bull;
+      <a href="https://github.com/naur-Io/FloraCare" target="_blank" rel="noreferrer">Código-Fonte no GitHub</a>
+    </p>
+  </footer>
+
+  <!-- Script PWA Install Prompt & Service Worker Registration -->
+  <script>
+    let deferredPrompt = null;
+    const btnHero = document.getElementById('btnInstallPwaHero');
+    const btnTop = document.getElementById('btnInstallPwaTop');
+    const btnBanner = document.getElementById('btnInstallPwaBanner');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (btnTop) btnTop.style.display = 'inline-flex';
+    });
+
+    function triggerInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+          if (choice.outcome === 'accepted') {
+            console.log('Usuário aceitou instalar o PWA');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        // Detecção de iOS / Safari ou Navegador sem suporte direto
+        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIos) {
+          alert("Para instalar no seu iPhone/iPad:\n1. Toque no ícone Compartilhar (⎋) na barra do Safari;\n2. Role para baixo e selecione 'Adicionar à Tela de Início' 🌿.");
+        } else {
+          alert("Para instalar:\nAbra as opções do seu navegador (três pontinhos no canto superior) e clique em 'Instalar aplicativo' ou 'Adicionar à tela inicial'!");
+        }
+      }
+    }
+
+    if (btnHero) btnHero.addEventListener('click', triggerInstall);
+    if (btnTop) btnTop.addEventListener('click', triggerInstall);
+    if (btnBanner) btnBanner.addEventListener('click', triggerInstall);
+
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[Canto Alegre] Service Worker ativo:', reg.scope))
+          .catch(err => console.warn('[Canto Alegre] Erro ao registrar SW:', err));
+      });
+    }
+  </script>
+</body>
+</html>

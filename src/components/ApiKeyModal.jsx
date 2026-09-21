@@ -94,7 +94,7 @@ export default function ApiKeyModal({ onClose, onKeySaved }) {
 
         <div className="modal-body">
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-            O FloraCare utiliza a IA multimodal gratuita <strong>Google Gemini Flash</strong> para reconhecer espécies de plantas por foto, indicar cuidados completos e gerar o guia de mudas e cultivo.
+            O Canto Alegre utiliza a IA multimodal gratuita <strong>Google Gemini Flash</strong> para reconhecer espécies de plantas por foto, indicar cuidados completos e gerar o guia de mudas e cultivo.
           </p>
 
           <form onSubmit={handleValidateAndSave}>
