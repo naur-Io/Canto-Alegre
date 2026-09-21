@@ -7,3 +7,4 @@
 [ ] Fazer commit e push para o GitHub (naur-Io/FloraCare)
 [ ] Configurar deploy na Vercel ou Netlify (vercel.json / _redirects já inclusos)
 [ ] Publicar post no LinkedIn com o link do app no ar                                                           
+[ ] estudar essa api > https://my.plantnet.org/ e ver como posso usar no app para identificar plantas (talvez seja necessário criar uma conta e gerar uma chave de API)

@@ -170,7 +170,9 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  padding-bottom: 60px;
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 button, input, select, textarea {
@@ -192,8 +194,12 @@ button, input, select, textarea {
   z-index: 50;
   background: var(--surface-glass);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
-  padding: 14px 0;
+  padding-top: max(14px, calc(14px + env(safe-area-inset-top, 0px)));
+  padding-bottom: 14px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
   margin-bottom: 24px;
 }
 
@@ -672,7 +678,10 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding-top: max(16px, calc(16px + env(safe-area-inset-top, 0px)));
+  padding-bottom: max(16px, calc(16px + env(safe-area-inset-bottom, 0px)));
+  padding-left: max(12px, calc(12px + env(safe-area-inset-left, 0px)));
+  padding-right: max(12px, calc(12px + env(safe-area-inset-right, 0px)));
   box-sizing: border-box;
   overflow-x: hidden;
   animation: fadeIn 0.2s ease;
@@ -1216,7 +1225,10 @@ html, body {
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 10px 0 8px 0;
+    padding-top: max(12px, calc(10px + env(safe-area-inset-top, 0px)));
+    padding-bottom: 8px;
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
     margin-bottom: 16px;
   }
 
@@ -1629,5 +1641,23 @@ html, body {
   color: #ffffff;
 }
 
+/* =========================================
+   iOS Standalone PWA Safe Area Overrides
+   ========================================= */
+@media all and (display-mode: standalone) {
+  .navbar {
+    padding-top: max(20px, calc(12px + env(safe-area-inset-top, 24px)));
+  }
+}
 
-
+@supports (-webkit-touch-callout: none) {
+  @media all and (display-mode: standalone) {
+    .navbar {
+      /* Garante espaco seguro para notch, Dynamic Island e barra de status do iOS */
+      padding-top: max(44px, calc(12px + env(safe-area-inset-top, 44px)));
+    }
+    .modal-overlay {
+      padding-top: max(48px, calc(16px + env(safe-area-inset-top, 44px)));
+    }
+  }
+}
