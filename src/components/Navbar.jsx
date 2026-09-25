@@ -1,5 +1,6 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Sun, Moon } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Sun, Moon, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
+import { TRANSLATIONS } from '../services/i18n';
 
 export default function Navbar({ 
   hasApiKey, 
@@ -12,26 +13,70 @@ export default function Navbar({
   onToggleTheme,
   onOpenSettings,
   isInstallable, 
-  onInstallApp 
+  onInstallApp,
+  currentView = 'landing',
+  onSwitchView,
+  currentLang = 'pt-BR',
+  onLanguageChange,
+  onOpenFeedback
 }) {
+  const t = TRANSLATIONS[currentLang]?.nav || TRANSLATIONS['pt-BR'].nav;
+
   return (
     <header className="navbar">
       <div className="app-container navbar-content">
-        {/* Linha Principal (ou Esquerda/Direita integrados no Desktop) */}
+        {/* Linha Principal */}
         <div className="navbar-main-row">
-          <div className="brand" onClick={onOpenGuide} style={{ cursor: 'pointer' }} title="Clique para ver o Guia do Canto Alegre">
+          <div 
+            className="brand" 
+            onClick={() => onSwitchView && onSwitchView(currentView === 'landing' ? 'garden' : 'landing')} 
+            style={{ cursor: 'pointer' }} 
+            title="Canto Alegre"
+          >
             <div className="brand-icon">
               <Leaf size={20} />
             </div>
             <div className="brand-info">
               <span className="brand-title">Canto Alegre</span>
-              <span className="brand-subtitle">IA Botânica & Mudas</span>
+              <span className="brand-subtitle">{t.brandTag}</span>
             </div>
           </div>
 
-          {/* Grupo de Ações Primárias (Tema, Configurações e Nova Planta) */}
+          {/* Grupo de Ações Primárias (Idioma, Tema, Alternador de Tela e Nova Planta) */}
           <div className="nav-primary-actions">
-            {/* Botão de Alternar Tema Rápido */}
+            {/* Alternador de Idioma (PT-BR / EN) */}
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => onLanguageChange && onLanguageChange(currentLang === 'pt-BR' ? 'en' : 'pt-BR')}
+              title="Mudar idioma / Switch language"
+              aria-label="Alternar Idioma"
+              style={{ fontWeight: 700, padding: '6px 10px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Globe size={14} />
+              <span>{currentLang === 'pt-BR' ? 'PT-BR' : 'EN'}</span>
+            </button>
+
+            {/* Alternador de Tela (Apresentacao vs Meu Jardim) */}
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => onSwitchView && onSwitchView(currentView === 'landing' ? 'garden' : 'landing')}
+              title={currentView === 'landing' ? t.myGarden : t.presentation}
+              style={{ fontWeight: 600, padding: '6px 12px' }}
+            >
+              {currentView === 'landing' ? (
+                <>
+                  <Layout size={14} />
+                  <span className="nav-btn-text-full">{t.myGarden}</span>
+                </>
+              ) : (
+                <>
+                  <BookOpen size={14} />
+                  <span className="nav-btn-text-full">{t.presentation}</span>
+                </>
+              )}
+            </button>
+
+            {/* Alternar Tema Visual */}
             <button 
               className="btn btn-secondary btn-sm nav-btn-theme"
               onClick={onToggleTheme}
@@ -41,36 +86,49 @@ export default function Navbar({
               {currentTheme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#3b82f6" />}
             </button>
 
-            {/* Botão de Configurações */}
+            {/* Configuracoes */}
             <button 
               className="btn btn-secondary btn-sm nav-btn-settings"
               onClick={onOpenSettings}
-              title="Configurações do Canto Alegre"
-              aria-label="Configurações"
+              title="Configuracoes do Canto Alegre"
+              aria-label="Configuracoes"
             >
               <Settings size={15} />
             </button>
 
-            {/* Botão Adicionar Planta (CTA Principal) */}
-            <button 
-              className="btn btn-primary btn-sm nav-btn-add"
-              onClick={onAddClick}
-              title="Adicionar nova planta ao jardim"
-            >
-              <Plus size={16} />
-              <span className="nav-btn-text-full">Nova Planta</span>
-              <span className="nav-btn-text-short">Planta</span>
-            </button>
+            {/* CTA Adicionar Planta */}
+            {currentView === 'garden' && (
+              <button 
+                className="btn btn-primary btn-sm nav-btn-add"
+                onClick={onAddClick}
+                title="Adicionar nova planta ao jardim"
+              >
+                <Plus size={16} />
+                <span className="nav-btn-text-full">Nova Planta</span>
+                <span className="nav-btn-text-short">Planta</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Grupo de Ações Secundárias (Novidades, Guia, Instalar PWA, Status IA) */}
+        {/* Grupo de Ações Secundárias */}
         <div className="nav-secondary-actions">
-          {/* Botão Notificações / Atualizações */}
+          {/* Feedback & Suporte */}
+          <button 
+            className="btn btn-secondary btn-sm"
+            onClick={onOpenFeedback}
+            title={t.feedback}
+          >
+            <MessageSquare size={14} />
+            <span className="nav-btn-text-full">{t.feedback}</span>
+            <span className="nav-btn-text-short">Suporte</span>
+          </button>
+
+          {/* Notificacoes / Atualizacoes */}
           <button 
             className="btn btn-secondary btn-sm nav-btn-updates"
             onClick={onOpenUpdates}
-            title="Novidades & Atualizações do Canto Alegre"
+            title="Novidades & Atualizacoes do Canto Alegre"
             style={{ position: 'relative' }}
           >
             <Bell size={14} />
@@ -81,7 +139,7 @@ export default function Navbar({
             <span className="nav-btn-text-short">Novidades</span>
           </button>
 
-          {/* Botão Guia / Apresentação */}
+          {/* Guia & PWA */}
           <button 
             className="btn btn-secondary btn-sm nav-btn-guide"
             onClick={onOpenGuide}
@@ -92,7 +150,7 @@ export default function Navbar({
             <span className="nav-btn-text-short">Guia</span>
           </button>
 
-          {/* Botão de Instalar PWA se disponível */}
+          {/* Instalar App */}
           {isInstallable && (
             <button 
               className="btn btn-install btn-sm nav-btn-install"
@@ -100,16 +158,16 @@ export default function Navbar({
               title="Instalar Canto Alegre no seu dispositivo"
             >
               <Download size={14} />
-              <span className="nav-btn-text-full">Instalar App</span>
+              <span className="nav-btn-text-full">{t.installApp}</span>
               <span className="nav-btn-text-short">Instalar</span>
             </button>
           )}
 
-          {/* Botão Status do Motor de IA */}
+          {/* Status IA Gemini */}
           <button 
             className={`btn ${hasApiKey ? 'btn-key-active' : 'btn-secondary'} btn-sm nav-btn-key`}
             onClick={onOpenKeyModal}
-            title={hasApiKey ? "Chave API Gemini Conectada (Clique para alterar)" : "Modo Simulação Ativo (Clique para configurar chave)"}
+            title={hasApiKey ? "Chave API Gemini Conectada (Clique para alterar)" : "Modo Simulacao Ativo (Clique para configurar chave)"}
           >
             {hasApiKey ? (
               <>

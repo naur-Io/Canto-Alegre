@@ -18,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-09-25
+
+### Added
+- Tela de Apresentacao do Produto (Landing Page) & Suporte Bilingue:
+  - Nova Tela de Apresentacao do Produto integrada com o proposito do aplicativo, botao de acao "Adquirir e Usar Agora" / "Abrir o Aplicativo" e secao de creditos no rodape.
+  - Guia ilustrado de instalacao PWA passo a passo para dispositivos Android (Chrome / Edge / Samsung) e iOS (Safari Compartilhar -> Adicionar a Tela de Inicio).
+  - Suporte Bilingue completo (Português PT-BR e Inglês EN) com alternador dinamico de idiomas na barra de navegacao (`Navbar.jsx`).
+  - Central de Feedbacks & Suporte com modal interativo (`FeedbackSupportModal.jsx`) para envio de sugestoes, relatorio de bugs e duvidas.
+  - Componente `PresentationLanding.jsx` responsivo com suporte a temas visuais Claro e Escuro.
+
+---
+
 ## [1.2.0] - 2026-09-25
 
 ### Added

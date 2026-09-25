@@ -9,6 +9,8 @@ import ApiKeyModal from './components/ApiKeyModal';
 import IntroGuideModal from './components/IntroGuideModal';
 import UpdatesNotificationModal from './components/UpdatesNotificationModal';
 import SettingsModal from './components/SettingsModal';
+import PresentationLanding from './components/PresentationLanding';
+import FeedbackSupportModal from './components/FeedbackSupportModal';
 
 import { 
   getStoredPlants, 
@@ -22,12 +24,15 @@ import {
   getStoredTheme,
   saveTheme
 } from './services/storageService';
+import { getStoredLanguage, saveLanguage } from './services/i18n';
 import { LATEST_VERSION } from './services/updatesData';
 
 export default function App() {
+  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'garden'
+  const [currentLang, setCurrentLang] = useState('pt-BR');
   const [plants, setPlants] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'needs_water' | 'direct_sun' | 'indirect_light' | 'shade'
+  const [activeFilter, setActiveFilter] = useState('all');
 
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -35,6 +40,8 @@ export default function App() {
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [showUpdatesModal, setShowUpdatesModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
   const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
   const [unreadUpdates, setUnreadUpdates] = useState(false);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
@@ -45,15 +52,10 @@ export default function App() {
   useEffect(() => {
     saveTheme(currentTheme);
     loadPlants();
+    initLanguage();
     setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''));
     setUnreadUpdates(hasUnreadUpdates(LATEST_VERSION));
 
-    // Exibir Guia de Introdução no primeiro acesso
-    if (!hasSeenIntroGuide()) {
-      setShowGuideModal(true);
-    }
-
-    // Capturar suporte a instalação PWA
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -75,6 +77,16 @@ export default function App() {
     };
   }, []);
 
+  const initLanguage = async () => {
+    const lang = await getStoredLanguage();
+    setCurrentLang(lang);
+  };
+
+  const handleLanguageChange = async (newLang) => {
+    const applied = await saveLanguage(newLang);
+    setCurrentLang(applied);
+  };
+
   const handleInstallPwa = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -86,9 +98,13 @@ export default function App() {
     } else {
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       if (isIos) {
-        alert("Para instalar no iPhone/iPad:\n1. Toque no ícone Compartilhar (⎋) no Safari;\n2. Toque em 'Adicionar à Tela de Início'.");
+        alert(currentLang === 'en' 
+          ? "To install on iPhone/iPad:\n1. Tap the Share icon (⎋) in Safari;\n2. Tap 'Add to Home Screen'."
+          : "Para instalar no iPhone/iPad:\n1. Toque no icone Compartilhar (⎋) no Safari;\n2. Toque em 'Adicionar a Tela de Inicio'.");
       } else {
-        alert("Para instalar:\nAbra o menu do navegador (⋮) e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+        alert(currentLang === 'en'
+          ? "To install:\nOpen the browser menu (⋮) and select 'Install app' or 'Add to Home screen'."
+          : "Para instalar:\nAbra o menu do navegador (⋮) e selecione 'Instalar aplicativo' ou 'Adicionar a tela inicial'.");
       }
     }
   };
@@ -107,7 +123,6 @@ export default function App() {
     setPlants(data);
   };
 
-  // Marcar como regada
   const handleWaterPlant = async (plantId) => {
     const updated = await markAsWatered(plantId);
     setPlants(updated);
@@ -115,7 +130,6 @@ export default function App() {
       setSelectedPlant(prev => ({ ...prev, lastWatered: new Date().toISOString() }));
     }
 
-    // Efeito Festivo Confetti
     confetti({
       particleCount: 40,
       spread: 60,
@@ -124,7 +138,6 @@ export default function App() {
     });
   };
 
-  // Salvar ou Editar planta
   const handleSavePlant = async (plantData) => {
     const updated = await savePlant(plantData);
     setPlants(updated);
@@ -133,13 +146,11 @@ export default function App() {
     }
   };
 
-  // Excluir planta
   const handleDeletePlant = async (plantId) => {
     const updated = await deletePlant(plantId);
     setPlants(updated);
   };
 
-  // Calcular estatísticas do jardim
   const totalCount = plants.length;
   const now = new Date();
   const needsWaterCount = plants.filter(p => {
@@ -149,9 +160,7 @@ export default function App() {
     return diffHours >= (freq * 24 - 12);
   }).length;
 
-  // Filtragem de plantas
   const filteredPlants = plants.filter(p => {
-    // Busca abrangente
     const term = searchTerm.toLowerCase();
     const matchesSearch = 
       (p.commonName && p.commonName.toLowerCase().includes(term)) ||
@@ -165,7 +174,6 @@ export default function App() {
     
     if (!matchesSearch) return false;
 
-    // Filtros por categoria de cuidados e luz
     if (activeFilter === 'needs_water') {
       const last = new Date(p.lastWatered);
       const freq = p.watering?.frequencyDays || 3;
@@ -175,17 +183,9 @@ export default function App() {
 
     const lightType = p.sunlight?.lightType || (p.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : p.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
 
-    if (activeFilter === 'direct_sun') {
-      return lightType === 'direta';
-    }
-
-    if (activeFilter === 'indirect_light') {
-      return lightType === 'indireta';
-    }
-
-    if (activeFilter === 'shade') {
-      return lightType === 'sombra';
-    }
+    if (activeFilter === 'direct_sun') return lightType === 'direta';
+    if (activeFilter === 'indirect_light') return lightType === 'indireta';
+    if (activeFilter === 'shade') return lightType === 'sombra';
 
     return true;
   });
@@ -195,7 +195,10 @@ export default function App() {
       <Navbar 
         hasApiKey={hasApiKey}
         plantCount={totalCount}
-        onAddClick={() => setShowAddModal(true)}
+        onAddClick={() => {
+          setCurrentView('garden');
+          setShowAddModal(true);
+        }}
         onOpenKeyModal={() => setShowKeyModal(true)}
         onOpenGuide={() => setShowGuideModal(true)}
         onOpenUpdates={() => {
@@ -209,109 +212,132 @@ export default function App() {
         onOpenSettings={() => setShowSettingsModal(true)}
         isInstallable={isInstallable}
         onInstallApp={handleInstallPwa}
+        currentView={currentView}
+        onSwitchView={setCurrentView}
+        currentLang={currentLang}
+        onLanguageChange={handleLanguageChange}
+        onOpenFeedback={() => setShowFeedbackModal(true)}
       />
 
-      <main className="app-container">
-        {/* Banner Hero / Dashboard */}
-        <section className="hero-header">
-          <div className="hero-text">
-            <h1>Meu Jardim Inteligente</h1>
-            <p>Guia botânico completo com quantidade de luz, rega, origem, clima, tipo de solo e guia passo a passo para tirar mudas e cultivar.</p>
-          </div>
-
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">{totalCount}</div>
-              <div className="stat-label">Plantas Salvas</div>
+      {currentView === 'landing' ? (
+        <PresentationLanding 
+          currentLang={currentLang}
+          onLaunchApp={() => setCurrentView('garden')}
+          isInstallable={isInstallable}
+          onInstallApp={handleInstallPwa}
+          onOpenFeedback={() => setShowFeedbackModal(true)}
+        />
+      ) : (
+        <main className="app-container">
+          {/* Banner Hero / Dashboard do Jardim */}
+          <section className="hero-header">
+            <div className="hero-text">
+              <h1>{currentLang === 'en' ? 'My Smart Garden' : 'Meu Jardim Inteligente'}</h1>
+              <p>
+                {currentLang === 'en'
+                  ? 'Complete botanical guide with light, watering, origin, soil type, and step-by-step cutting propagation instructions.'
+                  : 'Guia botanico completo com quantidade de luz, rega, origem, clima, tipo de solo e guia passo a passo para tirar mudas e cultivar.'}
+              </p>
             </div>
 
-            <div className="stat-card" style={{ background: needsWaterCount > 0 ? 'rgba(239, 68, 68, 0.25)' : undefined }}>
-              <div className="stat-value" style={{ color: needsWaterCount > 0 ? '#fca5a5' : '#fff' }}>
-                {needsWaterCount}
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-value">{totalCount}</div>
+                <div className="stat-label">{currentLang === 'en' ? 'Saved Plants' : 'Plantas Salvas'}</div>
               </div>
-              <div className="stat-label">Sede Hoje</div>
+
+              <div className="stat-card" style={{ background: needsWaterCount > 0 ? 'rgba(239, 68, 68, 0.25)' : undefined }}>
+                <div className="stat-value" style={{ color: needsWaterCount > 0 ? '#fca5a5' : '#fff' }}>
+                  {needsWaterCount}
+                </div>
+                <div className="stat-label">{currentLang === 'en' ? 'Thirsty Today' : 'Sede Hoje'}</div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Toolbar de Pesquisa & Filtros */}
-        <section className="toolbar">
-          <div className="search-box">
-            <Search className="search-icon" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar por nome, origem, tipo de solo ou cuidados..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="filter-chips">
-            <button 
-              className={`chip ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('all')}
-            >
-              Todas ({totalCount})
-            </button>
-
-            <button 
-              className={`chip ${activeFilter === 'needs_water' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('needs_water')}
-            >
-              <Droplets size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              Precisa de Água ({needsWaterCount})
-            </button>
-
-            <button 
-              className={`chip ${activeFilter === 'direct_sun' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('direct_sun')}
-            >
-              <Sun size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              Luz Direta
-            </button>
-
-            <button 
-              className={`chip ${activeFilter === 'indirect_light' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('indirect_light')}
-            >
-              <CloudSun size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              Luz Indireta
-            </button>
-
-            <button 
-              className={`chip ${activeFilter === 'shade' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('shade')}
-            >
-              <Moon size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              Sombra
-            </button>
-          </div>
-        </section>
-
-        {/* Galeria de Cartões de Plantas */}
-        {filteredPlants.length > 0 ? (
-          <div className="plant-grid">
-            {filteredPlants.map(plant => (
-              <PlantCard 
-                key={plant.id} 
-                plant={plant} 
-                onWater={handleWaterPlant}
-                onClick={setSelectedPlant}
+          {/* Toolbar de Pesquisa & Filtros */}
+          <section className="toolbar">
+            <div className="search-box">
+              <Search className="search-icon" size={18} />
+              <input 
+                type="text" 
+                placeholder={currentLang === 'en' ? "Search by name, origin, soil, or care..." : "Buscar por nome, origem, tipo de solo ou cuidados..."}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <Leaf className="empty-icon" />
-            <h3>Nenhuma planta encontrada</h3>
-            <p>Adicione uma planta manualmente ou tire uma foto com a IA para iniciar seu diário de cultivo.</p>
-            <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-              <Plus size={18} />
-              <span>Adicionar Primeira Planta</span>
-            </button>
-          </div>
-        )}
-      </main>
+            </div>
+
+            <div className="filter-chips">
+              <button 
+                className={`chip ${activeFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setActiveFilter('all')}
+              >
+                {currentLang === 'en' ? `All (${totalCount})` : `Todas (${totalCount})`}
+              </button>
+
+              <button 
+                className={`chip ${activeFilter === 'needs_water' ? 'active' : ''}`}
+                onClick={() => setActiveFilter('needs_water')}
+              >
+                <Droplets size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {currentLang === 'en' ? `Needs Water (${needsWaterCount})` : `Precisa de Agua (${needsWaterCount})`}
+              </button>
+
+              <button 
+                className={`chip ${activeFilter === 'direct_sun' ? 'active' : ''}`}
+                onClick={() => setActiveFilter('direct_sun')}
+              >
+                <Sun size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {currentLang === 'en' ? 'Full Sun' : 'Luz Direta'}
+              </button>
+
+              <button 
+                className={`chip ${activeFilter === 'indirect_light' ? 'active' : ''}`}
+                onClick={() => setActiveFilter('indirect_light')}
+              >
+                <CloudSun size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {currentLang === 'en' ? 'Indirect Light' : 'Luz Indireta'}
+              </button>
+
+              <button 
+                className={`chip ${activeFilter === 'shade' ? 'active' : ''}`}
+                onClick={() => setActiveFilter('shade')}
+              >
+                <Moon size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {currentLang === 'en' ? 'Shade' : 'Sombra'}
+              </button>
+            </div>
+          </section>
+
+          {/* Galeria de Cartões de Plantas */}
+          {filteredPlants.length > 0 ? (
+            <div className="plant-grid">
+              {filteredPlants.map(plant => (
+                <PlantCard 
+                  key={plant.id} 
+                  plant={plant} 
+                  onWater={handleWaterPlant}
+                  onClick={setSelectedPlant}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <Leaf className="empty-icon" />
+              <h3>{currentLang === 'en' ? 'No plants found' : 'Nenhuma planta encontrada'}</h3>
+              <p>
+                {currentLang === 'en' 
+                  ? 'Add a plant manually or take a photo with AI to start your garden journal.'
+                  : 'Adicione uma planta manualmente ou tire uma foto com a IA para iniciar seu diario de cultivo.'}
+              </p>
+              <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                <Plus size={18} />
+                <span>{currentLang === 'en' ? 'Add First Plant' : 'Adicionar Primeira Planta'}</span>
+              </button>
+            </div>
+          )}
+        </main>
+      )}
 
       {/* Modais */}
       {selectedPlant && (
@@ -372,6 +398,14 @@ export default function App() {
           isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
           onReloadPlants={loadPlants}
+        />
+      )}
+
+      {showFeedbackModal && (
+        <FeedbackSupportModal 
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+          currentLang={currentLang}
         />
       )}
     </div>
