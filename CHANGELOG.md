@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.3.1] - 2026-09-25
+
+### Added & Fixed
+- **Melhoria de Contraste e Paleta Botânica Pastéis**:
+  - Ajustados os contrastes de todos os elementos da barra de navegação (`Canto Alegre`, `IA Botânica & Mudas`, `PT-BR`, `Meu Jardim`, `Feedback & Suporte`, `Novidades`, `Guia & PWA`, `Instalar App`, `Modo Simulado`), tornando os textos nítidos e altamente legíveis.
+  - Implementada nova paleta botânica com tons pastéis para o Tema Claro (pistache e sálvia suave) e Tema Escuro (gradiente sálvia profundo).
+  - Regra de legibilidade de texto: no **Tema Escuro**, o texto do corpo fica **branco** (`#ffffff`), e no **Tema Claro**, o texto do corpo fica **preto** (`#111827`), mantendo a hierarquia e destaque dos títulos botânicos.
+  - Alinhamento visual e suporte de contraste dinâmico nas seções da Landing Page (`PresentationLanding.jsx`), modal de guia PWA (`IntroGuideModal.jsx`) e página estática `public/about.html`.
+
 ---
 
 ## [1.3.0] - 2026-09-25
