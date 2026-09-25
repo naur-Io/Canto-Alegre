@@ -1,5 +1,62 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.3.1',
+    version: 'v1.3.1',
+    date: '25 de Setembro de 2026',
+    title: 'Canto Alegre - Temas Pastéis & Super Contraste de Leitura',
+    isMajor: false,
+    badges: ['Novo', 'Design System', 'Acessibilidade'],
+    summary: 'Aprimoramento completo de contraste na barra de navegação, paleta botânica com tons pastéis para temas claro e escuro, e legibilidade de textos.',
+    items: [
+      {
+        type: 'contrast',
+        title: 'Super Contraste na Navbar',
+        desc: 'Todos os botões e rótulos da barra superior agora possuem textos brilhantes e nítidos em qualquer modo visual.'
+      },
+      {
+        type: 'pastel',
+        title: 'Paleta Botânica Pastéis',
+        desc: 'Novos fundos e cartões pastéis suaves em verde pistache/sálvia para o modo claro e sálvia profundo no modo escuro.'
+      },
+      {
+        type: 'readability',
+        title: 'Texto Adaptativo Inteligente',
+        desc: 'Regra de leitura nítida: texto do corpo em branco puro no modo escuro e preto nítido no modo claro.'
+      }
+    ]
+  },
+  {
+    id: 'v1.3.0',
+    version: 'v1.3.0',
+    date: '25 de Setembro de 2026',
+    title: 'Canto Alegre - Tela de Apresentação & Suporte Bilíngue',
+    isMajor: true,
+    badges: ['Novo', 'Landing Page', 'i18n PT/EN', 'Feedbacks'],
+    summary: 'Nova Tela de Apresentação do produto para compartilhamento, suporte a idiomas Português/Inglês, instruções PWA para Android e iOS e modal de feedbacks.',
+    items: [
+      {
+        type: 'landing',
+        title: 'Tela de Apresentação do Produto',
+        desc: 'Porta de entrada do app perfeita para compartilhar links, apresentando o propósito, botão para usar o app e créditos.'
+      },
+      {
+        type: 'i18n',
+        title: 'Suporte Bilíngue (PT-BR & EN)',
+        desc: 'Alternador de idiomas instantâneo na Navbar permitindo alternar a interface entre Português do Brasil e Inglês.'
+      },
+      {
+        type: 'pwa',
+        title: 'Guia de Instalação PWA Ilustrado',
+        desc: 'Instruções passo a passo para instalar o aplicativo no Android (Chrome/Edge/Samsung) e iOS (Safari).'
+      },
+      {
+        type: 'feedback',
+        title: 'Central de Feedbacks & Suporte',
+        desc: 'Modal interativo para envio de sugestões, bugs e dúvidas diretamente pela plataforma.'
+      }
+    ]
+  },
+  {
     id: 'v1.1.0',
     version: 'v1.1.0',
     date: '21 de Setembro de 2026',
