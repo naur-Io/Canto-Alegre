@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Servico `PlantService` com integridade transacional ACID, mitigacao N+1 via `JOIN FETCH` e calculo automatico de proximas regas.
   - Servico `GeminiService` e `BotanicalSpeciesService.getOrCreateSpeciesByName` para enriquecimento automatico via Gemini e persistencia de cache canonico em PostgreSQL.
   - Endpoints REST para `/api/v1/plants`, `/api/v1/plants/{id}/water`, `/api/v1/plants/thirsty` e catalogo canonico `/api/v1/species` (incluindo `/by-name`).
+  - Suites de testes unitarios com JUnit 5 e Mockito para validacao completa da camada de servicos (`UserServiceTest`, `BotanicalSpeciesServiceTest`, `PlantServiceTest` e `GeminiServiceTest`).
+
 
 - Integracao Resiliente de Sincronizacao Frontend PWA (Fase 1 Concluida):
   - Modulo `apiService.js` com geracao e gerencimento de UUID local no IndexedDB.
