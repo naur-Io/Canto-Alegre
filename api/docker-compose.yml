@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: canto_alegre_postgres
+    environment:
+      POSTGRES_DB: canto_alegre_db
+      POSTGRES_USER: canto_user
+      POSTGRES_PASSWORD: canto_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - canto_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  canto_postgres_data:

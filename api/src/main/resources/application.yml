@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: canto-alegre-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/canto_alegre_db
+    username: canto_user
+    password: canto_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+gemini:
+  api-key: ${GEMINI_API_KEY:}

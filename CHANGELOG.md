@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-09-25
+
+### Added
+- Canto Alegre REST API Backend (Spring Boot 3 + Java 21):
+  - Camada de excecoes globais `@RestControllerAdvice` formatada conforme RFC 7807 (`ProblemDetail`).
+  - DTOs imutaveis em Java Records com validacoes declarativas Jakarta Bean Validation.
+  - Multi-tenancy anonomo baseado no modelo Guest UUID via cabeçalho HTTP `X-Guest-Id`.
+  - Servico `PlantService` com integridade transacional ACID, mitigacao N+1 via `JOIN FETCH` e calculo automatico de proximas regas.
+  - Servico `GeminiService` e `BotanicalSpeciesService.getOrCreateSpeciesByName` para enriquecimento automatico via Gemini e persistencia de cache canonico em PostgreSQL.
+  - Endpoints REST para `/api/v1/plants`, `/api/v1/plants/{id}/water`, `/api/v1/plants/thirsty` e catalogo canonico `/api/v1/species` (incluindo `/by-name`).
+
+- Integracao Resiliente de Sincronizacao Frontend PWA (Fase 1 Concluida):
+  - Modulo `apiService.js` com geracao e gerencimento de UUID local no IndexedDB.
+  - Modulo `syncService.js` com fila offline de operacoes pendentes (`cantoalegre_pending_sync_queue`) e reconciliacao automatica com a API ao reconectar.
+  - Atualizacao de `storageService.js` para persistencia simultanea no IndexedDB local e sincronizacao cloud transparente com Spring Boot.
+
+
+---
+
 ## [1.1.0] - 2026-09-21
 
 ### Added

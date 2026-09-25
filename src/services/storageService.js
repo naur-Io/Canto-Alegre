@@ -1,5 +1,7 @@
 import { get, set } from 'idb-keyval';
 import { INITIAL_PLANTS } from './mockData';
+import { apiService } from './apiService';
+import { addToPendingQueue, syncWithCloud } from './syncService';
 
 const PLANTS_STORAGE_KEY = 'cantoalegre_user_plants_v1';
 const LEGACY_PLANTS_KEY = 'floracare_user_plants_v1';
@@ -9,7 +11,7 @@ const INITIALIZED_FLAG_KEY = 'cantoalegre_has_initialized_v1';
 const INTRO_COMPLETED_KEY = 'cantoalegre_intro_completed';
 
 // Sincroniza dados em ambos os armazenamentos (IndexedDB + LocalStorage)
-async function persistToAllStorages(plants) {
+export async function persistToAllStorages(plants) {
   // 1. Salvar no IndexedDB
   try {
     await set(PLANTS_STORAGE_KEY, plants);
@@ -17,18 +19,19 @@ async function persistToAllStorages(plants) {
     console.warn('Falha ao salvar no IndexedDB:', err);
   }
 
-  // 2. Salvar cópia redundante no LocalStorage
+  // 2. Salvar copia redundante no LocalStorage
   try {
     localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(plants));
     localStorage.setItem(INITIALIZED_FLAG_KEY, 'true');
   } catch (err) {
-    console.warn('LocalStorage quota ou indisponível:', err);
+    console.warn('LocalStorage quota ou indisponivel:', err);
   }
 }
 
-// Carregar todas as plantas salvas pelo usuário
+// Carregar todas as plantas salvas pelo usuario
 export async function getStoredPlants() {
   const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true' || localStorage.getItem('floracare_has_initialized_v1') === 'true';
+  let localPlants = [];
 
   // 1. Tentar ler do IndexedDB (chave nova ou antiga)
   try {
@@ -40,63 +43,61 @@ export async function getStoredPlants() {
       }
     }
     if (idbData !== undefined && idbData !== null && Array.isArray(idbData)) {
-      // Filtrar plantas de demonstração antigas, mantendo apenas a Jiboia e plantas customizadas
       const cleaned = idbData.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
-      if (cleaned.length !== idbData.length) {
-        // Se após a limpeza não sobrar nada e não foi deletado explicitamente, insere a Jiboia
-        const finalPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
-        await persistToAllStorages(finalPlants);
-        return finalPlants;
-      }
-      return idbData;
+      localPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
     }
   } catch (error) {
-    console.warn('IndexedDB não disponível, verificando localStorage:', error);
+    console.warn('IndexedDB nao disponivel, verificando localStorage:', error);
   }
 
-  // 2. Tentar ler do LocalStorage (chave nova ou antiga)
-  try {
-    let localData = localStorage.getItem(PLANTS_STORAGE_KEY) || localStorage.getItem(LEGACY_PLANTS_KEY);
-    if (localData) {
-      const parsed = JSON.parse(localData);
-      if (Array.isArray(parsed)) {
-        const cleaned = parsed.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
-        const finalPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
-        set(PLANTS_STORAGE_KEY, finalPlants).catch(() => {});
-        localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(finalPlants));
-        return finalPlants;
+  // 2. Tentar ler do LocalStorage caso o IndexedDB falhe
+  if (localPlants.length === 0) {
+    try {
+      let localData = localStorage.getItem(PLANTS_STORAGE_KEY) || localStorage.getItem(LEGACY_PLANTS_KEY);
+      if (localData) {
+        const parsed = JSON.parse(localData);
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
+          localPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
+        }
       }
+    } catch (error) {
+      console.warn('Erro ao ler do LocalStorage:', error);
     }
-  } catch (error) {
-    console.warn('Erro ao ler do LocalStorage:', error);
   }
 
-  // 3. Se o usuário já interagiu com o app antes e deletou as plantas, retornar vazio
-  if (hasInitialized) {
-    return [];
+  if (localPlants.length === 0 && !hasInitialized) {
+    localPlants = INITIAL_PLANTS;
+    await persistToAllStorages(localPlants);
   }
 
-  // 4. Primeiro acesso absoluto: semear apenas com a Jiboia
-  await persistToAllStorages(INITIAL_PLANTS);
-  return INITIAL_PLANTS;
+  // Tentar sincronizacao assincrona com o backend Spring Boot em segundo plano
+  if (navigator.onLine) {
+    syncWithCloud(localPlants, persistToAllStorages).catch(err => 
+      console.warn('Sincronizacao em segundo plano falhou:', err)
+    );
+  }
+
+  return localPlants;
 }
 
-// Salvar ou Atualizar uma Planta
+// Salvar ou Atualizar uma Planta com Sincronizacao Cloud Resiliente
 export async function savePlant(plantData) {
   const currentPlants = await getStoredPlants();
   const index = currentPlants.findIndex(p => p.id === plantData.id);
 
   let updatedPlants;
+  let targetPlant;
+
   if (index >= 0) {
-    // Atualizar existente preservando histórico
     updatedPlants = [...currentPlants];
     updatedPlants[index] = { 
       ...updatedPlants[index], 
       ...plantData, 
       updatedAt: new Date().toISOString() 
     };
+    targetPlant = updatedPlants[index];
   } else {
-    // Adicionar nova planta no início
     const newPlant = {
       ...plantData,
       id: plantData.id || `plant-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -104,9 +105,25 @@ export async function savePlant(plantData) {
       lastWatered: plantData.lastWatered || new Date().toISOString()
     };
     updatedPlants = [newPlant, ...currentPlants];
+    targetPlant = newPlant;
   }
 
   await persistToAllStorages(updatedPlants);
+
+  if (navigator.onLine) {
+    apiService.createPlant({
+      nickname: targetPlant.name || targetPlant.commonName || targetPlant.nickname || 'Nova Planta',
+      customLocation: targetPlant.customLocation || targetPlant.location || '',
+      photoUrl: targetPlant.image || targetPlant.photoUrl || '',
+      notes: targetPlant.notes || ''
+    }).catch(err => {
+      console.warn('Backend cloud offline, enfileirando plantio para sincronizacao futura:', err);
+      addToPendingQueue('CREATE_PLANT', targetPlant);
+    });
+  } else {
+    addToPendingQueue('CREATE_PLANT', targetPlant);
+  }
+
   return updatedPlants;
 }
 
@@ -132,6 +149,16 @@ export async function markAsWatered(plantId) {
   });
 
   await persistToAllStorages(updatedPlants);
+
+  if (navigator.onLine) {
+    apiService.waterPlant(plantId).catch(err => {
+      console.warn('Backend cloud offline, enfileirando rega para sincronizacao futura:', err);
+      addToPendingQueue('WATER_PLANT', { plantId });
+    });
+  } else {
+    addToPendingQueue('WATER_PLANT', { plantId });
+  }
+
   return updatedPlants;
 }
 
@@ -158,7 +185,7 @@ export function saveApiKey(key) {
   }
 }
 
-// Controle de exibição do Guia de Introdução Onboarding
+// Controle de exibicao do Guia de Introducao Onboarding
 export function hasSeenIntroGuide() {
   return localStorage.getItem(INTRO_COMPLETED_KEY) === 'true';
 }
@@ -167,7 +194,7 @@ export function markIntroGuideSeen() {
   localStorage.setItem(INTRO_COMPLETED_KEY, 'true');
 }
 
-// Controle de Notificações de Atualizações / Novidades
+// Controle de Notificacoes de Atualizacoes / Novidades
 const LAST_SEEN_VERSION_KEY = 'cantoalegre_last_seen_version';
 
 export function getLastSeenVersion() {
@@ -197,7 +224,7 @@ export async function exportGardenBackup() {
 export async function importGardenBackup(jsonString) {
   const parsed = JSON.parse(jsonString);
   const plants = Array.isArray(parsed) ? parsed : (parsed.plants || []);
-  if (!Array.isArray(plants)) throw new Error('Formato de backup inválido.');
+  if (!Array.isArray(plants)) throw new Error('Formato de backup invalido.');
   await persistToAllStorages(plants);
   return plants;
 }
@@ -217,4 +244,3 @@ export function saveTheme(theme) {
   }
   return selected;
 }
-
