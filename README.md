@@ -1,8 +1,16 @@
 # Canto Alegre - Guia de Plantas, Mudas & Jardinagem Inteligente
 
-> **Identifique espécies com IA multimodal, aprenda o passo a passo para tirar mudas e cuide do seu jardim com funcionamento 100% offline.**
+> **Assistente botânico inteligente com PWA Offline-First no Frontend (React 18 + Vite) e API de Microsserviços no Backend (Java 21 + Spring Boot 3 + PostgreSQL 16 + Google Gemini LLM).**
 
-Canto Alegre é um aplicativo web progressivo (PWA) e assistente botânico pessoal desenvolvido para praticantes de jardinagem, horticultura urbana e voluntariado ecológico. Utiliza inteligência artificial multimodal (**Google Gemini Flash**) para identificar espécies botânicas a partir de fotos, diagnosticar saúde, sugerir rega/luminosidade ideal e ensinar métodos seguros de propagação e estaquia de mudas.
+---
+
+## Guia de Estudos & Documentacao Arquitetural
+
+Para entender detalhadamente a arquitetura do sistema, a comunicacao entre o PWA e a API REST, o fluxo de sincronizacao offline-first e o funcionamento das anotações Java/Spring, consulte a pasta de estudos dedicada:
+
+- **[Indice de Estudos (studies/README.md)](studies/README.md)**
+  - **[Roadmap & Arquitetura de Comunicacao (studies/01-ROADMAP_E_ARQUITETURA.md)](studies/01-ROADMAP_E_ARQUITETURA.md)**: Visao geral da evolucao do escopo, diagramas de sequencia e sincronizacao hibrida offline-first.
+  - **[Manual de Anotacoes Java/Spring (studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)](studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)**: Guia completo de anotações ("decoradores") Spring Boot, JPA/Hibernate, Validation, Lombok e Testes (JUnit 5, Mockito e Testcontainers).
 
 ---
 
@@ -10,108 +18,83 @@ Canto Alegre é um aplicativo web progressivo (PWA) e assistente botânico pesso
 
 Este projeto nasceu da vivência prática durante **voluntariados no Worldpackers** atuando como jardineiro e cuidador de espaços verdes em eco-pousadas, hostels e fazendas agroecológicas. No campo, identificar plantas nativas, entender ciclos de rega sob climas variados e tirar mudas para multiplicar os canteiros eram desafios diários. 
 
-O **Canto Alegre** foi criado para conectar esse aprendizado prático da terra com o que há de mais avançado em IA e tecnologias web modernas.
+O **Canto Alegre** foi criado para conectar esse aprendizado prático da terra com o que há de mais avançado em IA e tecnologias web/cloud modernas.
+
+---
+
+## Arquitetura do Ecossistema
+
+O sistema adota uma arquitetura descentralizada e resiliente dividida em duas grandes camadas:
+
+```
+[ PWA Client (React 18 + IndexedDB) ] <---> [ REST API (Spring Boot 3 + Java 21) ] <---> [ PostgreSQL 16 ]
+                                                     |
+                                                     +---> [ Google Gemini LLM ]
+```
+
+### 1. Backend REST API (`canto-alegre-api`)
+- **Linguagem & Framework**: Java 21 e Spring Boot 3.x (Spring Web, Spring Data JPA, Spring Security, Validation).
+- **Banco de Dados Relacional**: PostgreSQL 16 (executado via Docker Compose) com controle de versoes de schema via **Flyway Migration** (`V1__create_initial_schema.sql`).
+- **Respostas de Erro Padronizadas**: Mapeamento global de exceções via `@RestControllerAdvice` seguindo a **RFC 7807 (ProblemDetail)**.
+- **Enriquecimento via IA Botânica**: `GeminiService` realiza a busca e enriquecimento de novas especies com fallback automatico e persistência no banco de dados como **cache canonico**.
+- **Multi-Tenancy Anônimo (Guest-First)**: Seguranca stateless isolada por `X-Guest-Id` via cabeçalho HTTP, permitindo que cada usuario tenha seu jardim isolado sem barreiras de login.
+- **Suíte de Testes Automatizados**: 17 testes automatizados divididos em testes unitarios com JUnit 5 + Mockito e testes de integracao com **Testcontainers** subindo container PostgreSQL `16-alpine` real.
+
+### 2. Frontend PWA (`Canto Alegre`)
+- **Tecnologias**: React 18, Vite 5, CSS3 com tokens de Design System e alternância de Temas (Claro e Escuro).
+- **Resiliencia Offline-First**: Persistencia instantânea via IndexedDB (`idb-keyval`) e Service Worker nativo.
+- **Sincronizacao Hibrida Cloud**: Cliente HTTP (`apiService.js`) integrado com fila offline de operacoes pendentes (`syncService.js`) que envia as alteracoes para a API assim que a conexao de rede e restabelecida.
 
 ---
 
 ## Funcionalidades Principais
 
-- **Identificação Botânica por Foto**: Use a câmera do celular ou suba fotos da galeria. A IA Google Gemini extrai:
-  - Nome popular e nomenclatura científica/botânica.
-  - Necessidade de rega (volume em ml e frequência em dias).
-  - Exposição solar recomendada (Sol Pleno, Meia-Sombra, Sombra).
-  - Recomendações de adubação orgânica (Húmus, Bokashi, NPK) e tipo de solo.
-  - Diagnóstico de saúde e notas de cultivo.
-- **Guia Completo de Mudas & Estaquia**: Instruções detalhadas de multiplicação por estaca de caule, folha ou divisão de touceira, enraizamento (água vs. substrato) e melhor época do ano.
-- **PWA Instalável com Suporte 100% Offline**:
-  - Service Worker nativo com cache inteligente de arquivos e casca do app (App Shell).
-  - Ícones adaptados em alta resolução (192px e 512px).
-  - Suporte à instalação na tela inicial no Android, iOS e Desktop sem precisar de downloads em lojas de aplicativos.
-  - Armazenamento local das plantas e fotos no navegador via IndexedDB (`idb-keyval`).
-- **Alternância de Temas (Claro e Escuro)**:
-  - Sessão de configurações e botão rápido para alternar entre os modos visual claro e escuro a qualquer momento.
-- **Guia de Boas-Vindas & Configurações Rápidas**:
-  - Modal interativo de onboarding explicando como o app funciona no primeiro acesso.
-  - Configuração rápida da chave de API gratuita do Google AI Studio ou uso imediato com dados simulados offline.
-  - Página standalone de apresentação e landing page em `/about.html`.
-- **Diário & Alerta de Sede**: Dashboard com contadores, filtro de plantas que precisam de água hoje e histórico de regas.
-- **Central de Notificações & Atualizações**: Notificações in-app sobre novidades, melhorias do sistema e atualizações de versão em tempo real.
+- **Identificação Botânica por Foto & IA Multimodal**: Use a câmera ou fotos da galeria. A IA Google Gemini extrai nome popular/cientifico, rega, sol, solo e diagnostico de saude.
+- **Guia Completo de Mudas & Estaquia**: Passo a passo de multiplicacao por estaca de caule, folha ou divisao de touceiras.
+- **Sincronizacao Hibrida Cloud + Offline-First**: Funciona perfeitamente sem internet e sincroniza os dados com o PostgreSQL na nuvem quando online.
+- **Dashboard do Jardim & Alerta de Sede**: Gerenciamento de plantas, historico de regas e lembretes diarios.
+- **Alternância de Temas (Claro e Escuro)**: Interface adaptativa para uso em ambientes internos ou sob luz solar direta.
 
 ---
 
-## Como Instalar e Usar no Celular (Android & iOS)
+## Como Executar o Projeto Localmente
 
-O Canto Alegre é um **Progressive Web App (PWA)**, oferecendo a experiência de um aplicativo nativo completo sem ocupar a memória do celular:
-
-### No Android (Google Chrome / Samsung Internet / Edge)
-1. Acesse o endereço do aplicativo pelo navegador no seu celular.
-2. Toque no botão **"Instalar App"** na barra superior ou no Guia de Introdução.
-3. Se preferir fazer pelo menu do navegador: toque nos três pontinhos verticais no canto superior direito e selecione **"Instalar aplicativo"** (ou *"Adicionar à tela inicial"*).
-4. O ícone do Canto Alegre será adicionado à sua tela inicial, funcionando mesmo sem conexão com a internet.
-
-### No iPhone / iPad (Apple Safari)
-1. Abra o Safari e acesse o endereço do aplicativo.
-2. Toque no botão de **Compartilhar** (ícone do quadrado com seta para cima na barra inferior).
-3. Role as opções para baixo e toque em **"Adicionar à Tela de Início"**.
-4. Toque em **"Adicionar"** no canto superior direito. O aplicativo abrirá em tela cheia diretamente da sua tela inicial.
-
----
-
-## Como Contribuir (Forks & Pull Requests)
-
-Contribuições da comunidade são muito bem-vindas. Para instruções de como configurar seu ambiente local, criar branches e enviar um Pull Request, consulte o guia dedicado:  
-[Guia de Contribuição (CONTRIBUTING.md)](CONTRIBUTING.md)
-
----
-
-## Tecnologias Utilizadas
-
-- **Frontend**: React 18, Vite 5, HTML5, CSS3 Moderno (Design System com suporte a temas Dark/Light)
-- **PWA**: Service Worker nativo (`sw.js`), Web App Manifest, Cache API
-- **Ícones**: Lucide-React
-- **Banco de Dados Local**: IndexedDB (`idb-keyval`) & LocalStorage
-- **IA Multimodal**: Google Gemini 1.5 Flash Vision API (Google AI Studio)
-
----
-
-## Como Executar Localmente
+### 1. Executando o Backend REST API (`canto-alegre-api`)
 
 ```bash
-# 1. Clone o repositório
-git clone https://github.com/naur-Io/FloraCare.git
-cd FloraCare
+# 1. Navegue para a pasta da API
+cd api
 
-# 2. Instale as dependências
+# 2. Inicie o container PostgreSQL via Docker Compose
+docker-compose up -d
+
+# 3. Compilar e executar os testes unitarios e de integracao (Testcontainers)
+./mvnw test
+
+# 4. Iniciar a aplicacao Spring Boot (Porta 8080)
+./mvnw spring-boot:run
+```
+
+### 2. Executando o Frontend PWA
+
+```bash
+# 1. Na raiz do projeto, instale as dependencias
 npm install
 
-# 3. Inicie o servidor de desenvolvimento
+# 2. Inicie o servidor de desenvolvimento Vite
 npm run dev
 
-# 4. Build de produção
+# 3. Executar o build de producao
 npm run build
 ```
 
 ---
 
-## Compartilhamento no LinkedIn
+## Como Contribuir (Forks & Pull Requests)
 
-Sugestão de texto para postagem de portfólio no LinkedIn:
-
-> **Cultive a vida, planta por planta: conheça o Canto Alegre**
->
-> Durante minhas experiências de voluntariado com o Worldpackers em pousadas e fazendas agroecológicas, vivenciei na prática o desafio de identificar espécies nativas, entender as necessidades de cada solo e aprender o momento exato para tirar mudas e multiplicar o jardim.
->
-> Unindo essa vivência prática à inteligência artificial, desenvolvi o **Canto Alegre**: um assistente botânico inteligente em PWA (Progressive Web App) que funciona 100% offline.
->
-> - **Identificação Multimodal**: tire uma foto da folha ou vaso para a IA (Google Gemini Flash) reconhecer a espécie botânica, rega ideal e luminosidade.  
-> - **Guia de Mudas & Estaquia**: passo a passo detalhado de propagação para cada espécie.  
-> - **Temas Claro e Escuro**: interface adaptável para leitura em ambientes internos ou sob luz solar.  
-> - **PWA Offline**: dados e fotos preservados localmente no aparelho (IndexedDB), sem depender de internet no campo.  
-> - **Zero barreira**: gratuito e acessível direto pelo navegador.
->
-> Código-fonte: https://github.com/naur-Io/FloraCare  
->
-> #React #PWA #ArtificialIntelligence #GoogleGemini #WebDevelopment #OpenSource #Jardinagem #TechForGood
+Contribuições da comunidade sao muito bem-vindas. Para instruções de como configurar seu ambiente local, criar branches e enviar um Pull Request, consulte os guias dedicados:  
+- [Guia de Contribuicao (CONTRIBUTING.md)](CONTRIBUTING.md)
+- [Estudos de Arquitetura & Anotacoes (studies/README.md)](studies/README.md)
 
 ---
 
