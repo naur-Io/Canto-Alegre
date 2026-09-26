@@ -16,7 +16,6 @@ export default function FeedbackSupportModal({ isOpen, onClose, currentLang = 'p
     e.preventDefault();
     if (!message.trim()) return;
 
-    // Salva o feedback enviado localmente no IndexedDB / LocalStorage para auditoria
     try {
       const existing = JSON.parse(localStorage.getItem('cantoalegre_user_feedbacks') || '[]');
       const newFeedback = {
@@ -42,26 +41,30 @@ export default function FeedbackSupportModal({ isOpen, onClose, currentLang = 'p
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '540px' }}>
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 110 }}>
+      <div 
+        className="modal-container" 
+        onClick={e => e.stopPropagation()} 
+        style={{ maxWidth: '540px', background: 'var(--modal-bg)', borderRadius: 'var(--radius-lg)' }}
+      >
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div className="modal-icon-badge" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
-              <MessageSquare size={20} style={{ color: '#10b981' }} />
+            <div className="modal-icon-badge" style={{ background: 'var(--primary-100)', border: '1px solid var(--border-color)', padding: '6px', borderRadius: '10px' }}>
+              <MessageSquare size={20} style={{ color: 'var(--primary-600)' }} />
             </div>
-            <h3>{t.modalTitle}</h3>
+            <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--primary-900)' }}>{t.modalTitle}</h3>
           </div>
-          <button className="btn-icon" onClick={onClose} title="Fechar">
+          <button className="modal-close" onClick={onClose} title="Fechar">
             <X size={20} />
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="modal-body" style={{ padding: '24px' }}>
           {submitted ? (
-            <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-              <CheckCircle2 size={54} style={{ color: '#10b981', marginBottom: '16px' }} />
-              <h4 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '10px' }}>{t.successMessage}</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: '24px' }}>
+            <div style={{ textAlign: 'center', padding: '20px 10px' }}>
+              <CheckCircle2 size={54} style={{ color: 'var(--primary-500)', marginBottom: '16px' }} />
+              <h4 style={{ color: 'var(--primary-900)', fontSize: '1.25rem', marginBottom: '10px' }}>{t.successMessage}</h4>
+              <p style={{ color: 'var(--text-main)', fontSize: '0.94rem', marginBottom: '24px' }}>
                 Agradecemos por contribuir para o crescimento do Canto Alegre!
               </p>
               <button className="btn btn-primary" onClick={handleReset}>
@@ -71,19 +74,20 @@ export default function FeedbackSupportModal({ isOpen, onClose, currentLang = 'p
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '6px', fontWeight: 600 }}>
+                <label style={{ display: 'block', color: 'var(--primary-900)', fontSize: '0.88rem', marginBottom: '6px', fontWeight: 700 }}>
                   {t.typeLabel}
                 </label>
                 <select 
                   value={msgType}
                   onChange={e => setMsgType(e.target.value)}
+                  className="form-select"
                   style={{
                     width: '100%',
                     padding: '10px 14px',
-                    borderRadius: 'var(--radius-sm, 8px)',
-                    background: 'rgba(0, 0, 0, 0.25)',
-                    border: '1px solid var(--card-border, rgba(52, 211, 153, 0.2))',
-                    color: '#fff',
+                    borderRadius: 'var(--radius-md, 12px)',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: '0.92rem'
                   }}
                 >
@@ -94,19 +98,23 @@ export default function FeedbackSupportModal({ isOpen, onClose, currentLang = 'p
               </div>
 
               <div>
+                <label style={{ display: 'block', color: 'var(--primary-900)', fontSize: '0.88rem', marginBottom: '6px', fontWeight: 700 }}>
+                  Mensagem
+                </label>
                 <textarea
                   rows={5}
                   required
                   placeholder={t.messagePlaceholder}
                   value={message}
                   onChange={e => setMessage(e.target.value)}
+                  className="form-textarea"
                   style={{
                     width: '100%',
                     padding: '12px 14px',
-                    borderRadius: 'var(--radius-sm, 8px)',
-                    background: 'rgba(0, 0, 0, 0.25)',
-                    border: '1px solid var(--card-border, rgba(52, 211, 153, 0.2))',
-                    color: '#fff',
+                    borderRadius: 'var(--radius-md, 12px)',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: '0.92rem',
                     resize: 'vertical'
                   }}
@@ -114,18 +122,22 @@ export default function FeedbackSupportModal({ isOpen, onClose, currentLang = 'p
               </div>
 
               <div>
+                <label style={{ display: 'block', color: 'var(--primary-900)', fontSize: '0.88rem', marginBottom: '6px', fontWeight: 700 }}>
+                  E-mail para Contato (Opcional)
+                </label>
                 <input
                   type="email"
                   placeholder={t.emailPlaceholder}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
+                  className="form-input"
                   style={{
                     width: '100%',
                     padding: '10px 14px',
-                    borderRadius: 'var(--radius-sm, 8px)',
-                    background: 'rgba(0, 0, 0, 0.25)',
-                    border: '1px solid var(--card-border, rgba(52, 211, 153, 0.2))',
-                    color: '#fff',
+                    borderRadius: 'var(--radius-md, 12px)',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: '0.92rem'
                   }}
                 />

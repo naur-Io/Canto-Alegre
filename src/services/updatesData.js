@@ -1,5 +1,36 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.4.0',
+    version: 'v1.4.0',
+    date: '26 de Setembro de 2026',
+    title: 'Canto Alegre - Tour Guiado no Jardim, Botão Flutuante (+) & Tema Escuro Reformulado',
+    isMajor: true,
+    badges: ['Novo', 'Tour Onboarding', 'Botão FAB +', 'UI/UX'],
+    summary: 'Novo guia interativo passo a passo ao entrar no jardim, botão flutuante (+) no canto inferior direito para adicionar plantas, modal de suporte 100% opaco e tema escuro totalmente reformulado com alto contraste.',
+    items: [
+      {
+        type: 'tour',
+        title: 'Tour Guiado Interativo no Jardim',
+        desc: 'Novo guia passo a passo em popovers para apresentar os recursos do painel, filtros de sol/água, botão + e IA Gemini.'
+      },
+      {
+        type: 'fab',
+        title: 'Botão Flutuante FAB (+)',
+        desc: 'Botão fixo verde no canto inferior direito da tela para cadastrar novas plantas rapidamente de qualquer dispositivo.'
+      },
+      {
+        type: 'support',
+        title: 'Modal de Suporte Opaco',
+        desc: 'Eliminadas transparências no modal de feedbacks e suporte com fundos sólidos e inputs de alta legibilidade.'
+      },
+      {
+        type: 'theme',
+        title: 'Tema Escuro Botânico de Alto Contraste',
+        desc: 'Novo tema escuro com verde botânico profundo, superfícies sólidas e textos brancos cristalinos para leitura agradável sem cansaço visual.'
+      }
+    ]
+  },
+  {
     id: 'v1.3.1',
     version: 'v1.3.1',
     date: '25 de Setembro de 2026',

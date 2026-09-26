@@ -194,6 +194,17 @@ export function markIntroGuideSeen() {
   localStorage.setItem(INTRO_COMPLETED_KEY, 'true');
 }
 
+// Controle do Tour Guiado Interativo do Jardim
+const GARDEN_TOUR_COMPLETED_KEY = 'cantoalegre_garden_tour_completed_v1';
+
+export function hasCompletedGardenTour() {
+  return localStorage.getItem(GARDEN_TOUR_COMPLETED_KEY) === 'true';
+}
+
+export function markGardenTourCompleted() {
+  localStorage.setItem(GARDEN_TOUR_COMPLETED_KEY, 'true');
+}
+
 // Controle de Notificacoes de Atualizacoes / Novidades
 const LAST_SEEN_VERSION_KEY = 'cantoalegre_last_seen_version';
 

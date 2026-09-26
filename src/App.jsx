@@ -11,6 +11,7 @@ import UpdatesNotificationModal from './components/UpdatesNotificationModal';
 import SettingsModal from './components/SettingsModal';
 import PresentationLanding from './components/PresentationLanding';
 import FeedbackSupportModal from './components/FeedbackSupportModal';
+import GardenTourWalkthrough from './components/GardenTourWalkthrough';
 
 import { 
   getStoredPlants, 
@@ -19,6 +20,7 @@ import {
   markAsWatered, 
   getStoredApiKey, 
   hasSeenIntroGuide,
+  hasCompletedGardenTour,
   hasUnreadUpdates,
   markVersionAsSeen,
   getStoredTheme,
@@ -41,6 +43,7 @@ export default function App() {
   const [showUpdatesModal, setShowUpdatesModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showGardenTourModal, setShowGardenTourModal] = useState(false);
 
   const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
   const [unreadUpdates, setUnreadUpdates] = useState(false);
@@ -190,13 +193,20 @@ export default function App() {
     return true;
   });
 
+  const handleSwitchView = (view) => {
+    setCurrentView(view);
+    if (view === 'garden' && !hasCompletedGardenTour()) {
+      setShowGardenTourModal(true);
+    }
+  };
+
   return (
     <div>
       <Navbar 
         hasApiKey={hasApiKey}
         plantCount={totalCount}
         onAddClick={() => {
-          setCurrentView('garden');
+          handleSwitchView('garden');
           setShowAddModal(true);
         }}
         onOpenKeyModal={() => setShowKeyModal(true)}
@@ -213,7 +223,7 @@ export default function App() {
         isInstallable={isInstallable}
         onInstallApp={handleInstallPwa}
         currentView={currentView}
-        onSwitchView={setCurrentView}
+        onSwitchView={handleSwitchView}
         currentLang={currentLang}
         onLanguageChange={handleLanguageChange}
         onOpenFeedback={() => setShowFeedbackModal(true)}
@@ -222,7 +232,7 @@ export default function App() {
       {currentView === 'landing' ? (
         <PresentationLanding 
           currentLang={currentLang}
-          onLaunchApp={() => setCurrentView('garden')}
+          onLaunchApp={() => handleSwitchView('garden')}
           isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
           onOpenFeedback={() => setShowFeedbackModal(true)}
@@ -407,6 +417,29 @@ export default function App() {
           onClose={() => setShowFeedbackModal(false)}
           currentLang={currentLang}
         />
+      )}
+
+      {showGardenTourModal && (
+        <GardenTourWalkthrough 
+          isOpen={showGardenTourModal}
+          onClose={() => setShowGardenTourModal(false)}
+          currentLang={currentLang}
+        />
+      )}
+
+      {/* Botao Flutuante (FAB) para Adicionar Nova Planta no Jardim */}
+      {currentView === 'garden' && (
+        <button 
+          className="fab-add-plant"
+          onClick={() => {
+            handleSwitchView('garden');
+            setShowAddModal(true);
+          }}
+          title={currentLang === 'en' ? "Add New Plant" : "Adicionar Nova Planta"}
+          aria-label="Adicionar Nova Planta"
+        >
+          <Plus size={26} />
+        </button>
       )}
     </div>
   );

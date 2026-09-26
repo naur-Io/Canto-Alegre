@@ -16,6 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.4.0] - 2026-09-26
+
+### Added & Fixed
+- **Guia Interativo Onboarding (Tour no Jardim)**:
+  - Novo componente `GardenTourWalkthrough.jsx` com tour guiado em popovers (5 passos) para orientar o usuário ao acessar o painel "Meu Jardim".
+- **Botão Flutuante FAB (+)**:
+  - Botão flutuante fixo no canto inferior direito (`.fab-add-plant`) para adição rápida de novas plantas em qualquer dispositivo.
+- **Suporte Opaco & Tema Escuro Reformulado**:
+  - Reformulação completa do modal de suporte (`FeedbackSupportModal.jsx`) eliminando transparências indesejadas e garantindo legibilidade nítida.
+  - Reestruturação do Tema Escuro (`[data-theme="dark"]`) com verde botânico profundo opaco e textos brancos de alto contraste (`#ffffff`).
+
+---
+
 ## [1.3.1] - 2026-09-25
 
 ### Added & Fixed

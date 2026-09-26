@@ -1681,3 +1681,41 @@ html, body {
     }
   }
 }
+
+/* =========================================
+   Floating Action Button (FAB + Nova Planta)
+   ========================================= */
+.fab-add-plant {
+  position: fixed;
+  bottom: max(24px, calc(24px + env(safe-area-inset-bottom, 0px)));
+  right: max(24px, calc(24px + env(safe-area-inset-right, 0px)));
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, background 0.2s ease;
+}
+
+.fab-add-plant:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.6);
+  background: linear-gradient(135deg, #34d399, #059669);
+}
+
+.fab-add-plant:active {
+  transform: scale(0.95);
+}
+
+/* Tour Walkthrough Popover Styles */
+.tour-walkthrough-container {
+  background: var(--modal-bg);
+  border: 1px solid var(--border-color);
+}
