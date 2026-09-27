@@ -1,60 +1,107 @@
-# Rastreabilidade de Features & Documentação Técnica da Etapa 2: Storage Cloud
+# Guia de Rastreabilidade, Evolução do Projeto & Transição para Nuvem (AWS)
 
-Este documento serve como **guia de rastreabilidade** de todas as funcionalidades implementadas no projeto **Canto Alegre**, detalhando o histórico de desenvolvimento (Usuário vs Agente), instruções de **como fazer e desfazer** cada alteração, e o detalhamento arquitetural completo da **Etapa 2 (Storage Cloud de Fotos)**.
-
----
-
-## 1. Matriz de Rastreabilidade de Features (Histórico do Projeto)
-
-| Funcionalidade / Feature | O que foi feito | Solicitado / Executado Por | Arquivos Principais | Como Fazer / Testar | Como Desfazer / Reverter |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Identidade Canto Alegre** | Renomeação da marca e geração de ícones PWA 192px/512px. | Usuário / Agente | `manifest.json`, `index.html`, `public/icons/` | Acessar o app e verificar título e ícone na aba/instalação PWA. | Reverter arquivos em `manifest.json` e `index.html` via `git checkout`. |
-| **PWA & Cache 100% Offline** | Service Worker nativo e persistência local via IndexedDB (`idb-keyval`). | Usuário / Agente | `public/sw.js`, `src/services/storageService.js` | Desconectar a internet no navegador e recarregar a página. | Remover o registro de Service Worker em `main.jsx`. |
-| **Tela de Apresentação (Landing Page)** | Página web de entrada com propósito, instruções PWA (Android/iOS) e créditos. | Usuário / Agente | `src/components/PresentationLanding.jsx`, `public/about.html` | Acessar a raiz da aplicação (`currentView === 'landing'`). | Remover a exibição condicional da landing page em `App.jsx`. |
-| **Suporte Bilíngue (PT-BR / EN)** | Alternador de idioma instantâneo na barra superior. | Usuário / Agente | `src/services/i18n.js`, `src/components/Navbar.jsx` | Clicar no botão `PT-BR / EN` na Navbar. | Remover o estado `currentLang` e manter apenas strings estáticas em PT-BR. |
-| **Botão Flutuante FAB (+)** | Botão verde fixo no canto inferior direito para adicionar planta rápida. | Usuário / Agente | `src/App.jsx`, `src/styles/index.css` | Acessar a tela "Meu Jardim" e observar o botão `+` no canto inferior. | Remover o elemento `<button className="fab-add-plant">` em `App.jsx`. |
-| **Tour Guiado com Spotlight Highlight** | Passo a passo com destaque luminoso (*spotlight ring*) nos botões do sistema. | Usuário / Agente | `src/components/GardenTourWalkthrough.jsx` | Acessar o jardim ou limpar `cantoalegre_garden_tour_completed_v1` no localStorage. | Remover o componente `<GardenTourWalkthrough>` em `App.jsx`. |
-| **Novo Fluxo de Adição (Pergunta Inicial + Auto-Complete)** | Pergunta *"Você já conhece o nome da planta?"* com auto-complete de cuidados e mudas por IA ou foto. | Usuário / Agente | `src/components/AddPlantModal.jsx`, `src/services/geminiService.js` | Clicar em "Nova Planta", escolher "Sim" e digitar um nome (ex: Jiboia) -> Auto-completar. | Voltar a etapa inicial do `AddPlantModal.jsx` para `'choose_photo'`. |
-| **Tema Botânico Único Claro** | Consolidação em um tema claro botânico de alto contraste sem alternância escuro. | Usuário / Agente | `src/styles/index.css`, `src/services/storageService.js` | Navegar pela interface observando paleta sálvia/pistache com texto nítido. | Restaurar o seletor `[data-theme="dark"]` em `index.css` via Git. |
-| **Etapa 1 Backend (Spring Boot 3 + PostgreSQL)** | APIs REST para plantas, espécies, rega e enriquecimento Gemini LLM. | Agente | `api/src/main/java/com/cantoalegre/api/` | Executar `./mvnw test` na pasta `api/`. | Desfazer commits do backend em `api/`. |
-| **Etapa 2 Storage Cloud de Fotos** | Endpoint Multipart `POST /plants/{id}/photo` e `LocalStorageService`. | Usuário / Agente | `PlantController.java`, `LocalStorageService.java`, `apiService.js` | Enviar requisição POST multipart com arquivo de imagem. | Remover endpoint `/{id}/photo` do `PlantController.java`. |
+> **Este documento apresenta a trajetória do Canto Alegre: desde a ideia original até a construção do ecossistema híbrido (PWA + REST API + IA Gemini + Cloud Storage em AWS), detalhando o histórico de desenvolvimento, como fazer e desfazer recursos, e o papel dos serviços em nuvem.**
 
 ---
 
-## 2. Detalhamento Técnico da Etapa 2 (Storage Cloud de Fotos)
+## 1. Contexto & História da Evolução do Projeto
 
-### 2.1. O que vai ser feito (What)
-Implementação do sistema de **upload e persistência de arquivos de imagem na nuvem/servidor**, permitindo que fotos tiradas pelo usuário ou selecionadas da galeria sejam enviadas via multipart para a API Spring Boot, salvando o arquivo e atualizando o atributo `photoUrl` da planta no PostgreSQL.
+O **Canto Alegre** nasceu de uma necessidade real vivenciada em campos de jardinagem e agroecologia. Conforme o aplicativo evoluiu, a arquitetura foi expandida para atender tanto o uso offline no celular quanto o armazenamento seguro em nuvem.
 
-### 2.2. Onde vai ser feito (Where)
-- **Interface de Storage**: `api/src/main/java/com/cantoalegre/api/service/ImageStorageService.java`
-- **Serviço de Armazenamento**: `api/src/main/java/com/cantoalegre/api/service/LocalStorageService.java`
-- **Configuração de Recursos Estáticos**: `api/src/main/java/com/cantoalegre/api/config/WebMvcConfig.java`
-- **Endpoint REST Multipart**: `api/src/main/java/com/cantoalegre/api/controller/PlantController.java` (`POST /api/v1/plants/{id}/photo`)
-- **Regras de Negócio**: `api/src/main/java/com/cantoalegre/api/service/PlantService.java` (`uploadPlantPhoto`)
-- **Cliente HTTP Frontend**: `src/services/apiService.js` (`uploadPlantPhoto`)
-- **Testes Automáticos**: `api/src/test/java/com/cantoalegre/api/service/PlantServiceTest.java`
+Abaixo está o mapa contextual de como cada funcionalidade foi idealizada, construída e mantida no projeto:
 
-### 2.3. Como vai ser feito (How)
-1. **Padrão de Projeto Strategy**: A interface `ImageStorageService` define o contrato `storeImage(MultipartFile file)`. A classe `LocalStorageService` implementa o salvamento no diretório `./uploads` com nome único baseado em UUID v4.
-2. **Exposição de Recursos**: O `WebMvcConfig` registra `/uploads/**` como manipulador de recursos estáticos, permitindo que as imagens sejam acessadas publicamente via HTTP.
-3. **Endpoint Controller**: O `PlantController` expõe a rota `@PostMapping("/{id}/photo")` recebendo `@RequestParam("file") MultipartFile file` e o cabeçalho `@RequestHeader("X-Guest-Id") UUID guestUuid`.
-4. **Validação & Higienização**: Validação de arquivos nulos, verificação de tipo MIME (`image/jpeg`, `image/png`, `image/webp`) e tratamento de exceções com a RFC 7807 (`BusinessRuleException`).
+### 🌿 Identidade Canto Alegre & PWA Offline-First
+- **Por que fizemos?** Garantir que o aplicativo funcione em qualquer lugar — mesmo em hortas ou fazendas distantes sem sinal de internet.
+- **Como foi construído?** Criamos a marca Canto Alegre, geramos os ícones do aplicativo (`public/icons/`) e implementamos um Service Worker nativo (`public/sw.js`) integrado ao banco local IndexedDB (`src/services/storageService.js`).
+- **Como Testar:** Abra o app no navegador, abra as ferramentas de desenvolvedor (F12), desligue a internet (modo Offline) e recarregue a página. O aplicativo continuará funcionando perfeitamente.
+- **Como Desfazer:** Basta desativar a linha de registro do Service Worker em `src/main.jsx`.
 
-### 2.4. Por que vai ser feito (Why)
-- **Persistência Nuvem / Multi-dispositivo**: Atualmente as fotos em base64 salvas no IndexedDB ocupam muito espaço local no navegador do celular.
-- **Eficiência e Desempenho**: Armazenar arquivos de imagem em um servidor/nuvem otimiza o carregamento da lista de plantas e possibilita o compartilhamento do jardim entre múltiplos dispositivos do mesmo usuário.
+### 📱 Tela de Apresentação (Landing Page) & Guia de Instalação PWA
+- **Por que fizemos?** Permitir o compartilhamento do projeto através de um link público e orientar o usuário a instalar o PWA no celular (Android e iOS) antes de entrar na aplicação.
+- **Como foi construído?** Desenvolvemos o componente `PresentationLanding.jsx` e o modal explicativo com o passo a passo ilustrado para Chrome, Edge, Samsung Internet e Safari.
+- **Como Testar:** Acesse o link raiz da aplicação e observe a tela de boas-vindas com o botão "Usar o Aplicativo".
+- **Como Desfazer:** Altere o estado padrão de navegação em `src/App.jsx` para direcionar diretamente à página "Meu Jardim".
+
+### 💡 Tour Guiado Interativo com Spotlight Ring
+- **Por que fizemos?** Garantir uma recepção acolhedora para novos usuários, ensinando a utilizar o app através de pequenas janelas explicativas com botão *Próximo*.
+- **Como foi construído?** Criamos o componente `GardenTourWalkthrough.jsx` que aplica um círculo de iluminação visual (*spotlight*) em cada botão do sistema à medida que o usuário avança no tutorial.
+- **Como Testar:** Abra o aplicativo no navegador pela primeira vez (ou limpe a chave `cantoalegre_garden_tour_completed_v1` do localStorage).
+- **Como Desfazer:** Remova a chamada do componente `<GardenTourWalkthrough>` dentro de `src/App.jsx`.
+
+### 🌸 Pergunta Inicial ("Conhece a Planta?") & Auto-Complete com IA Gemini
+- **Por que fizemos?** Agilizar o cadastro de quem já sabe o nome popular da planta (ex: "Jiboia" ou "Espada de São Jorge") sem obrigar tirar foto imediata, preenchendo todos os detalhes botânicos automaticamente via IA.
+- **Como foi construído?** Reformulamos o `AddPlantModal.jsx` com um fluxo de duas etapas: pergunta inicial interativa + busca inteligente com auto-complete alimentado pelo modelo `Google Gemini 1.5 Flash`.
+- **Como Testar:** Clique no botão "+ Nova Planta", selecione "Sim, já conheço o nome", digite o nome de uma planta e observe a IA preenchendo a ficha técnica completa.
+- **Como Desfazer:** Reverta a etapa inicial do `AddPlantModal.jsx` para ir diretamente ao upload de foto.
+
+### 🏡 Ambiente Ideal / Onde Fica a Planta (Fase v1.5.1)
+- **Por que fizemos?** Ajudar o usuário a organizar o espaço da casa ou quintal, indicando visualmente onde posicionar cada espécie para que receba a iluminação correta.
+- **Como foi construído?** Adicionamos o atributo `idealEnvironment` na interface React, no prompt da IA Gemini, no banco relacional PostgreSQL (`V2__add_ideal_environment.sql`) e nas rotas da REST API Spring Boot.
+- **Como Testar:** Adicione ou edite uma planta e defina o ambiente (ex: *"Dentro de casa (Sala/Quarto)"*). Na barra de busca do jardim, digite "quarto" ou "sala" para filtrar instantaneamente.
+- **Como Desfazer:** Reverta a migração `V2` no banco de dados e remova o campo nos componentes React.
 
 ---
 
-## 3. Instruções de Como Fazer e Desfazer (Rastreabilidade de Alterações)
+## 2. A transição para a Nuvem: Onde a AWS se Encaixa no Projeto?
 
-### Como Fazer / Testar a Etapa 2:
-1. Navegue até a pasta `api/` no terminal.
-2. Execute a suíte de testes com `./mvnw test`. Todos os 20 testes devem passar sem erros.
-3. No frontend React, chame `apiService.uploadPlantPhoto(plantId, file)` enviando o arquivo recebido pelo input de câmera/galeria.
+Muitos desenvolvedores têm dúvida sobre **quando e onde usam serviços na nuvem (como a AWS)** durante o ciclo de vida de um projeto. Vamos contextualizar exatamente a situação atual do Canto Alegre e os próximos passos.
 
-### Como Desfazer / Reverter a Etapa 2 (Se necessário):
-1. Para remover o recurso de upload sem afetar as demais funcionalidades, remova o método `uploadPlantPhoto` em `PlantController.java` e `PlantService.java`.
-2. Delete as classes `LocalStorageService.java`, `ImageStorageService.java` e `WebMvcConfig.java`.
-3. Execute `git checkout -- src/services/apiService.js` para reverter o cliente frontend.
+### 🎯 O que você já está usando em Nuvem HOJE?
+1. **Google Gemini LLM Cloud API**: A inteligência artificial que reconhece plantas por foto e gera os guias de cultivo é um serviço 100% em nuvem fornecido pela Google AI Cloud.
+2. **PostgreSQL Relacional (Container Docker)**: Atualmente, seu banco de dados roda localmente na sua máquina para agilidade no desenvolvimento.
+3. **Armazenamento de Fotos Local (`./uploads`)**: As fotos das plantas enviadas via backend são gravadas no disco local da máquina.
+
+---
+
+### ☁️ Onde e Como Você Vai Mexer na AWS (Próximos Passos de Produção)
+
+Para disponibilizar o **Canto Alegre** para milhares de usuários na internet de forma profissional, você utilizará **três pilares principais da AWS**:
+
+```
++-----------------------------------------------------------------------------------+
+|                                 ARQUITETURA AWS CLOUD                             |
++-----------------------------------------------------------------------------------+
+|                                                                                   |
+|  [ Usuário no Smartphone / PWA ]                                                  |
+|                 │                                                                 |
+|                 ├── (1) Fotos de Plantas ──────► AWS S3 (Simple Storage Service)   |
+|                 │                                 (Guardar imagens das mudas)     |
+|                 │                                                                 |
+|                 └── (2) Requisições REST API ──► AWS EC2 / App Runner             |
+|                                                   (Executar API Spring Boot Java) |
+|                                                           │                       |
+|                                                           ▼                       |
+|                                                    AWS RDS (PostgreSQL)           |
+|                                                    (Banco de Dados na Nuvem)      |
++-----------------------------------------------------------------------------------+
+```
+
+#### 1. AWS S3 (Simple Storage Service) - Armazenamento de Fotos
+- **Por quê usar?** Salvar fotos de plantas no próprio disco da máquina local limita o espaço e impede o dimensionamento automático. O AWS S3 é o serviço padrão para guardar imagens de forma rápida, barata e acessível por URL pública.
+- **Como implementar no Java?** Graças ao padrão de projeto `Strategy` criado no backend, você só precisará criar uma classe `S3StorageService` implementando a interface `ImageStorageService.java`, alterando uma única linha de configuração no Spring Boot!
+
+#### 2. AWS RDS (Relational Database Service) - Banco PostgreSQL na Nuvem
+- **Por quê usar?** Em vez de manter o banco PostgreSQL rodando no Docker do seu computador, o AWS RDS fornece um banco de dados PostgreSQL totalmente gerenciado pela AWS com backups diários automáticos.
+
+#### 3. AWS App Runner / EC2 - Servidor da API Spring Boot
+- **Por quê usar?** É onde o arquivo executável da sua API Java (`canto-alegre-api-0.0.1-SNAPSHOT.jar`) ficará rodando 24 horas por dia para responder às requisições do aplicativo.
+
+---
+
+## 3. Resumo Prático de Rastreabilidade das Modificações
+
+Se você precisar consultar quem alterou o quê ou desejar testar/desfazer qualquer parte da aplicação, utilize este mapa sintético:
+
+| Funcionalidade | Papel do Agente / Usuário | Arquivos Afetados | Como Testar Rapidamente | Como Desfazer com Segurança |
+| :--- | :--- | :--- | :--- | :--- |
+| **PWA & Offline** | Parceria Usuário + Agente | `sw.js`, `storageService.js` | Desligar Wi-Fi no navegador | Desativar SW em `main.jsx` |
+| **Fluxo IA Gemini** | Parceria Usuário + Agente | `geminiService.js`, `AddPlantModal.jsx` | Testar auto-complete com "Jiboia" | Voltar modal para passo único |
+| **Backend REST API** | Agente de Código | `api/src/main/java/...` | Executar `./mvnw test` na pasta `api` | Checkout dos commits na pasta `api` |
+| **Ambiente Ideal (v1.5.1)** | Solicitado pelo Usuário | `Plant.java`, `V2...sql`, `PlantCard.jsx` | Filtrar por "quarto" na barra de busca | Dropar coluna `ideal_environment` |
+| **Cloud Storage AWS S3** | Próxima Etapa da Nuvem | `ImageStorageService.java` | Criar `S3StorageService.java` | Trocar bean para `LocalStorageService` |
+
+---
+
+## 4. Conclusão
+
+O **Canto Alegre** já possui toda a base arquitetural pronta para a nuvem. O código foi projetado de forma desacoplada para que a transição do armazenamento local para a **AWS** aconteça de maneira simples e transparente, mantendo a experiência do usuário fluida tanto online quanto offline.

@@ -10,7 +10,7 @@ Este diretório contem o material de estudo detalhado sobre a evolucao arquitetu
 | :--- | :--- |
 | [01-ROADMAP_E_ARQUITETURA.md](./01-ROADMAP_E_ARQUITETURA.md) | Roadmap do desenvolvimento, transicao de escopo (PWA IndexedDB para Spring Boot 3 + PostgreSQL + Gemini LLM), fluxo de comunicacao entre modulos e sincronizacao hibrida offline-first. |
 | [02-GUIA_DE_ANOTACOES_JAVA_SPRING.md](./02-GUIA_DE_ANOTACOES_JAVA_SPRING.md) | Manual exaustivo de todas as anotações Java (Spring, JPA/Hibernate, Lombok, Validation, JUnit 5, Mockito e Testcontainers), detalhando utilidade, localizacao no codigo, dependencias Maven e impacto no software/banco de dados. |
-| [03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](./03-RASTREABILIDADE_E_ETAPA2_STORAGE.md) | Rastreabilidade de features e historico (Usuario vs Agente), instruçoes de como fazer e desfazer cada recurso, e detalhamento da Etapa 2 (Storage Cloud de Fotos). |
+| [03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](./03-RASTREABILIDADE_E_ETAPA2_STORAGE.md) | Guia contextualizado de rastreabilidade de recursos (como fazer/desfazer cada funcionalidade), história da evolução do projeto e guia prático sobre como e onde utilizar os serviços em nuvem AWS (S3, RDS e EC2). |
 
 ---
 

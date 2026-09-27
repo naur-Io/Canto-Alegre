@@ -6,11 +6,12 @@
 
 ## Guia de Estudos & Documentacao Arquitetural
 
-Para entender detalhadamente a arquitetura do sistema, a comunicacao entre o PWA e a API REST, o fluxo de sincronizacao offline-first e o funcionamento das anotações Java/Spring, consulte a pasta de estudos dedicada:
+Para entender detalhadamente a arquitetura do sistema, a comunicacao entre o PWA e a API REST, o fluxo de sincronizacao offline-first, o funcionamento das anotações Java/Spring e a integracao com AWS, consulte a pasta de estudos dedicada:
 
 - **[Indice de Estudos (studies/README.md)](studies/README.md)**
   - **[Roadmap & Arquitetura de Comunicacao (studies/01-ROADMAP_E_ARQUITETURA.md)](studies/01-ROADMAP_E_ARQUITETURA.md)**: Visao geral da evolucao do escopo, diagramas de sequencia e sincronizacao hibrida offline-first.
   - **[Manual de Anotacoes Java/Spring (studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)](studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)**: Guia completo de anotações ("decoradores") Spring Boot, JPA/Hibernate, Validation, Lombok e Testes (JUnit 5, Mockito e Testcontainers).
+  - **[Rastreabilidade, Evolução & Guia Cloud AWS (studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)](studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)**: Rastreabilidade de cada funcionalidade (como fazer/desfazer), história da evolução do projeto e guia prático sobre utilização dos serviços em nuvem AWS (S3, RDS e EC2).
 
 ---
 
@@ -34,14 +35,14 @@ O sistema adota uma arquitetura descentralizada e resiliente dividida em duas gr
 
 ### 1. Backend REST API (`canto-alegre-api`)
 - **Linguagem & Framework**: Java 21 e Spring Boot 3.x (Spring Web, Spring Data JPA, Spring Security, Validation).
-- **Banco de Dados Relacional**: PostgreSQL 16 (executado via Docker Compose) com controle de versoes de schema via **Flyway Migration** (`V1__create_initial_schema.sql`).
+- **Banco de Dados Relacional**: PostgreSQL 16 (executado via Docker Compose ou AWS RDS) com controle de versoes de schema via **Flyway Migration** (`V1__create_initial_schema.sql`, `V2__add_ideal_environment.sql`).
 - **Respostas de Erro Padronizadas**: Mapeamento global de exceções via `@RestControllerAdvice` seguindo a **RFC 7807 (ProblemDetail)**.
 - **Enriquecimento via IA Botânica**: `GeminiService` realiza a busca e enriquecimento de novas especies com fallback automatico e persistência no banco de dados como **cache canonico**.
 - **Multi-Tenancy Anônimo (Guest-First)**: Seguranca stateless isolada por `X-Guest-Id` via cabeçalho HTTP, permitindo que cada usuario tenha seu jardim isolado sem barreiras de login.
-- **Suíte de Testes Automatizados**: 17 testes automatizados divididos em testes unitarios com JUnit 5 + Mockito e testes de integracao com **Testcontainers** subindo container PostgreSQL `16-alpine` real.
+- **Suíte de Testes Automatizados**: 20 testes automatizados divididos em testes unitarios com JUnit 5 + Mockito e testes de integracao com **Testcontainers** subindo container PostgreSQL `16-alpine` real.
 
 ### 2. Frontend PWA (`Canto Alegre`)
-- **Tecnologias**: React 18, Vite 5, CSS3 com tokens de Design System e alternância de Temas (Claro e Escuro).
+- **Tecnologias**: React 18, Vite 5, CSS3 com tokens de Design System em Tema Botânico Único Claro de alto contraste.
 - **Resiliencia Offline-First**: Persistencia instantânea via IndexedDB (`idb-keyval`) e Service Worker nativo.
 - **Sincronizacao Hibrida Cloud**: Cliente HTTP (`apiService.js`) integrado com fila offline de operacoes pendentes (`syncService.js`) que envia as alteracoes para a API assim que a conexao de rede e restabelecida.
 
@@ -49,11 +50,14 @@ O sistema adota uma arquitetura descentralizada e resiliente dividida em duas gr
 
 ## Funcionalidades Principais
 
-- **Identificação Botânica por Foto & IA Multimodal**: Use a câmera ou fotos da galeria. A IA Google Gemini extrai nome popular/cientifico, rega, sol, solo e diagnostico de saude.
+- **Identificação Botânica por Foto & IA Multimodal**: Use a câmera ou fotos da galeria. A IA Google Gemini extrai nome popular/cientifico, rega, sol, solo, ambiente ideal e diagnostico de saude.
+- **Novo Fluxo de Adição (Pergunta Inicial & Auto-Complete)**: Pergunta *"Você já conhece o nome da planta?"* com auto-complete inteligente de cuidados e guia de mudas por IA ou foto.
+- **Ambiente Ideal / Onde Fica a Planta**: Especificação do local ideal (sala, quarto, terraço, banheiro ou quintal) com filtro dinâmico na barra de busca do jardim.
+- **Tour Guiado com Spotlight Ring**: Guia interativo passo a passo que ilumina os botões principais do aplicativo para novos usuários.
 - **Guia Completo de Mudas & Estaquia**: Passo a passo de multiplicacao por estaca de caule, folha ou divisao de touceiras.
 - **Sincronizacao Hibrida Cloud + Offline-First**: Funciona perfeitamente sem internet e sincroniza os dados com o PostgreSQL na nuvem quando online.
 - **Dashboard do Jardim & Alerta de Sede**: Gerenciamento de plantas, historico de regas e lembretes diarios.
-- **Alternância de Temas (Claro e Escuro)**: Interface adaptativa para uso em ambientes internos ou sob luz solar direta.
+- **Botão Flutuante (+)**: Acesso rápido no canto inferior direito para cadastrar plantas em qualquer dispositivo.
 
 ---
 
