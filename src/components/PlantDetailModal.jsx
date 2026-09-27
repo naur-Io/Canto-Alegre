@@ -20,7 +20,8 @@ import {
   CheckCircle2,
   Info,
   Sprout,
-  Lightbulb
+  Lightbulb,
+  Home
 } from 'lucide-react';
 import { getDefaultPropagationForPlant } from '../services/geminiService';
 
@@ -183,6 +184,17 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                     value={formData.origin || ''}
                     onChange={e => handleInputChange('origin', e.target.value)}
                     placeholder="Ex: Sudeste Asiático, Florestas do Brasil, México..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Ambiente Ideal / Onde Fica a Planta</label>
+                  <input 
+                    type="text" 
+                    className="form-input"
+                    value={formData.idealEnvironment || ''}
+                    onChange={e => handleInputChange('idealEnvironment', e.target.value)}
+                    placeholder="Ex: Dentro de casa (Sala, Quarto), Fora de casa (Quintal), Terraço, Banheiro..."
                   />
                 </div>
               </div>
@@ -498,6 +510,13 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   <div className="plant-origin-badge">
                     <Globe size={14} />
                     <span><strong>Origem:</strong> {plant.origin}</span>
+                  </div>
+                )}
+
+                {plant.idealEnvironment && (
+                  <div className="plant-origin-badge" style={{ marginTop: '6px', background: 'var(--primary-50, rgba(16, 185, 129, 0.12))', borderColor: 'var(--border-color)', color: 'var(--primary-800, #15803d)' }}>
+                    <Home size={14} />
+                    <span><strong>Ambiente Ideal:</strong> {plant.idealEnvironment}</span>
                   </div>
                 )}
               </div>

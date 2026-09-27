@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.5.1] - 2026-09-27
+
+### Added & Updated
+- **Ambiente Ideal / Onde Fica a Planta**:
+  - Novo campo de especificação do ambiente ideal (ex: *"Dentro de casa (Sala, Quarto ou Escritório)"*, *"Fora de casa / Quintal"*, *"Terraço / Sacada"*, *"Banheiro / Área Úmida"*).
+  - Classificação e preenchimento automático via IA Gemini ao cadastrar ou auto-completar a planta.
+  - Exibição de badge com ícone de casa no cartão da planta (`PlantCard.jsx`), modal de detalhes (`PlantDetailModal.jsx`) e modal de adição (`AddPlantModal.jsx`).
+  - Suporte à busca dinâmica por ambiente no campo de pesquisa da página inicial.
+  - Migração de banco de dados PostgreSQL `V2__add_ideal_environment.sql` e suporte REST na API backend Java.
+
 ## [1.5.0] - 2026-09-27
 
 ### Added & Changed

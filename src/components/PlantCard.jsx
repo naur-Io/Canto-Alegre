@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droplets, Sun, AlertCircle, CheckCircle2, Clock, Globe, Sprout } from 'lucide-react';
+import { Droplets, Sun, AlertCircle, CheckCircle2, Clock, Globe, Sprout, Home } from 'lucide-react';
 
 export default function PlantCard({ plant, onWater, onClick }) {
   // Cálculo de dias até a próxima rega
@@ -79,6 +79,13 @@ export default function PlantCard({ plant, onWater, onClick }) {
           <div className="card-origin-snippet" title={plant.origin}>
             <Globe size={12} />
             <span>{plant.origin}</span>
+          </div>
+        )}
+
+        {plant.idealEnvironment && (
+          <div className="card-origin-snippet" title={`Ambiente Ideal: ${plant.idealEnvironment}`} style={{ color: 'var(--primary-700, #166534)' }}>
+            <Home size={12} />
+            <span>{plant.idealEnvironment}</span>
           </div>
         )}
 

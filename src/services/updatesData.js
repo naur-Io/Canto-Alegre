@@ -1,5 +1,31 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.5.1',
+    version: 'v1.5.1',
+    date: '27 de Setembro de 2026',
+    title: 'Canto Alegre - Campo "Ambiente Ideal / Onde Fica a Planta"',
+    isMajor: false,
+    badges: ['Novo', 'Ambiente Ideal', 'IA Gemini', 'Backend API'],
+    summary: 'Adicionado campo de ambiente ideal em toda a aplicação (frontend, IA Gemini auto-complete e banco de dados PostgreSQL backend), permitindo especificar se a planta fica dentro de casa, quintal, sacada ou banheiro.',
+    items: [
+      {
+        type: 'environment',
+        title: 'Ambiente Ideal da Planta',
+        desc: 'Identifique facilmente onde posicionar cada espécie (sala, quarto, terraço, banheiro ou quintal).'
+      },
+      {
+        type: 'ai',
+        title: 'Sugestão Automática por IA',
+        desc: 'A IA Gemini sugere e preenche o ambiente ideal automaticamente ao cadastrar ou pesquisar uma muda.'
+      },
+      {
+        type: 'search',
+        title: 'Filtro & Busca por Cômodo/Ambiente',
+        desc: 'Pesquise diretamente por "quarto", "sala" ou "varanda" no campo de busca do jardim.'
+      }
+    ]
+  },
+  {
     id: 'v1.5.0',
     version: 'v1.5.0',
     date: '27 de Setembro de 2026',

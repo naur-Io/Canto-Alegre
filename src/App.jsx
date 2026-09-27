@@ -163,6 +163,7 @@ export default function App() {
       (p.origin && p.origin.toLowerCase().includes(term)) ||
       (p.soilType && p.soilType.toLowerCase().includes(term)) ||
       (p.notes && p.notes.toLowerCase().includes(term)) ||
+      (p.idealEnvironment && p.idealEnvironment.toLowerCase().includes(term)) ||
       (p.sunlight?.notes && p.sunlight.notes.toLowerCase().includes(term)) ||
       (p.propagation?.method && p.propagation.method.toLowerCase().includes(term)) ||
       (p.propagation?.proTips && p.propagation.proTips.toLowerCase().includes(term));

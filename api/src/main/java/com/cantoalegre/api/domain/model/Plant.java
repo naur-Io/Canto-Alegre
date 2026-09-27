@@ -38,6 +38,9 @@ public class Plant {
     @Column(name = "custom_location", length = 100)
     private String customLocation;
 
+    @Column(name = "ideal_environment", length = 150)
+    private String idealEnvironment;
+
     @Column(name = "photo_url", columnDefinition = "TEXT")
     private String photoUrl;
 

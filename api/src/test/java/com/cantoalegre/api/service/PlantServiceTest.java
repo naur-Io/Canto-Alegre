@@ -85,6 +85,7 @@ class PlantServiceTest {
                 "Minha Jiboia",
                 species.getId(),
                 "Varanda",
+                "Dentro de casa (Sala, Quarto ou Escritório)",
                 null,
                 null,
                 null,

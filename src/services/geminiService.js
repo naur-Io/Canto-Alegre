@@ -595,6 +595,7 @@ export function simulateSmartAiAnalysis() {
       scientificName: 'Aglaonema commutatum',
       origin: 'Florestas Tropicais do Sudeste Asiático (Tailândia, Filipinas e Malásia)',
       plantType: 'Luz Indireta / Sombra Luminosa',
+      idealEnvironment: 'Dentro de casa (Sala, Quarto ou Escritório)',
       healthStatus: 'Saudável & Vistosa',
       sunlight: {
         lightType: 'indireta',
@@ -641,6 +642,7 @@ export function simulateSmartAiAnalysis() {
       scientificName: 'Epipremnum aureum',
       origin: 'Ilhas Salomão e Polinésia Francesa',
       plantType: 'Luz Indireta / Meia Sombra',
+      idealEnvironment: 'Dentro de casa (Sala, Quarto ou Escritório)',
       healthStatus: 'Vigorosa',
       sunlight: {
         lightType: 'indireta',
@@ -684,6 +686,7 @@ export function simulateSmartAiAnalysis() {
       scientificName: 'Ocimum basilicum',
       origin: 'Regiões Tropicais da Ásia Central e Índia',
       plantType: 'Sol Pleno (Luz Direta)',
+      idealEnvironment: 'Fora de casa (Quintal, Horta ou Sacada de Sol)',
       healthStatus: 'Saudável & Vigoroso',
       sunlight: {
         lightType: 'direta',
@@ -730,6 +733,7 @@ export function simulateSmartAiAnalysis() {
       scientificName: 'Nephrolepis exaltata',
       origin: 'Florestas Tropicais Úmidas das Américas e Polinésia',
       plantType: 'Sombra / Luz Indireta',
+      idealEnvironment: 'Dentro de casa (Banheiro, Varanda protegida ou Cozinha)',
       healthStatus: 'Folhagem Verde Vistosa',
       sunlight: {
         lightType: 'sombra',

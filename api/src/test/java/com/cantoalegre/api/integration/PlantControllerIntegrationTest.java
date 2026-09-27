@@ -34,6 +34,7 @@ class PlantControllerIntegrationTest extends AbstractIntegrationTest {
                 "Jiboia da Varanda",
                 null,
                 "Varanda Principal",
+                "Dentro de casa (Sala, Quarto ou Escritório)",
                 "http://example.com/photo.jpg",
                 4,
                 null,

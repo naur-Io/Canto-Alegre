@@ -7,6 +7,7 @@ export const INITIAL_PLANTS = [
     origin: 'Ilhas Salomão e Polinésia Francesa (Pacífico Sul)',
     photoUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80',
     plantType: 'Luz Indireta / Meia Sombra',
+    idealEnvironment: 'Dentro de casa (Sala, Quarto ou Escritório)',
     healthStatus: 'Excelente Vigor',
     lastWatered: new Date(Date.now() - 86400000 * 2).toISOString(),
     sunlight: {

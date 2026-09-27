@@ -53,6 +53,7 @@ public class PlantService {
                 .species(species)
                 .nickname(request.nickname())
                 .customLocation(request.customLocation())
+                .idealEnvironment(request.idealEnvironment())
                 .photoUrl(request.photoUrl())
                 .nextWateringAt(nextWatering)
                 .notes(request.notes())

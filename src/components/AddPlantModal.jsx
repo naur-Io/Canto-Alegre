@@ -44,6 +44,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
     scientificName: '',
     origin: '',
     plantType: 'Luz Indireta / Meia Sombra',
+    idealEnvironment: 'Dentro de casa (Sala, Quarto ou Escritório)',
     sunlight: {
       lightType: 'indireta', // 'direta' | 'indireta' | 'sombra'
       period: 'Luz Indireta Filtrada / Meia Sombra',
@@ -168,6 +169,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
         scientificName: result.scientificName || prev.scientificName || '',
         origin: result.origin || prev.origin || '',
         plantType: result.plantType || prev.plantType || 'Luz Indireta / Meia Sombra',
+        idealEnvironment: result.idealEnvironment || prev.idealEnvironment,
         sunlight: {
           lightType: result.sunlight?.lightType || (result.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : result.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta'),
           period: result.sunlight?.period || prev.sunlight.period,
@@ -220,6 +222,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
         scientificName: result.scientificName || prev.scientificName,
         origin: result.origin || prev.origin,
         plantType: result.plantType || prev.plantType,
+        idealEnvironment: result.idealEnvironment || prev.idealEnvironment,
         sunlight: {
           lightType: result.sunlight?.lightType || (result.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : result.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta'),
           period: result.sunlight?.period || prev.sunlight.period,
@@ -716,6 +719,18 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                       value={plantData.origin || ''} 
                       onChange={e => setPlantData({ ...plantData, origin: e.target.value })}
                       placeholder="Ex: Florestas Tropicais do Sudeste Asiático (Tailândia, Filipinas)"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Ambiente Ideal / Onde Fica a Planta *</label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      value={plantData.idealEnvironment || ''} 
+                      onChange={e => setPlantData({ ...plantData, idealEnvironment: e.target.value })}
+                      placeholder="Ex: Dentro de casa (Sala, Quarto), Fora de casa (Quintal), Terraço, Banheiro..."
+                      required
                     />
                   </div>
                 </div>
