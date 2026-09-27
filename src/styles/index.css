@@ -544,6 +544,12 @@ button, input, select, textarea {
   animation: pulse 2s infinite;
 }
 
+.badge-environment {
+  background: rgba(209, 250, 229, 0.95);
+  color: #047857;
+  border: 1px solid #6ee7b7;
+}
+
 .card-body {
   padding: 18px;
   display: flex;
@@ -564,6 +570,30 @@ button, input, select, textarea {
   color: var(--text-muted);
   font-style: italic;
   margin-bottom: 8px;
+}
+
+.card-environment-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--primary-800, #047857);
+  margin-bottom: 8px;
+}
+
+.plant-environment-highlight-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1.5px solid rgba(16, 185, 129, 0.3);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin-top: 10px;
 }
 
 .card-origin-snippet {

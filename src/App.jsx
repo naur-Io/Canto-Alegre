@@ -230,27 +230,6 @@ export default function App() {
         />
       ) : (
         <main className="app-container">
-          {/* Banner Hero / Dashboard do Jardim (Versão Compacta Slim) */}
-          <section className="hero-header hero-header-compact">
-            <div className="hero-text">
-              <h1>{currentLang === 'en' ? 'My Smart Garden' : 'Meu Jardim Inteligente'}</h1>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-value">{totalCount}</div>
-                <div className="stat-label">{currentLang === 'en' ? 'Saved Plants' : 'Plantas Salvas'}</div>
-              </div>
-
-              <div className="stat-card" style={{ background: needsWaterCount > 0 ? 'rgba(239, 68, 68, 0.25)' : undefined }}>
-                <div className="stat-value" style={{ color: needsWaterCount > 0 ? '#fca5a5' : '#fff' }}>
-                  {needsWaterCount}
-                </div>
-                <div className="stat-label">{currentLang === 'en' ? 'Thirsty Today' : 'Sede Hoje'}</div>
-              </div>
-            </div>
-          </section>
-
           {/* Toolbar de Pesquisa & Filtros */}
           <section className="toolbar">
             <div className="search-box">

@@ -514,9 +514,16 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 )}
 
                 {plant.idealEnvironment && (
-                  <div className="plant-origin-badge" style={{ marginTop: '6px', background: 'var(--primary-50, rgba(16, 185, 129, 0.12))', borderColor: 'var(--border-color)', color: 'var(--primary-800, #15803d)' }}>
-                    <Home size={14} />
-                    <span><strong>Ambiente Ideal:</strong> {plant.idealEnvironment}</span>
+                  <div className="plant-environment-highlight-badge">
+                    <Home size={18} color="#047857" style={{ flexShrink: 0 }} />
+                    <div>
+                      <span style={{ display: 'block', fontSize: '0.75rem', color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '700' }}>
+                        Onde Fica / Ambiente Ideal
+                      </span>
+                      <span style={{ fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: '600' }}>
+                        {plant.idealEnvironment}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
