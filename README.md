@@ -11,7 +11,8 @@ Para entender detalhadamente a arquitetura do sistema, a comunicacao entre o PWA
 - **[Indice de Estudos (studies/README.md)](studies/README.md)**
   - **[Roadmap & Arquitetura de Comunicacao (studies/01-ROADMAP_E_ARQUITETURA.md)](studies/01-ROADMAP_E_ARQUITETURA.md)**: Visao geral da evolucao do escopo, diagramas de sequencia e sincronizacao hibrida offline-first.
   - **[Manual de Anotacoes Java/Spring (studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)](studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)**: Guia completo de anotações ("decoradores") Spring Boot, JPA/Hibernate, Validation, Lombok e Testes (JUnit 5, Mockito e Testcontainers).
-  - **[Rastreabilidade, Evolução & Guia Cloud AWS (studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)](studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)**: Rastreabilidade de cada funcionalidade (como fazer/desfazer), história da evolução do projeto e guia prático sobre utilização dos serviços em nuvem AWS (S3, RDS e EC2).
+  - **[Rastreabilidade, Evolução & Guia Cloud AWS (studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)](studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)**: Rastreabilidade de cada funcionalidade (como fazer/desfazer), história da evolução do projeto e visão geral dos serviços em nuvem AWS.
+  - **[Guia Passo a Passo AWS Cloud (studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md)](studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md)**: Passo a passo visual de configuração AWS (Console IAM, S3 Bucket, RDS PostgreSQL, S3StorageService.java e Deploy).
 
 ---
 

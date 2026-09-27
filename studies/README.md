@@ -10,7 +10,8 @@ Este diretório contem o material de estudo detalhado sobre a evolucao arquitetu
 | :--- | :--- |
 | [01-ROADMAP_E_ARQUITETURA.md](./01-ROADMAP_E_ARQUITETURA.md) | Roadmap do desenvolvimento, transicao de escopo (PWA IndexedDB para Spring Boot 3 + PostgreSQL + Gemini LLM), fluxo de comunicacao entre modulos e sincronizacao hibrida offline-first. |
 | [02-GUIA_DE_ANOTACOES_JAVA_SPRING.md](./02-GUIA_DE_ANOTACOES_JAVA_SPRING.md) | Manual exaustivo de todas as anotações Java (Spring, JPA/Hibernate, Lombok, Validation, JUnit 5, Mockito e Testcontainers), detalhando utilidade, localizacao no codigo, dependencias Maven e impacto no software/banco de dados. |
-| [03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](./03-RASTREABILIDADE_E_ETAPA2_STORAGE.md) | Guia contextualizado de rastreabilidade de recursos (como fazer/desfazer cada funcionalidade), história da evolução do projeto e guia prático sobre como e onde utilizar os serviços em nuvem AWS (S3, RDS e EC2). |
+| [03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](./03-RASTREABILIDADE_E_ETAPA2_STORAGE.md) | Guia contextualizado de rastreabilidade de recursos (como fazer/desfazer cada funcionalidade), história da evolução do projeto e visão geral dos serviços em nuvem. |
+| [04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md](./04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md) | Passo a passo prático de configuração AWS: onde clicar no Console, criação de credenciais IAM, bucket S3 para fotos, banco PostgreSQL no RDS, classe Java S3StorageService e deploy do ecossistema. |
 
 ---
 
@@ -43,6 +44,7 @@ Canto-Alegre/
 │   ├── README.md
 │   ├── 01-ROADMAP_E_ARQUITETURA.md
 │   ├── 02-GUIA_DE_ANOTACOES_JAVA_SPRING.md
-│   └── 03-RASTREABILIDADE_E_ETAPA2_STORAGE.md
+│   ├── 03-RASTREABILIDADE_E_ETAPA2_STORAGE.md
+│   └── 04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md
 └── CHANGELOG.md                        # Histórico de versoes e alteracoes
 ```
