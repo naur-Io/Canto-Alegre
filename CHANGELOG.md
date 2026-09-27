@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.6.0] - 2026-09-27
+
+### Added & Changed
+- **Deploy Nuvem AWS RDS & Render.com**:
+  - API REST Spring Boot 3 no ar 24/7 hospedada no Render (`https://canto-alegre.onrender.com/api/v1`).
+  - Banco de Dados PostgreSQL 16.9 gerenciado no AWS RDS (`canto-alegre-db.czisisu4ueck.sa-east-1.rds.amazonaws.com`).
+  - Armazenamento de fotos no bucket AWS S3 (`canto-alegre-fotos-prod`) e suporte a CORS global (`SecurityConfig.java`).
+- **Redesign Compacto do Painel "Meu Jardim Inteligente"**:
+  - Redução da altura e padding do painel hero da home (`.hero-header-compact`), eliminando blocos de texto redundantes e aumentando a área útil visível para a galeria de plantas em mais de 60%.
+- **Ampliação Ergonomica do Botão Flutuante (+)**:
+  - Botão FAB verde no canto inferior direito expandido para 68px de diâmetro com ícone ampliado de 32px (`<Plus size={32} />`), facilitando o toque em smartphones e computadores.
+- **Guia Completo de Nuvem na Pasta de Estudos**:
+  - Atualização do `studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md` e `studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md` detalhando cada serviço AWS (RDS, S3, IAM), variáveis de ambiente e dockerization.
+
 ## [1.5.1] - 2026-09-27
 
 ### Added & Updated

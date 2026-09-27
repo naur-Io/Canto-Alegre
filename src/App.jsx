@@ -230,15 +230,10 @@ export default function App() {
         />
       ) : (
         <main className="app-container">
-          {/* Banner Hero / Dashboard do Jardim */}
-          <section className="hero-header">
+          {/* Banner Hero / Dashboard do Jardim (Versão Compacta Slim) */}
+          <section className="hero-header hero-header-compact">
             <div className="hero-text">
               <h1>{currentLang === 'en' ? 'My Smart Garden' : 'Meu Jardim Inteligente'}</h1>
-              <p>
-                {currentLang === 'en'
-                  ? 'Complete botanical guide with light, watering, origin, soil type, and step-by-step cutting propagation instructions.'
-                  : 'Guia botanico completo com quantidade de luz, rega, origem, clima, tipo de solo e guia passo a passo para tirar mudas e cultivar.'}
-              </p>
             </div>
 
             <div className="stats-grid">
@@ -427,7 +422,7 @@ export default function App() {
           title={currentLang === 'en' ? "Add New Plant" : "Adicionar Nova Planta"}
           aria-label="Adicionar Nova Planta"
         >
-          <Plus size={26} />
+          <Plus size={32} />
         </button>
       )}
     </div>

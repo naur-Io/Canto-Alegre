@@ -1,65 +1,46 @@
-# Guia Passo a Passo: Implantação e Configuração na Nuvem AWS (Fase 3)
+# Guia Passo a Passo & Infraestrutura Concluída na Nuvem AWS (Fase 3)
 
-> **Manual detalhado para configuração de infraestrutura em nuvem na Amazon Web Services (AWS), cobrindo credenciais IAM, armazenamento de fotos no AWS S3, banco de dados gerenciado AWS RDS PostgreSQL e deploy da API Spring Boot.**
+> **Manual detalhado da infraestrutura em nuvem implantada com sucesso na Amazon Web Services (AWS) e Render, cobrindo credenciais IAM, armazenamento de fotos no AWS S3, banco de dados gerenciado AWS RDS PostgreSQL e deploy da API Spring Boot Java 21 via Docker.**
 
 ---
 
-## 1. Visão Geral dos Serviços AWS Utilizados
+## 1. Visão Geral da Infraestrutura em Produção
 
-Para colocar o projeto **Canto Alegre** em produção com alta disponibilidade, utilizaremos 4 serviços principais da AWS:
+O ecossistema do **Canto Alegre** está 100% no ar e em produção com a seguinte arquitetura distribuída:
 
-| Serviço AWS | Finalidade no Canto Alegre | Alternativa Gratuita / Simplificada |
+```
+[ PWA Client (React 18 / IndexedDB) ]
+                 │
+                 ├── (1) Requisições REST HTTPS ──► Render Web Service (Java 21 / Docker)
+                 │                                   URL: https://canto-alegre.onrender.com/api/v1
+                 │                                                   │
+                 │                                                   ├──► AWS RDS PostgreSQL 16.9
+                 │                                                   │    Endpoint: canto-alegre-db.czisisu4ueck...
+                 │                                                   │
+                 └── (2) Upload de Imagens ──────────────────────────┼──► AWS S3 Bucket
+                                                                          Bucket: canto-alegre-fotos-prod
+```
+
+| Serviço | Papel e Finalidade no Canto Alegre | Dados de Produção / Configuração |
 | :--- | :--- | :--- |
-| **AWS IAM (Identity & Access Management)** | Gestão de chaves de acesso (`Access Key` e `Secret Key`) para que o Spring Boot se comunique com a AWS com segurança. | Não se aplica (Nativo AWS) |
-| **AWS S3 (Simple Storage Service)** | Armazenamento de fotos de plantas enviadas pelos usuários via upload multipart. | Cloudinary / Supabase Storage |
-| **AWS RDS (Relational Database Service)** | Banco de dados PostgreSQL 16 gerenciado na nuvem com backups automáticos. | Render PostgreSQL / Neon.tech |
-| **AWS App Runner / Elastic Beanstalk** | Servidor para executar a REST API Spring Boot Java 21 (`.jar`) em execução 24/7. | Render / Railway / Fly.io |
-| **AWS Amplify / S3 + CloudFront** | Hospedagem do frontend PWA React em URL pública com HTTPS automático. | Vercel / Netlify |
+| **AWS IAM** | Credenciais seguras (`Access Key` e `Secret Key`) para autenticação stateless da API no S3. | Usuário: `canto-alegre-backend-user` com política `AmazonS3FullAccess`. |
+| **AWS S3** | Armazenamento seguro de fotos de plantas enviadas pelos usuários via upload multipart. | Bucket: `canto-alegre-fotos-prod` (Região `sa-east-1` São Paulo). |
+| **AWS RDS PostgreSQL** | Banco de dados relacional gerenciado na nuvem com backups diários e Flyway Migrations. | Endpoint: `canto-alegre-db.czisisu4ueck.sa-east-1.rds.amazonaws.com` (Porta `5432`, DB `cantoalegredb`, Usuário `cantoalegreadmin`). |
+| **Render Web Service** | Servidor de execução 24/7 da REST API Spring Boot 3 compilada via Docker multi-stage (Java 21). | URL Pública: `https://canto-alegre.onrender.com` |
 
 ---
 
-## 2. Passo a Passo Completo: Onde Clicar e Como Configurar
+## 2. Detalhamento Passo a Passo das Etapas Realizadas
 
-### Passo 1: Criar Conta AWS e Obter Credenciais IAM
+### Passo 1: Configuração das Credenciais IAM na AWS
+1. Acessou-se o Console AWS IAM e criou-se o usuário programático `canto-alegre-backend-user`.
+2. Anexou-se a política nativa `AmazonS3FullAccess`.
+3. Geraram-se as chaves `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY`.
+4. As credenciais foram isoladas de forma segura no arquivo local `api/.env` (adicionado ao `.gitignore` para proteção absoluta contra vazamentos).
 
-1. **Acessar a AWS**: Acesse o site oficial em `https://aws.amazon.com/` e clique no botão no canto superior direito **"Criar uma conta da AWS"** (*Create an AWS Account*).
-2. **Acessar o Painel IAM**:
-   - No campo de busca superior do Console AWS, digite **IAM** e clique no serviço **IAM**.
-3. **Criar Usuário Programático**:
-   - No menu lateral esquerdo, clique em **Usuários** (*Users*) e depois em **Criar usuário** (*Create user*).
-   - Nome do Usuário: `canto-alegre-backend-user`.
-   - Clique em **Próximo** (*Next*).
-4. **Atribuir Permissões**:
-   - Selecionar a opção **Anexar políticas diretamente** (*Attach policies directly*).
-   - Pesquisar e selecionar as seguintes políticas:
-     - `AmazonS3FullAccess` (para permissão de upload/leitura de fotos no S3).
-   - Clique em **Próximo** e depois em **Criar usuário**.
-5. **Gerar Access Key & Secret Key**:
-   - Clique no usuário recém-criado `canto-alegre-backend-user`.
-   - Vá para a aba **Credenciais de segurança** (*Security credentials*).
-   - Role até a seção **Chaves de acesso** (*Access keys*) e clique em **Criar chave de acesso** (*Create access key*).
-   - Selecione a opção **Código executado fora da AWS** (*Application running outside AWS*).
-   - Clique em **Próximo** -> **Criar chave de acesso**.
-   - **IMPORTANTE**: Copie e guarde em local seguro a **Access Key ID** e a **Secret Access Key** (a Secret Key só é exibida uma única vez).
-
----
-
-### Passo 2: Criar o Bucket no AWS S3 (Armazenamento de Imagens)
-
-1. **Acessar o S3**:
-   - Na barra de busca superior do Console AWS, digite **S3** e clique no serviço **S3**.
-2. **Criar um Bucket**:
-   - Clique no botão laranja **Criar bucket** (*Create bucket*).
-   - **Nome do bucket**: `canto-alegre-fotos-prod` (deve ser em letras minúsculas e único globalmente).
-   - **Região da AWS**: Escolha `sa-east-1` (América do Sul / São Paulo) ou `us-east-1` (Norte da Virgínia).
-   - **Propriedade do objeto**: Manter *ACLs desabilitadas (recomendado)*.
-   - **Bloqueio de acesso público**:
-     - Desmarque a opção *Bloquear todo o acesso público* (*Block all public access*) se desejar servir imagens publicamente via URL direta do S3, e marque a caixa de confirmação.
-   - Clique no botão **Criar bucket** no final da página.
-3. **Configurar Política de Acesso Público ao Bucket (Bucket Policy)**:
-   - Clique no nome do bucket `canto-alegre-fotos-prod`.
-   - Acesse a aba **Permissões** (*Permissions*).
-   - Na seção **Política do bucket** (*Bucket policy*), clique em **Editar** e cole o seguinte JSON (substituindo pelo nome do seu bucket):
+### Passo 2: Criação e Liberação do Bucket AWS S3
+1. Criou-se o bucket `canto-alegre-fotos-prod` na região `sa-east-1` (São Paulo).
+2. Desbloqueou-se o acesso público de leitura e aplicou-se a **Bucket Policy** para liberação de URLs públicas de imagens:
 
 ```json
 {
@@ -76,173 +57,38 @@ Para colocar o projeto **Canto Alegre** em produção com alta disponibilidade, 
 }
 ```
 
----
+### Passo 3: Instância AWS RDS PostgreSQL 16.9
+1. Criou-se a instância de banco de dados `canto-alegre-db` no AWS RDS sob o mecanismo PostgreSQL 16.9.
+2. Nome do banco de dados relacional: `cantoalegredb`.
+3. Nome do usuário administrador principal: `cantoalegreadmin`.
+4. Habilitou-se o **Acesso Público (Sim)** e abriu-se a regra de tráfego de entrada na porta `5432` no Security Group `canto-alegre-rds-sg` (`0.0.0.0/0`).
+5. Endpoint obtido: `canto-alegre-db.czisisu4ueck.sa-east-1.rds.amazonaws.com`.
 
-### Passo 3: Criar o Banco de Dados PostgreSQL no AWS RDS
+### Passo 4: Código Java / Spring Boot para AWS S3 e CORS
+1. **Bean S3Config.java**: Criou-se o bean `@Bean public S3Client s3Client()` no pacote `com.cantoalegre.api.config` habilitado para os profiles `aws` e `prod`.
+2. **Serviço S3StorageService.java**: Implementou-se a interface `ImageStorageService` enviando arquivos multipart diretamente ao bucket `canto-alegre-fotos-prod` e retornando a URL HTTPS pública.
+3. **Liberar CORS em SecurityConfig.java**: Adicionou-se o `CorsConfigurationSource` permitindo requisições de qualquer origem (PWA clientes web, mobile e browsers).
 
-1. **Acessar o RDS**:
-   - Na barra de busca superior, digite **RDS** e clique no serviço **RDS**.
-2. **Criar Banco de Dados**:
-   - Clique no botão laranja **Criar banco de dados** (*Create database*).
-   - Método de criação: **Criação padrão** (*Standard create*).
-   - Tipo de mecanismo: **PostgreSQL**.
-   - Versão do mecanismo: Selecionar **PostgreSQL 16.x**.
-   - Modelos (*Templates*): Selecionar **Nível gratuito** (*Free Tier*).
-3. **Configurações de Identificação e Credenciais**:
-   - **Identificador da instância de banco de dados**: `canto-alegre-db`.
-   - **Nome do usuário principal**: `cantoalegre_admin`.
-   - **Senha principal**: Digite uma senha forte (ex: `CantoAlegre#2026Prod`).
-4. **Conectividade & Acesso**:
-   - **Acesso público**: Selecionar **Sim** (*Yes*) para permitir conexões de teste vindas da sua máquina local ou de servidores externos.
-   - **Grupo de segurança VPC (Security Group)**: Criar novo -> Nome: `canto-alegre-rds-sg`.
-   - Garantir que a porta `5432` esteja aberta no Security Group para tráfego de entrada.
-5. **Finalizar**:
-   - Clique no botão **Criar banco de dados**. O RDS levará cerca de 3 a 5 minutos para provisionar a instância.
-   - Após a conclusão, clique na instância `canto-alegre-db` e copie o **Ponto de extremidade** (*Endpoint*), ex: `canto-alegre-db.c123456789.sa-east-1.rds.amazonaws.com`.
-
----
-
-### Passo 4: Conectar a API Spring Boot ao AWS S3 e AWS RDS
-
-#### 1. Adicionar Dependência do AWS SDK S3 no `pom.xml` (Backend)
-
-No arquivo `api/pom.xml`, adicione a dependência do AWS SDK v2 para Java:
-
-```xml
-<dependency>
-    <groupId>software.amazon.awssdk</groupId>
-    <artifactId>s3</artifactId>
-    <version>2.25.15</version>
-</dependency>
-```
-
-#### 2. Criar a Classe `S3StorageService.java` (Implementando `ImageStorageService`)
-
-No pacote `com.cantoalegre.api.service`, crie a implementação para envio de imagens ao AWS S3:
-
-```java
-package com.cantoalegre.api.service;
-
-import com.cantoalegre.api.exception.BusinessRuleException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-import java.io.IOException;
-import java.util.UUID;
-
-@Service
-@Profile("aws")
-public class S3StorageService implements ImageStorageService {
-
-    private final S3Client s3Client;
-    private final String bucketName;
-    private final String region;
-
-    public S3StorageService(
-            S3Client s3Client,
-            @Value("${aws.s3.bucket-name}") String bucketName,
-            @Value("${aws.s3.region:sa-east-1}") String region
-    ) {
-        this.s3Client = s3Client;
-        this.bucketName = bucketName;
-        this.region = region;
-    }
-
-    @Override
-    public String storeImage(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new BusinessRuleException("O arquivo de imagem enviado esta vazio");
-        }
-
-        String extension = getFileExtension(file.getOriginalFilename());
-        String fileName = UUID.randomUUID() + extension;
-
-        try {
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .contentType(file.getContentType())
-                    .build();
-
-            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-
-            return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
-        } catch (IOException e) {
-            throw new BusinessRuleException("Falha ao enviar arquivo para o AWS S3: " + e.getMessage());
-        }
-    }
-
-    private String getFileExtension(String fileName) {
-        if (fileName != null && fileName.contains(".")) {
-            return fileName.substring(fileName.lastIndexOf("."));
-        }
-        return ".jpg";
-    }
-}
-```
-
-#### 3. Configurar o Profile de Produção (`application-prod.properties`)
-
-No diretório `api/src/main/resources/`, crie o arquivo `application-prod.properties`:
-
-```properties
-# Configuracao do Banco de Dados PostgreSQL no AWS RDS
-spring.datasource.url=jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:cantoalegredb}
-spring.datasource.username=${DB_USER:cantoalegre_admin}
-spring.datasource.password=${DB_PASSWORD:sua_senha}
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# Execucao automatica das Migracoes Flyway (V1 e V2)
-spring.flyway.enabled=true
-spring.flyway.baseline-on-migrate=true
-
-# Configuracao do AWS S3
-aws.accessKeyId=${AWS_ACCESS_KEY_ID}
-aws.secretAccessKey=${AWS_SECRET_ACCESS_KEY}
-aws.s3.region=${AWS_REGION:sa-east-1}
-aws.s3.bucket-name=${AWS_S3_BUCKET:canto-alegre-fotos-prod}
-```
+### Passo 5: Dockerfile Multi-Stage & Deploy no Render.com
+1. Criou-se o `api/Dockerfile` utilizando build multi-stage:
+   - Stage 1: `maven:3.9.6-eclipse-temurin-21-alpine` para compilação.
+   - Stage 2: `eclipse-temurin:21-jre-alpine` para execução enxuta.
+2. Criou-se o serviço no Render sob o runtime **Docker** com as variáveis de ambiente:
+   - `DB_HOST`: `canto-alegre-db.czisisu4ueck.sa-east-1.rds.amazonaws.com`
+   - `DB_NAME`: `cantoalegredb`
+   - `DB_USER`: `cantoalegreadmin`
+   - `DB_PASSWORD`: `${DB_PASSWORD}`
+   - `AWS_ACCESS_KEY_ID`: `${AWS_ACCESS_KEY_ID}`
+   - `AWS_SECRET_ACCESS_KEY`: `${AWS_SECRET_ACCESS_KEY}`
+   - `AWS_S3_BUCKET`: `canto-alegre-fotos-prod`
+   - `AWS_REGION`: `sa-east-1`
+3. O Render efetuou o deploy automático, executou as migrações Flyway `V1` e `V2` no AWS RDS e disponibilizou a API REST pública em `https://canto-alegre.onrender.com`.
 
 ---
 
-### Passo 5: Fazer o Deploy da API REST e do PWA Frontend
+## 3. Checklist de Validação em Produção
 
-#### Opção Recomendada 1: Deploy Simplificado e Gratuito/Econômico (Render + Vercel)
-- **Backend (Spring Boot + PostgreSQL RDS/Render)**:
-  - Crie uma conta em `https://render.com/`.
-  - Conecte o repositório GitHub `naur-Io/Canto-Alegre`.
-  - Suba o serviço Docker/Java a partir da pasta `/api` definindo as variáveis de ambiente (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`).
-- **Frontend PWA (Vercel)**:
-  - Crie uma conta em `https://vercel.com/`.
-  - Importe o repositório GitHub.
-  - Root Directory: `./` (raiz).
-  - Build Command: `npm run build`.
-  - Output Directory: `dist`.
-  - Variável de ambiente: `VITE_API_URL=https://sua-api.onrender.com`.
-
-#### Opção Recomendada 2: Deploy 100% AWS (AWS App Runner + AWS Amplify)
-- **Backend**:
-  - No Console AWS, acesse **AWS App Runner** -> **Create service**.
-  - Selecione o repositório GitHub da API Spring Boot ou a imagem Docker.
-  - Porta de execução: `8080`.
-  - Defina as variáveis de ambiente de banco de dados e chaves IAM S3.
-- **Frontend PWA**:
-  - No Console AWS, acesse **AWS Amplify** -> **New app** -> **Host web app**.
-  - Conecte a branch `main` do repositório `naur-Io/Canto-Alegre`.
-  - O AWS Amplify detectará automaticamente o projeto Vite React e fará a compilação pública em HTTPS com suporte PWA.
-
----
-
-## 3. Checklist de Validação da Fase 3
-
-Antes de considerar a infraestrutura pronta, execute a seguinte verificação:
-
-1. [ ] **Testes de Integração**: Executar `./mvnw test` na pasta `api/` (garantindo que todos os 20 testes continuem passando).
-2. [ ] **Migrações de Banco de Dados**: Acessar o banco de dados via DBeaver / pgAdmin conectado ao AWS RDS e verificar se as tabelas `plants`, `botanical_species`, `users` e a coluna `ideal_environment` foram criadas pelo Flyway.
-3. [ ] **Upload no S3**: Cadastrar uma nova planta enviando foto e verificar se o arquivo foi salvo no bucket AWS S3 `canto-alegre-fotos-prod`.
-4. [ ] **Sincronização PWA Offline**: Testar a aplicação no celular desconectando a internet e re-conectando para validar a fila de sincronização `syncService.js`.
+- [x] **Testes Automatizados Backend**: 20/20 testes unitários e de integração com Testcontainers aprovados (`./mvnw test`).
+- [x] **Migrações de Banco de Dados**: Flyway executou `DbValidate` e `DbMigrate` (versão atual do schema "public": 2).
+- [x] **Conexão AWS RDS**: Spring Boot conectado com sucesso ao PostgreSQL 16.9 na porta `5432`.
+- [x] **CORS e URLs Públicas**: API acessível publicamente com HTTPS habilitado no Render.

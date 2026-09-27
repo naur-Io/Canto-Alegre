@@ -90,15 +90,15 @@ Para disponibilizar o **Canto Alegre** para milhares de usuários na internet de
 
 ## 3. Resumo Prático de Rastreabilidade das Modificações
 
-Se você precisar consultar quem alterou o quê ou desejar testar/desfazer qualquer parte da aplicação, utilize este mapa sintético:
-
 | Funcionalidade | Papel do Agente / Usuário | Arquivos Afetados | Como Testar Rapidamente | Como Desfazer com Segurança |
 | :--- | :--- | :--- | :--- | :--- |
 | **PWA & Offline** | Parceria Usuário + Agente | `sw.js`, `storageService.js` | Desligar Wi-Fi no navegador | Desativar SW em `main.jsx` |
 | **Fluxo IA Gemini** | Parceria Usuário + Agente | `geminiService.js`, `AddPlantModal.jsx` | Testar auto-complete com "Jiboia" | Voltar modal para passo único |
 | **Backend REST API** | Agente de Código | `api/src/main/java/...` | Executar `./mvnw test` na pasta `api` | Checkout dos commits na pasta `api` |
 | **Ambiente Ideal (v1.5.1)** | Solicitado pelo Usuário | `Plant.java`, `V2...sql`, `PlantCard.jsx` | Filtrar por "quarto" na barra de busca | Dropar coluna `ideal_environment` |
-| **Cloud Storage AWS S3** | Próxima Etapa da Nuvem | `ImageStorageService.java` | Criar `S3StorageService.java` | Trocar bean para `LocalStorageService` |
+| **Cloud Storage AWS S3** | Solicitado pelo Usuário | `S3Config.java`, `S3StorageService.java` | Cadastrar planta enviando foto no S3 | Alterar profile ativo para `default` |
+| **Deploy Nuvem Render + RDS (v1.6.0)** | Solicitado pelo Usuário | `api/Dockerfile`, `application-prod.properties` | Acessar `https://canto-alegre.onrender.com/api/v1/species` | Pausar serviço no Render |
+| **UI Compacta & Botão FAB + (v1.6.0)** | Solicitado pelo Usuário | `App.jsx`, `src/styles/index.css` | Abrir a home do app e testar botão + no canto inferior | Reverter estilos em `index.css` |
 
 ---
 

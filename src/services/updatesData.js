@@ -1,5 +1,31 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.6.0',
+    version: 'v1.6.0',
+    date: '27 de Setembro de 2026',
+    title: 'Canto Alegre - Deploy em Nuvem (AWS RDS + Render) & Interface Slim',
+    isMajor: true,
+    badges: ['Nuvem AWS', 'Render API', 'UI Slim', 'Botão FAB +'],
+    summary: 'Infraestrutura no ar 24/7 com banco AWS RDS PostgreSQL e API no Render, além do painel principal compacto para liberar mais espaço vertical e botão flutuante (+) ampliado para melhor toque.',
+    items: [
+      {
+        type: 'cloud',
+        title: 'Backend em Nuvem (Render + AWS RDS)',
+        desc: 'API REST online e sincronizada com banco relacional AWS RDS PostgreSQL e armazenamento de fotos em bucket AWS S3.'
+      },
+      {
+        type: 'ui',
+        title: 'Painel do Jardim Compacto (Slim UI)',
+        desc: 'Header do jardim enxuto com contadores numéricos, liberando mais de 60% do espaço da tela para visualização dos cartões de plantas.'
+      },
+      {
+        type: 'fab',
+        title: 'Botão Flutuante (+) Ampliado',
+        desc: 'Novo tamanho do botão verde de adição rápida no canto inferior direito para acesso instantâneo em qualquer tela.'
+      }
+    ]
+  },
+  {
     id: 'v1.5.1',
     version: 'v1.5.1',
     date: '27 de Setembro de 2026',
