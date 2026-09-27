@@ -15,7 +15,7 @@ O ecossistema do **Canto Alegre** está 100% no ar e em produção com a seguint
                  │                                   URL: https://canto-alegre.onrender.com/api/v1
                  │                                                   │
                  │                                                   ├──► AWS RDS PostgreSQL 16.9
-                 │                                                   │    Endpoint: canto-alegre-db.[SEU_ID_RDS].sa-east-1.rds.amazonaws.com
+                 │                                                   │    Endpoint: [SEU_ENDPOINT_RDS]
                  │                                                   │
                  └── (2) Upload de Imagens ──────────────────────────┼──► AWS S3 Bucket
                                                                           Bucket: [SEU_BUCKET_S3]
@@ -25,7 +25,7 @@ O ecossistema do **Canto Alegre** está 100% no ar e em produção com a seguint
 | :--- | :--- | :--- |
 | **AWS IAM** | Credenciais seguras (`Access Key` e `Secret Key`) para autenticação stateless da API no S3. | Usuário: `canto-alegre-backend-user` com política `AmazonS3FullAccess`. |
 | **AWS S3** | Armazenamento seguro de fotos de plantas enviadas pelos usuários via upload multipart. | Bucket: `[SEU_BUCKET_S3]` (Região `sa-east-1` São Paulo). |
-| **AWS RDS PostgreSQL** | Banco de dados relacional gerenciado na nuvem com backups diários e Flyway Migrations. | Endpoint: `canto-alegre-db.[SEU_ID_RDS].sa-east-1.rds.amazonaws.com` (Porta `5432`, DB `cantoalegredb`, Usuário `[SEU_USUARIO_RDS]`). |
+| **AWS RDS PostgreSQL** | Banco de dados relacional gerenciado na nuvem com backups diários e Flyway Migrations. | Endpoint: `[SEU_ENDPOINT_RDS]` (Porta `5432`, DB `[NOME_DO_BANCO_RDS]`, Usuário `[SEU_USUARIO_RDS]`). |
 | **Render Web Service** | Servidor de execução 24/7 da REST API Spring Boot 3 compilada via Docker multi-stage (Java 21). | URL Pública: `https://canto-alegre.onrender.com` |
 
 ---
@@ -58,11 +58,11 @@ O ecossistema do **Canto Alegre** está 100% no ar e em produção com a seguint
 ```
 
 ### Passo 3: Instância AWS RDS PostgreSQL 16.9
-1. Criou-se a instância de banco de dados `canto-alegre-db` no AWS RDS sob o mecanismo PostgreSQL 16.9.
-2. Nome do banco de dados relacional: `cantoalegredb`.
+1. Criou-se a instância de banco de dados no AWS RDS sob o mecanismo PostgreSQL 16.9.
+2. Nome do banco de dados relacional: `[NOME_DO_BANCO_RDS]`.
 3. Nome do usuário administrador principal: `[SEU_USUARIO_RDS]`.
 4. Habilitou-se o **Acesso Público (Sim)** e abriu-se a regra de tráfego de entrada na porta `5432` no Security Group `canto-alegre-rds-sg` (`0.0.0.0/0`).
-5. Endpoint obtido: `canto-alegre-db.[SEU_ID_RDS].sa-east-1.rds.amazonaws.com`.
+5. Endpoint obtido: `[SEU_ENDPOINT_RDS]`.
 
 ### Passo 4: Código Java / Spring Boot para AWS S3 e CORS
 1. **Bean S3Config.java**: Criou-se o bean `@Bean public S3Client s3Client()` no pacote `com.cantoalegre.api.config` habilitado para os profiles `aws` e `prod`.
@@ -74,8 +74,8 @@ O ecossistema do **Canto Alegre** está 100% no ar e em produção com a seguint
    - Stage 1: `maven:3.9.6-eclipse-temurin-21-alpine` para compilação.
    - Stage 2: `eclipse-temurin:21-jre-alpine` para execução enxuta.
 2. Criou-se o serviço no Render sob o runtime **Docker** com as variáveis de ambiente mascaradas:
-   - `DB_HOST`: `canto-alegre-db.[SEU_ID_RDS].sa-east-1.rds.amazonaws.com`
-   - `DB_NAME`: `cantoalegredb`
+   - `DB_HOST`: `[SEU_ENDPOINT_RDS]`
+   - `DB_NAME`: `[NOME_DO_BANCO_RDS]`
    - `DB_USER`: `[SEU_USUARIO_RDS]`
    - `DB_PASSWORD`: `[SUA_SENHA_RDS]`
    - `AWS_ACCESS_KEY_ID`: `[SUA_CHAVE_ACCESS_KEY_ID]`
