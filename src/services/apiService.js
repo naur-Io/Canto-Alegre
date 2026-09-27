@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://canto-alegre.onrender.com/api/v1' : 'http://localhost:8080/api/v1');
 const GUEST_ID_KEY = 'canto_alegre_guest_uuid';
 
 export async function getOrCreateGuestId() {
