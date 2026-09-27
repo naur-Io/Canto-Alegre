@@ -41,4 +41,27 @@ class GeminiServiceTest {
         assertThat(result.wateringFrequencyDays()).isEqualTo(7);
         assertThat(result.wateringVolumeMl()).isEqualTo(100);
     }
+
+    @Test
+    @DisplayName("Deve gerar guia de propagacao e cuidados especificos para Samambaias")
+    void shouldGenerateSpecificCareAndPropagationForFerns() {
+        CreateBotanicalSpeciesRequest result = geminiService.generateBotanicalSpeciesInfo("Samambaia Americana");
+
+        assertThat(result).isNotNull();
+        assertThat(result.commonName()).isEqualTo("Samambaia Americana");
+        assertThat(result.sunlightRequirement()).isEqualTo(SunlightRequirement.FULL_SHADE);
+        assertThat(result.wateringFrequencyDays()).isEqualTo(2);
+        assertThat(result.propagationGuide()).contains("Divisao de touceira");
+    }
+
+    @Test
+    @DisplayName("Deve auto-completar especie quando informado o nome da planta no novo fluxo")
+    void shouldAutoCompleteSpeciesWhenPlantNameIsProvided() {
+        CreateBotanicalSpeciesRequest result = geminiService.generateBotanicalSpeciesInfo("Jiboia Amarela");
+
+        assertThat(result).isNotNull();
+        assertThat(result.commonName()).isEqualTo("Jiboia Amarela");
+        assertThat(result.propagationGuide()).isNotBlank();
+        assertThat(result.soilType()).isNotBlank();
+    }
 }

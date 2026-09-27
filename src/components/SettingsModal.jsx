@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { 
   X, 
   Settings, 
-  Sun, 
-  Moon, 
   Key, 
   Download, 
   Database, 
@@ -87,60 +85,6 @@ export default function SettingsModal({
 
         {/* Body */}
         <div className="modal-body" style={{ overflowY: 'auto', padding: '20px', flex: 1 }}>
-          
-          {/* SEÇÃO 1: TEMA VISUAL */}
-          <section style={{ marginBottom: '24px' }}>
-            <label className="form-label" style={{ marginBottom: '10px', display: 'block', fontWeight: '700' }}>
-              Aparência & Tema Visual
-            </label>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '12px'
-            }}>
-              {/* Opção Tema Escuro */}
-              <div 
-                className={`theme-option-card ${currentTheme === 'dark' ? 'active' : ''}`}
-                onClick={() => onThemeChange('dark')}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div className="theme-icon-box dark">
-                    <Moon size={18} />
-                  </div>
-                  {currentTheme === 'dark' && (
-                    <span className="theme-active-tag">Ativo</span>
-                  )}
-                </div>
-                <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: '4px' }}>
-                  Tema Escuro
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-                  Tons botânicos profundos, confortável para a visão e economia de energia.
-                </div>
-              </div>
-
-              {/* Opção Tema Claro */}
-              <div 
-                className={`theme-option-card ${currentTheme === 'light' ? 'active' : ''}`}
-                onClick={() => onThemeChange('light')}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div className="theme-icon-box light">
-                    <Sun size={18} />
-                  </div>
-                  {currentTheme === 'light' && (
-                    <span className="theme-active-tag">Ativo</span>
-                  )}
-                </div>
-                <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: '4px' }}>
-                  Tema Claro
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-                  Fundo limpo e suave, ideal para leitura em ambientes bem iluminados.
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* SEÇÃO 2: INTELIGÊNCIA ARTIFICIAL */}
           <section style={{ 

@@ -1,5 +1,31 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.5.0',
+    version: 'v1.5.0',
+    date: '27 de Setembro de 2026',
+    title: 'Canto Alegre - Novo Fluxo de Adição de Plantas, Tour Spotlight & Tema Botânico Único',
+    isMajor: true,
+    badges: ['Novo', 'IA Auto-Complete', 'Spotlight Tour', 'Design System'],
+    summary: 'Novo fluxo inteligente de adição de plantas com pergunta "Você já conhece o nome da planta?", auto-complete de ficha completa com IA Gemini, tour com destaque spotlight nos botões e tema botânico único claro de alto contraste.',
+    items: [
+      {
+        type: 'flow',
+        title: 'Novo Fluxo de Adição com Pergunta Inicial',
+        desc: 'Pergunta interativa se você já conhece o nome da planta. Se sim, a IA dá auto-complete instantâneo em todos os cuidados e guia de mudas; se não, permite foto para identificação.'
+      },
+      {
+        type: 'tour',
+        title: 'Tour Guiado com Spotlight Highlight',
+        desc: 'Passo a passo interativo que destaca visualmente com efeito spotlight cada botão e seção principal do aplicativo.'
+      },
+      {
+        type: 'theme',
+        title: 'Tema Botânico Único Claro',
+        desc: 'Interface unificada em tema claro botânico (pistache/sálvia) de alto contraste e legibilidade perfeita sem distrações.'
+      }
+    ]
+  },
+  {
     id: 'v1.4.0',
     version: 'v1.4.0',
     date: '26 de Setembro de 2026',

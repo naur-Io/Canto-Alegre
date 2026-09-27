@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Sun, Moon, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
 import { TRANSLATIONS } from '../services/i18n';
 
 export default function Navbar({ 
@@ -9,8 +9,6 @@ export default function Navbar({
   onOpenGuide, 
   onOpenUpdates,
   hasUnreadUpdates,
-  currentTheme,
-  onToggleTheme,
   onOpenSettings,
   isInstallable, 
   onInstallApp,
@@ -42,7 +40,7 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Grupo de Ações Primárias (Idioma, Tema, Alternador de Tela e Nova Planta) */}
+          {/* Grupo de Ações Primárias (Idioma, Alternador de Tela e Nova Planta) */}
           <div className="nav-primary-actions">
             {/* Alternador de Idioma (PT-BR / EN) */}
             <button
@@ -74,16 +72,6 @@ export default function Navbar({
                   <span className="nav-btn-text-full">{t.presentation}</span>
                 </>
               )}
-            </button>
-
-            {/* Alternar Tema Visual */}
-            <button 
-              className="btn btn-secondary btn-sm nav-btn-theme"
-              onClick={onToggleTheme}
-              title={currentTheme === 'dark' ? "Mudar para Tema Claro" : "Mudar para Tema Escuro"}
-              aria-label="Alternar Tema"
-            >
-              {currentTheme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#3b82f6" />}
             </button>
 
             {/* Configuracoes */}

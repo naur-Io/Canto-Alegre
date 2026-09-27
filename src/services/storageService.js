@@ -240,15 +240,15 @@ export async function importGardenBackup(jsonString) {
   return plants;
 }
 
-// Gerenciamento de Tema Visual (Dark / Light)
+// Gerenciamento de Tema Visual (Tema Botânico Único Claro)
 const THEME_STORAGE_KEY = 'cantoalegre_theme';
 
 export function getStoredTheme() {
-  return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+  return 'light';
 }
 
 export function saveTheme(theme) {
-  const selected = theme === 'light' ? 'light' : 'dark';
+  const selected = 'light';
   localStorage.setItem(THEME_STORAGE_KEY, selected);
   if (typeof document !== 'undefined') {
     document.documentElement.setAttribute('data-theme', selected);

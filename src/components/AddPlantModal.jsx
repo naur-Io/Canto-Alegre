@@ -20,17 +20,21 @@ import {
   Search,
   ExternalLink,
   Sprout,
-  Lightbulb
+  Lightbulb,
+  HelpCircle,
+  CheckCircle2,
+  ArrowLeft
 } from 'lucide-react';
 import CameraCapture from './CameraCapture';
-import { analyzePlantImage, getDefaultPropagationForPlant, normalizeImageForAi } from '../services/geminiService';
+import { analyzePlantImage, autoCompletePlantByName, getDefaultPropagationForPlant, normalizeImageForAi } from '../services/geminiService';
 import { getStoredApiKey } from '../services/storageService';
 
 export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, hasApiKey }) {
   const [photo, setPhoto] = useState(null);
+  const [inputPlantName, setInputPlantName] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [step, setStep] = useState('choose_photo'); // 'choose_photo' | 'form'
+  const [step, setStep] = useState('ask_known_name'); // 'ask_known_name' | 'knows_name' | 'choose_photo' | 'form'
   const [aiNotice, setAiNotice] = useState(null);
   const nativeCameraInputRef = useRef(null);
   
@@ -198,6 +202,59 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
     }
   };
 
+  const runAiAutoCompleteByName = async () => {
+    if (!inputPlantName || !inputPlantName.trim()) return;
+    setIsAnalyzing(true);
+    setAiNotice(null);
+    try {
+      const apiKey = getStoredApiKey();
+      const result = await autoCompletePlantByName(inputPlantName.trim(), apiKey);
+
+      const propagationResult = result.propagation && result.propagation.method 
+        ? result.propagation 
+        : getDefaultPropagationForPlant(result);
+
+      setPlantData(prev => ({
+        ...prev,
+        commonName: result.commonName || inputPlantName.trim(),
+        scientificName: result.scientificName || prev.scientificName,
+        origin: result.origin || prev.origin,
+        plantType: result.plantType || prev.plantType,
+        sunlight: {
+          lightType: result.sunlight?.lightType || (result.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : result.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta'),
+          period: result.sunlight?.period || prev.sunlight.period,
+          hoursPerDay: result.sunlight?.hoursPerDay || prev.sunlight.hoursPerDay,
+          notes: result.sunlight?.notes || prev.sunlight.notes
+        },
+        watering: {
+          frequencyTimesPerWeek: result.watering?.frequencyTimesPerWeek || 2,
+          frequencyDays: result.watering?.frequencyDays || prev.watering.frequencyDays,
+          amountMl: result.watering?.amountMl || prev.watering.amountMl,
+          description: result.watering?.description || prev.watering.description
+        },
+        propagation: propagationResult,
+        soilType: result.soilType || prev.soilType,
+        idealTemperature: result.idealTemperature || prev.idealTemperature,
+        howToCare: result.howToCare || (Array.isArray(result.careTips) ? result.careTips.join('\n') : prev.howToCare),
+        fertilizer: {
+          type: result.fertilizer?.type || prev.fertilizer.type,
+          frequency: result.fertilizer?.frequency || prev.fertilizer.frequency,
+          notes: result.fertilizer?.notes || prev.fertilizer.notes
+        },
+        careTips: result.careTips || prev.careTips,
+        notes: result.notes || prev.notes
+      }));
+
+      setStep('form');
+    } catch (err) {
+      alert(`Não foi possível auto-completar com IA: ${err.message || 'Erro'}.\nCampos liberados para preenchimento manual.`);
+      setPlantData(prev => ({ ...prev, commonName: inputPlantName.trim() }));
+      setStep('form');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleManualEntry = () => {
     setStep('form');
   };
@@ -229,7 +286,13 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
         <div className="modal-container" onClick={e => e.stopPropagation()} style={{ maxWidth: '680px' }}>
           <div className="modal-header">
             <h3 className="modal-title">
-              {step === 'choose_photo' ? 'Adicionar Nova Planta' : 'Cadastrar Dados da Planta'}
+              {step === 'ask_known_name'
+                ? 'Adicionar Nova Planta'
+                : step === 'knows_name'
+                ? 'Digitar Nome & Auto-completar'
+                : step === 'choose_photo'
+                ? 'Identificação por Foto'
+                : 'Ficha Completa da Planta'}
             </h3>
             <button className="modal-close" onClick={onClose} aria-label="Fechar">
               <X size={20} />
@@ -237,7 +300,172 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
           </div>
 
           <div className="modal-body">
-            {step === 'choose_photo' ? (
+            {/* ETAPA 0: PERGUNTA INICIAL - VOCÊ JÁ CONHECE O NOME DA PLANTA? */}
+            {step === 'ask_known_name' && (
+              <div style={{ textAlign: 'center', padding: '16px 8px' }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '20px',
+                  background: 'var(--primary-50, rgba(16, 185, 129, 0.12))',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px'
+                }}>
+                  <HelpCircle size={32} color="var(--primary-600)" />
+                </div>
+
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--primary-900)', marginBottom: '8px' }}>
+                  Você já conhece o nome da planta?
+                </h3>
+                <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: 1.5 }}>
+                  Escolha uma das opções abaixo para a Inteligência Artificial gerar a ficha botânica completa e o guia de mudas:
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {/* Opção 1: Sim, já sei o nome */}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => setStep('knows_name')}
+                    style={{
+                      padding: '16px 20px',
+                      justifyContent: 'flex-start',
+                      textAlign: 'left',
+                      fontSize: '1rem',
+                      borderRadius: 'var(--radius-md)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px'
+                    }}
+                  >
+                    <CheckCircle2 size={24} style={{ flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 700 }}>Sim, já sei o nome da planta</div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: 400 }}>
+                        Digite o nome (ex: Jiboia, Monstera) para a IA dar auto-complete de todos os cuidados
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Opção 2: Não sei o nome (Usar Câmera / Foto) */}
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setStep('choose_photo')}
+                    style={{
+                      padding: '16px 20px',
+                      justifyContent: 'flex-start',
+                      textAlign: 'left',
+                      fontSize: '1rem',
+                      borderRadius: 'var(--radius-md)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px'
+                    }}
+                  >
+                    <Camera size={24} color="var(--primary-600)" style={{ flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>Não sei o nome da planta</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>
+                        Tire ou envie uma foto para a IA identificar a espécie e preencher a ficha
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ETAPA 1A: DIGITAR NOME E AUTO-COMPLETAR COM IA */}
+            {step === 'knows_name' && (
+              <div>
+                <div className="form-group" style={{ marginBottom: '18px' }}>
+                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', display: 'block' }}>
+                    Nome da Planta / Nome Popular *
+                  </label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={inputPlantName}
+                    onChange={e => setInputPlantName(e.target.value)}
+                    placeholder="Ex: Jiboia, Manjericão, Monstera, Samambaia..."
+                    autoFocus
+                    required
+                    style={{ padding: '12px 14px', fontSize: '1rem' }}
+                  />
+                </div>
+
+                {/* Foto Opcional */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', display: 'block' }}>
+                    Foto da Planta (Opcional)
+                  </label>
+                  {photo ? (
+                    <div className="preview-img-container" style={{ maxHeight: '180px', marginBottom: '10px' }}>
+                      <img src={photo} alt="Foto da planta" className="preview-img" />
+                      <button 
+                        type="button" 
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setPhoto(null)}
+                        style={{ marginTop: '8px' }}
+                      >
+                        Trocar Foto
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <label className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', padding: '10px', cursor: 'pointer' }}>
+                        <Camera size={16} />
+                        <span>Adicionar Foto (Opcional)</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleFileUpload} 
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Botão de Auto-complete com IA */}
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={runAiAutoCompleteByName}
+                  disabled={isAnalyzing || !inputPlantName.trim()}
+                  style={{ width: '100%', padding: '14px', fontSize: '0.98rem', fontWeight: 700, gap: '8px' }}
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }} />
+                      <span>Consultando Guia Botânico & Auto-completando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={18} />
+                      <span>Auto-completar Ficha com IA</span>
+                    </>
+                  )}
+                </button>
+
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setStep('ask_known_name')}
+                    style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)' }}
+                  >
+                    Voltar para a Pergunta Inicial
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ETAPA 1B: IDENTIFICAÇÃO POR FOTO */}
+            {step === 'choose_photo' && (
               <div>
                 {/* Banner Informativo sobre Modo IA vs Simulação */}
                 {hasApiKey ? (
@@ -414,7 +642,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                       </button>
                     </div>
 
-                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <div style={{ marginTop: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <button 
                         type="button"
                         className="btn btn-secondary btn-sm"
@@ -423,12 +651,23 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                       >
                         Cadastrar Planta Manualmente sem Foto
                       </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setStep('ask_known_name')}
+                        style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)' }}
+                      >
+                        Voltar para a Pergunta Inicial
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
-            ) : (
-              /* FORMULÁRIO DE ENTRADA MANUAL COM TODOS OS CAMPOS SOLICITADOS */
+            )}
+
+            {/* ETAPA 2: FORMULÁRIO DE REVISÃO E SALVAMENTO */}
+            {step === 'form' && (
               <form onSubmit={handleSubmit} className="plant-manual-form">
                 {aiNotice && (
                   <div className="ai-mode-banner simulated" style={{ marginBottom: '10px' }}>
@@ -786,7 +1025,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                   <button 
                     type="button" 
                     className="btn btn-secondary"
-                    onClick={() => setStep('choose_photo')}
+                    onClick={() => setStep('ask_known_name')}
                   >
                     Voltar
                   </button>

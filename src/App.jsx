@@ -45,7 +45,6 @@ export default function App() {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showGardenTourModal, setShowGardenTourModal] = useState(false);
 
-  const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
   const [unreadUpdates, setUnreadUpdates] = useState(false);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
@@ -53,7 +52,7 @@ export default function App() {
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
-    saveTheme(currentTheme);
+    saveTheme('light');
     loadPlants();
     initLanguage();
     setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''));
@@ -112,14 +111,7 @@ export default function App() {
     }
   };
 
-  const handleThemeChange = (newTheme) => {
-    const applied = saveTheme(newTheme);
-    setCurrentTheme(applied);
-  };
 
-  const handleToggleTheme = () => {
-    handleThemeChange(currentTheme === 'dark' ? 'light' : 'dark');
-  };
 
   const loadPlants = async () => {
     const data = await getStoredPlants();
@@ -217,8 +209,6 @@ export default function App() {
           markVersionAsSeen(LATEST_VERSION);
         }}
         hasUnreadUpdates={unreadUpdates}
-        currentTheme={currentTheme}
-        onToggleTheme={handleToggleTheme}
         onOpenSettings={() => setShowSettingsModal(true)}
         isInstallable={isInstallable}
         onInstallApp={handleInstallPwa}
@@ -400,8 +390,6 @@ export default function App() {
         <SettingsModal 
           isOpen={showSettingsModal}
           onClose={() => setShowSettingsModal(false)}
-          currentTheme={currentTheme}
-          onThemeChange={handleThemeChange}
           hasApiKey={hasApiKey}
           onOpenKeyModal={() => setShowKeyModal(true)}
           onOpenGuide={() => setShowGuideModal(true)}

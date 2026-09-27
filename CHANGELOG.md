@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.5.0] - 2026-09-27
+
+### Added & Changed
+- **Novo Fluxo de Adição de Plantas (Pergunta Inicial & Auto-complete)**:
+  - Pergunta interativa inicial: *"Você já conhece o nome da planta?"*
+  - Opção **Sim**: Digitação do nome popular com recurso de **Auto-completar com IA Gemini**, preenchendo automaticamente a ficha técnica completa e o guia de mudas.
+  - Opção **Não**: Envio/captura de foto para identificação botânica e preenchimento da ficha.
+- **Tour Guiado com Spotlight Highlight**:
+  - Atualização do `GardenTourWalkthrough.jsx` com destaque visual (*spotlight ring*) ao redor dos botões e áreas da interface em cada etapa do tutorial.
+- **Tema Botânico Único**:
+  - Consolidação do aplicativo em um único tema claro botânico (pistache/sálvia) de alto contraste e excelente legibilidade, removendo a alternância de tema e simplificando a interface.
+
+---
+
 ## [1.4.0] - 2026-09-26
 
 ### Added & Fixed
