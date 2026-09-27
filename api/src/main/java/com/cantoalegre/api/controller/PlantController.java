@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,14 @@ public class PlantController {
             @PathVariable UUID id,
             @RequestBody(required = false) WaterPlantRequest request) {
         return plantService.waterPlant(guestUuid, id, request);
+    }
+
+    @PostMapping("/{id}/photo")
+    public PlantResponse uploadPlantPhoto(
+            @RequestHeader("X-Guest-Id") UUID guestUuid,
+            @PathVariable UUID id,
+            @RequestParam("file") MultipartFile file) {
+        return plantService.uploadPlantPhoto(guestUuid, id, file);
     }
 
     @GetMapping("/thirsty")

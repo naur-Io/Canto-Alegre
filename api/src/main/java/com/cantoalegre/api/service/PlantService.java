@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +26,7 @@ public class PlantService {
     private final PlantRepository plantRepository;
     private final UserService userService;
     private final BotanicalSpeciesService speciesService;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public PlantResponse createPlant(UUID guestUuid, CreatePlantRequest request) {
@@ -106,5 +109,17 @@ public class PlantService {
                 .stream()
                 .map(PlantResponse::fromEntity)
                 .toList();
+    }
+
+    @Transactional
+    public PlantResponse uploadPlantPhoto(UUID guestUuid, UUID plantId, MultipartFile file) {
+        User user = userService.getOrCreateGuestUser(guestUuid);
+        Plant plant = plantRepository.findByIdAndUserIdWithSpecies(plantId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Planta nao encontrada para este usuario: " + plantId));
+
+        String photoUrl = imageStorageService.storeImage(file);
+        plant.setPhotoUrl(photoUrl);
+
+        return PlantResponse.fromEntity(plantRepository.save(plant));
     }
 }

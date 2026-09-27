@@ -39,6 +39,9 @@ class PlantServiceTest {
     @Mock
     private BotanicalSpeciesService speciesService;
 
+    @Mock
+    private ImageStorageService imageStorageService;
+
     @InjectMocks
     private PlantService plantService;
 
@@ -154,5 +157,26 @@ class PlantServiceTest {
 
         assertThat(response).hasSize(1);
         verify(plantRepository, times(1)).findThirstyPlants(eq(user.getId()), any());
+    }
+
+    @Test
+    @DisplayName("Deve realizar upload de foto da planta e atualizar photoUrl")
+    void shouldUploadPlantPhotoSuccessfully() {
+        UUID plantId = plant.getId();
+        org.springframework.mock.web.MockMultipartFile file = new org.springframework.mock.web.MockMultipartFile(
+                "file", "jiboia.jpg", "image/jpeg", "fake-image-bytes".getBytes()
+        );
+
+        when(userService.getOrCreateGuestUser(guestUuid)).thenReturn(user);
+        when(plantRepository.findByIdAndUserIdWithSpecies(plantId, user.getId()))
+                .thenReturn(Optional.of(plant));
+        when(imageStorageService.storeImage(file)).thenReturn("/uploads/jiboia-uuid.jpg");
+        when(plantRepository.save(any(Plant.class))).thenReturn(plant);
+
+        PlantResponse response = plantService.uploadPlantPhoto(guestUuid, plantId, file);
+
+        assertThat(response).isNotNull();
+        verify(imageStorageService, times(1)).storeImage(file);
+        verify(plantRepository, times(1)).save(plant);
     }
 }

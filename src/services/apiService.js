@@ -53,5 +53,25 @@ export const apiService = {
 
   async searchSpecies(query = '') {
     return fetchWithGuestId(`/species?search=${encodeURIComponent(query)}`);
+  },
+
+  async uploadPlantPhoto(plantId, file) {
+    const guestId = await getOrCreateGuestId();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/plants/${plantId}/photo`, {
+      method: 'POST',
+      headers: {
+        'X-Guest-Id': guestId
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Erro ao enviar foto: ${response.status}`);
+    }
+    return response.json();
   }
 };
