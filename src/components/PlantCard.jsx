@@ -44,8 +44,7 @@ export default function PlantCard({ plant, onWater, onClick }) {
     return { text: 'Luz Indireta', className: 'badge-sun-indirect' };
   };
 
-  const lightBadge = getLightBadge();
-  const propagationMethod = plant.propagation?.method;
+  const environmentText = plant.idealEnvironment || (lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)');
 
   return (
     <div className="plant-card" onClick={() => onClick(plant)}>
@@ -62,12 +61,10 @@ export default function PlantCard({ plant, onWater, onClick }) {
             {lightBadge.text}
           </span>
 
-          {plant.idealEnvironment && (
-            <span className="badge badge-environment" title={`Onde fica: ${plant.idealEnvironment}`}>
-              <Home size={12} />
-              {plant.idealEnvironment}
-            </span>
-          )}
+          <span className="badge badge-environment" title={`Onde fica: ${environmentText}`}>
+            <Home size={12} />
+            {environmentText}
+          </span>
 
           {needsWater && !isWateredToday && (
             <span className="badge badge-urgent">
@@ -82,12 +79,10 @@ export default function PlantCard({ plant, onWater, onClick }) {
         <h3 className="card-title">{plant.commonName}</h3>
         <p className="card-subtitle">{plant.scientificName || 'Espécie botânica'}</p>
 
-        {plant.idealEnvironment && (
-          <div className="card-environment-box" title={`Onde fica a planta: ${plant.idealEnvironment}`}>
-            <Home size={13} color="#047857" />
-            <span><strong>Onde Fica:</strong> {plant.idealEnvironment}</span>
-          </div>
-        )}
+        <div className="card-environment-box" title={`Onde fica a planta: ${environmentText}`}>
+          <Home size={13} color="#047857" />
+          <span><strong>Onde Fica:</strong> {environmentText}</span>
+        </div>
 
         {plant.origin && (
           <div className="card-origin-snippet" title={plant.origin}>

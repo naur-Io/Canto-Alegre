@@ -513,19 +513,17 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   </div>
                 )}
 
-                {plant.idealEnvironment && (
-                  <div className="plant-environment-highlight-badge">
-                    <Home size={18} color="#047857" style={{ flexShrink: 0 }} />
-                    <div>
-                      <span style={{ display: 'block', fontSize: '0.75rem', color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '700' }}>
-                        Onde Fica / Ambiente Ideal
-                      </span>
-                      <span style={{ fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: '600' }}>
-                        {plant.idealEnvironment}
-                      </span>
-                    </div>
+                <div className="plant-environment-highlight-badge">
+                  <Home size={18} color="#047857" style={{ flexShrink: 0 }} />
+                  <div>
+                    <span style={{ display: 'block', fontSize: '0.75rem', color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '700' }}>
+                      Onde Fica / Ambiente Ideal
+                    </span>
+                    <span style={{ fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: '600' }}>
+                      {plant.idealEnvironment || (plant.sunlight?.lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : plant.sunlight?.lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)')}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Grid de Cartões de Cuidados Completos */}
