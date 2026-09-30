@@ -114,8 +114,13 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
     }
   };
 
-  const handleCameraCapture = (capturedBase64) => {
-    setPhoto(capturedBase64);
+  const handleCameraCapture = async (capturedBase64) => {
+    try {
+      const normalized = await normalizeImageForAi(capturedBase64);
+      setPhoto(normalized ? normalized.dataUrl : capturedBase64);
+    } catch (normErr) {
+      setPhoto(capturedBase64);
+    }
     setShowCamera(false);
   };
 

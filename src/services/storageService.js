@@ -12,19 +12,36 @@ const INTRO_COMPLETED_KEY = 'cantoalegre_intro_completed';
 
 // Sincroniza dados em ambos os armazenamentos (IndexedDB + LocalStorage)
 export async function persistToAllStorages(plants) {
-  // 1. Salvar no IndexedDB
+  if (!Array.isArray(plants)) return;
+
+  // 1. Salvar no IndexedDB (Suporta grandes volumes e imagens comprimidas)
   try {
     await set(PLANTS_STORAGE_KEY, plants);
   } catch (err) {
     console.warn('Falha ao salvar no IndexedDB:', err);
   }
 
-  // 2. Salvar copia redundante no LocalStorage
+  // 2. Salvar copia redundante no LocalStorage com protecao de cota
   try {
     localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(plants));
     localStorage.setItem(INITIALIZED_FLAG_KEY, 'true');
   } catch (err) {
-    console.warn('LocalStorage quota ou indisponivel:', err);
+    console.warn('LocalStorage quota excedida, gerando backup leve:', err);
+    try {
+      // Se estourar a cota de 5MB do LocalStorage, salva versao com imagem otimizada para backup
+      const lightweight = plants.map(p => ({
+        ...p,
+        photoUrl: p.photoUrl && p.photoUrl.startsWith('data:') && p.photoUrl.length > 50000 
+          ? 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80' 
+          : p.photoUrl
+      }));
+      localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(lightweight));
+      localStorage.setItem(INITIALIZED_FLAG_KEY, 'true');
+    } catch (e) {
+      try {
+        localStorage.setItem(INITIALIZED_FLAG_KEY, 'true');
+      } catch (e2) {}
+    }
   }
 }
 
@@ -33,7 +50,7 @@ export async function getStoredPlants() {
   const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true' || localStorage.getItem('floracare_has_initialized_v1') === 'true';
   let localPlants = null;
 
-  // 1. Tentar ler do IndexedDB (chave nova ou antiga)
+  // 1. Tentar ler do IndexedDB (banco principal de alta capacidade)
   try {
     let idbData = await get(PLANTS_STORAGE_KEY);
     if (!idbData) {
@@ -50,12 +67,12 @@ export async function getStoredPlants() {
   }
 
   // 2. Tentar ler do LocalStorage caso o IndexedDB falhe ou retorne nulo
-  if (!localPlants || localPlants.length === 0) {
+  if (!localPlants) {
     try {
       let localData = localStorage.getItem(PLANTS_STORAGE_KEY) || localStorage.getItem(LEGACY_PLANTS_KEY);
       if (localData) {
         const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           localPlants = parsed;
         }
       }
@@ -64,8 +81,8 @@ export async function getStoredPlants() {
     }
   }
 
-  // 3. Se for primeira execucao absoluta, carregar INITIAL_PLANTS
-  if ((!localPlants || localPlants.length === 0) && !hasInitialized) {
+  // 3. Se for primeira execucao absoluta (primeiro acesso do usuario), carregar INITIAL_PLANTS
+  if (!localPlants && !hasInitialized) {
     localPlants = INITIAL_PLANTS;
     await persistToAllStorages(localPlants);
   } else if (!localPlants) {
