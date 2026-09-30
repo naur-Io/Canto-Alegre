@@ -78,7 +78,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
   // Garantir que a planta possua guia de mudas mesmo se for importada ou de versão antiga
   const initialPropagation = plant.propagation && plant.propagation.method 
     ? plant.propagation 
-    : getDefaultPropagationForPlant(plant);
+    : getDefaultPropagationForPlant(plant, currentLang);
 
   const [formData, setFormData] = useState({ 
     ...plant,
@@ -183,7 +183,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
   const lightStyle = getLightInfo(plant.sunlight?.lightType, plant.sunlight?.period);
   const activePropagation = plant.propagation && plant.propagation.method 
     ? plant.propagation 
-    : getDefaultPropagationForPlant(plant);
+    : getDefaultPropagationForPlant(plant, currentLang);
 
   return (
     <div className="modal-overlay" onClick={onClose}>

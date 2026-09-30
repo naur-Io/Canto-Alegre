@@ -346,9 +346,8 @@ export async function saveLanguage(lang) {
 
 export function translateEnvironment(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
 
-  const exactMap = {
+  const ptToEnMap = {
     'Dentro de casa (Sala, Quarto ou Escritório)': 'Indoor (Living Room, Bedroom or Office)',
     'Dentro de casa (Banheiro, Varanda protegida ou Cozinha)': 'Indoor (Bathroom, Protected Balcony or Kitchen)',
     'Dentro de casa (Banheiro ou Cômodo de Sombra)': 'Indoor (Bathroom or Shaded Room)',
@@ -359,78 +358,152 @@ export function translateEnvironment(text, currentLang = 'pt-BR') {
     'Dentro/Fora de casa': 'Indoor/Outdoor'
   };
 
-  if (exactMap[text]) return exactMap[text];
+  const enToPtMap = {
+    'Indoor (Living Room, Bedroom or Office)': 'Dentro de casa (Sala, Quarto ou Escritório)',
+    'Indoor (Bathroom, Protected Balcony or Kitchen)': 'Dentro de casa (Banheiro, Varanda protegida ou Cozinha)',
+    'Indoor (Bathroom or Shaded Room)': 'Dentro de casa (Banheiro ou Cômodo de Sombra)',
+    'Indoor': 'Dentro de casa',
+    'Outdoor (Yard, Garden or Sun Balcony)': 'Fora de casa (Quintal, Horta ou Sacada de Sol)',
+    'Outdoor (Full Sun Yard or Balcony)': 'Fora de casa (Quintal ou Sacada Ensolarada)',
+    'Outdoor': 'Fora de casa',
+    'Indoor/Outdoor': 'Dentro/Fora de casa'
+  };
 
-  let result = text;
-  result = result.replace(/Dentro de casa/gi, 'Indoor');
-  result = result.replace(/Fora de casa/gi, 'Outdoor');
-  result = result.replace(/Sala, Quarto ou Escritório/gi, 'Living Room, Bedroom or Office');
-  result = result.replace(/Quintal ou Sacada Ensolarada/gi, 'Full Sun Yard or Balcony');
-  result = result.replace(/Banheiro ou Cômodo de Sombra/gi, 'Bathroom or Shaded Room');
-  result = result.replace(/Banheiro, Varanda protegida ou Cozinha/gi, 'Bathroom, Protected Balcony or Kitchen');
-  result = result.replace(/Quintal, Horta ou Sacada de Sol/gi, 'Yard, Garden or Sun Balcony');
-  return result;
+  if (currentLang === 'en') {
+    if (ptToEnMap[text]) return ptToEnMap[text];
+    let result = text;
+    result = result.replace(/Dentro de casa/gi, 'Indoor');
+    result = result.replace(/Fora de casa/gi, 'Outdoor');
+    result = result.replace(/Sala, Quarto ou Escritório/gi, 'Living Room, Bedroom or Office');
+    result = result.replace(/Quintal ou Sacada Ensolarada/gi, 'Full Sun Yard or Balcony');
+    result = result.replace(/Banheiro ou Cômodo de Sombra/gi, 'Bathroom or Shaded Room');
+    result = result.replace(/Banheiro, Varanda protegida ou Cozinha/gi, 'Bathroom, Protected Balcony or Kitchen');
+    result = result.replace(/Quintal, Horta ou Sacada de Sol/gi, 'Yard, Garden or Sun Balcony');
+    return result;
+  } else {
+    if (enToPtMap[text]) return enToPtMap[text];
+    let result = text;
+    result = result.replace(/Indoor/gi, 'Dentro de casa');
+    result = result.replace(/Outdoor/gi, 'Fora de casa');
+    return result;
+  }
 }
 
 export function translateSoil(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  const exactMap = {
+  const ptToEn = {
     'Solo rico em matéria orgânica, leve e com boa drenagem': 'Soil rich in organic matter, light and well-draining',
     'Substrato leve, rico em matéria orgânica com boa drenagem.': 'Light substrate, rich in organic matter with good drainage.',
     'Substrato arenoso e muito bem drenado (cactos e suculentas)': 'Sandy and well-drained substrate (cacti and succulents)',
     'Substrato para orquídeas (casca de pínus e carvão)': 'Orchid substrate (pine bark and charcoal)'
   };
-  return exactMap[text] || text;
+  const enToPt = {
+    'Soil rich in organic matter, light and well-draining': 'Solo rico em matéria orgânica, leve e com boa drenagem',
+    'Light substrate, rich in organic matter with good drainage.': 'Substrato leve, rico em matéria orgânica com boa drenagem.',
+    'Sandy and well-drained substrate (cacti and succulents)': 'Substrato arenoso e muito bem drenado (cactos e suculentas)',
+    'Orchid substrate (pine bark and charcoal)': 'Substrato para orquídeas (casca de pínus e carvão)'
+  };
+  if (currentLang === 'en') {
+    return ptToEn[text] || text;
+  }
+  return enToPt[text] || text;
 }
 
 export function translateTemperature(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  const exactMap = {
+  const ptToEn = {
     '18°C a 27°C (clima ameno a quente)': '18°C to 27°C (mild to warm climate)',
     '18°C a 28°C (proteger de geadas e frio excessivo)': '18°C to 28°C (protect from frost and severe cold)',
     '15°C a 30°C (resistente ao calor)': '15°C to 30°C (heat resistant)'
   };
-  return exactMap[text] || text;
+  const enToPt = {
+    '18°C to 27°C (mild to warm climate)': '18°C a 27°C (clima ameno a quente)',
+    '18°C to 28°C (protect from frost and severe cold)': '18°C a 28°C (proteger de geadas e frio excessivo)',
+    '15°C to 30°C (heat resistant)': '15°C a 30°C (resistente ao calor)'
+  };
+  if (currentLang === 'en') {
+    return ptToEn[text] || text;
+  }
+  return enToPt[text] || text;
 }
 
 export function translateMethod(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  const exactMap = {
+  const ptToEn = {
     'Estaquia de caule na água ou solo': 'Stem cuttings in water or soil',
+    'Estaquia de caule com nó na água': 'Stem cuttings with node in water',
     'Estaquia de caule / folha': 'Stem / leaf cuttings',
     'Estaquia de caule': 'Stem cuttings',
     'Estaquia de folha': 'Leaf cuttings',
+    'Estaquia de folhas ou brotações laterais': 'Leaf cuttings or side shoots',
+    'Estaquia de galho na água': 'Branch cuttings in water',
+    'Estaquia de ponteiros na água': 'Tip cuttings in water',
     'Divisão de touceira': 'Clump division',
+    'Divisão de touceiras ou Estaquia de caule com nó': 'Clump division or stem cuttings with node',
+    'Divisão de touceiras/rizomas ou Pedaços de folha': 'Clump division or leaf cuttings',
     'Divisão de touceira / separação de mudas com raiz': 'Clump division / root separation',
+    'Divisão de touceira ou Estolões (estolhos com mudinhas)': 'Clump division or Runners (offsets)',
     'Brotos laterais / mudas': 'Side shoots / offsets'
   };
-  return exactMap[text] || text;
+  const enToPt = {
+    'Stem cuttings in water or soil': 'Estaquia de caule na água ou solo',
+    'Stem cuttings with node in water': 'Estaquia de caule com nó na água',
+    'Stem / leaf cuttings': 'Estaquia de caule / folha',
+    'Stem cuttings': 'Estaquia de caule',
+    'Leaf cuttings': 'Estaquia de folha',
+    'Leaf cuttings or side shoots': 'Estaquia de folhas ou brotações laterais',
+    'Branch cuttings in water': 'Estaquia de galho na água',
+    'Tip cuttings in water': 'Estaquia de ponteiros na água',
+    'Clump division': 'Divisão de touceira',
+    'Clump division or stem cuttings with node': 'Divisão de touceiras ou Estaquia de caule com nó',
+    'Clump division or leaf cuttings': 'Divisão de touceiras/rizomas ou Pedaços de folha',
+    'Clump division / root separation': 'Divisão de touceira / separação de mudas com raiz',
+    'Clump division or Runners (offsets)': 'Divisão de touceira ou Estolões (estolhos com mudinhas)',
+    'Side shoots / offsets': 'Brotos laterais / mudas'
+  };
+  if (currentLang === 'en') {
+    return ptToEn[text] || text;
+  }
+  return enToPt[text] || text;
 }
 
 export function translateDifficulty(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  if (/fácil/i.test(text)) return 'Easy';
-  if (/médio/i.test(text)) return 'Medium';
-  if (/difícil/i.test(text)) return 'Hard';
-  return text;
+  if (currentLang === 'en') {
+    if (/muito fácil/i.test(text)) return 'Very Easy';
+    if (/fácil/i.test(text)) return 'Easy';
+    if (/médio/i.test(text)) return 'Medium';
+    if (/difícil/i.test(text) || /avançado/i.test(text)) return 'Advanced';
+    return text;
+  } else {
+    if (/very easy/i.test(text)) return 'Muito Fácil';
+    if (/easy/i.test(text)) return 'Fácil';
+    if (/medium/i.test(text)) return 'Médio';
+    if (/hard/i.test(text) || /advanced/i.test(text)) return 'Avançado';
+    return text;
+  }
 }
 
 export function translateBestSeason(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  if (/Primavera/i.test(text) && /Verão/i.test(text)) return 'Spring & Summer';
-  if (/Outono/i.test(text) && /Inverno/i.test(text)) return 'Autumn & Winter';
-  if (/Ano todo/i.test(text)) return 'All year round';
-  return text;
+  if (currentLang === 'en') {
+    if (/Primavera/i.test(text) && /Verão/i.test(text)) return 'Spring & Summer';
+    if (/Outono/i.test(text) && /Inverno/i.test(text)) return 'Autumn & Winter';
+    if (/Ano todo/i.test(text)) return 'All year round';
+    return text;
+  } else {
+    if (/Spring/i.test(text) && /Summer/i.test(text)) return 'Primavera e Verão';
+    if (/Autumn/i.test(text) && /Winter/i.test(text)) return 'Outono e Inverno';
+    if (/All year/i.test(text)) return 'Ano todo';
+    return text;
+  }
 }
 
 export function translateRootingTime(text, currentLang = 'pt-BR') {
   if (!text) return '';
-  if (currentLang !== 'en') return text;
-  let res = text.replace(/semanas/gi, 'weeks').replace(/dias/gi, 'days').replace(/a/g, 'to');
-  return res;
+  if (currentLang === 'en') {
+    return text.replace(/semanas/gi, 'weeks').replace(/dias/gi, 'days').replace(/\ba\b/g, 'to');
+  } else {
+    return text.replace(/weeks/gi, 'semanas').replace(/days/gi, 'dias').replace(/\bto\b/g, 'a');
+  }
 }

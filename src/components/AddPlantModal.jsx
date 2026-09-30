@@ -164,22 +164,22 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
     setAiNotice(null);
     try {
       const apiKey = getStoredApiKey();
-      const result = await analyzePlantImage(photo, apiKey);
+      const result = await analyzePlantImage(photo, apiKey, currentLang);
       
       if (result._isFallback) {
-        setAiNotice('Sua chave foi direcionada para o catálogo botânico inteligente. Você pode ajustar todos os campos abaixo livremente!');
+        setAiNotice(isEn ? 'Your key redirected to smart botanical catalog. You can edit all fields below.' : 'Sua chave foi direcionada para o catálogo botânico inteligente. Você pode ajustar todos os campos abaixo livremente!');
       }
 
       const propagationResult = result.propagation && result.propagation.method 
         ? result.propagation 
-        : getDefaultPropagationForPlant(result);
+        : getDefaultPropagationForPlant(result, currentLang);
 
       setPlantData(prev => ({
         ...prev,
-        commonName: result.commonName || prev.commonName || 'Planta Identificada',
+        commonName: result.commonName || prev.commonName || (isEn ? 'Identified Plant' : 'Planta Identificada'),
         scientificName: result.scientificName || prev.scientificName || '',
         origin: result.origin || prev.origin || '',
-        plantType: result.plantType || prev.plantType || 'Luz Indireta / Meia Sombra',
+        plantType: result.plantType || prev.plantType || (isEn ? 'Indirect Light / Partial Shade' : 'Luz Indireta / Meia Sombra'),
         idealEnvironment: result.idealEnvironment || prev.idealEnvironment,
         sunlight: {
           lightType: result.sunlight?.lightType || (result.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : result.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta'),
@@ -211,7 +211,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
         confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       } catch (e) {}
     } catch (err) {
-      alert(`Não foi possível conectar à IA Gemini (${err.message || 'Erro de conexão'}).\n\nCarregamos os campos para preenchimento manual.`);
+      alert(isEn ? `Could not connect to Gemini AI (${err.message || 'Connection error'}).\nLoaded fields for manual entry.` : `Não foi possível conectar à IA Gemini (${err.message || 'Erro de conexão'}).\n\nCarregamos os campos para preenchimento manual.`);
       setStep('form');
     } finally {
       setIsAnalyzing(false);
@@ -224,11 +224,11 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
     setAiNotice(null);
     try {
       const apiKey = getStoredApiKey();
-      const result = await autoCompletePlantByName(inputPlantName.trim(), apiKey);
+      const result = await autoCompletePlantByName(inputPlantName.trim(), apiKey, currentLang);
 
       const propagationResult = result.propagation && result.propagation.method 
         ? result.propagation 
-        : getDefaultPropagationForPlant(result);
+        : getDefaultPropagationForPlant(result, currentLang);
 
       setPlantData(prev => ({
         ...prev,

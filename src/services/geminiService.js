@@ -171,9 +171,9 @@ export async function normalizeImageForAi(imageInput) {
   });
 }
 
-export async function autoCompletePlantByName(plantName, apiKey) {
+export async function autoCompletePlantByName(plantName, apiKey, currentLang = 'pt-BR') {
   if (!plantName || typeof plantName !== 'string' || plantName.trim() === '') {
-    throw new Error('Por favor, informe o nome da planta para o auto-complete.');
+    throw new Error(currentLang === 'en' ? 'Please provide a plant name for auto-complete.' : 'Por favor, informe o nome da planta para o auto-complete.');
   }
 
   const name = plantName.trim();
@@ -181,7 +181,7 @@ export async function autoCompletePlantByName(plantName, apiKey) {
 
   if (cleanKey) {
     try {
-      return await fetchGeminiTextAutoComplete(name, cleanKey);
+      return await fetchGeminiTextAutoComplete(name, cleanKey, currentLang);
     } catch (err) {
       console.warn(`Falha na API Gemini para nome "${name}": ${err.message}. Acionando catálogo botânico inteligente.`);
     }
@@ -189,8 +189,8 @@ export async function autoCompletePlantByName(plantName, apiKey) {
 
   // Simulação inteligente offline/fallback
   await new Promise(r => setTimeout(r, 1200));
-  const base = simulateSmartAiAnalysis();
-  const propagation = getDefaultPropagationForPlant({ commonName: name });
+  const base = simulateSmartAiAnalysis(currentLang);
+  const propagation = getDefaultPropagationForPlant({ commonName: name }, currentLang);
 
   return {
     ...base,
@@ -200,8 +200,64 @@ export async function autoCompletePlantByName(plantName, apiKey) {
   };
 }
 
-async function fetchGeminiTextAutoComplete(plantName, cleanKey) {
-  const prompt = `Você é um botânico especialista e taxonomista vegetal de renome, com altíssima precisão botânica.
+async function fetchGeminiTextAutoComplete(plantName, cleanKey, currentLang = 'pt-BR') {
+  const isEn = currentLang === 'en';
+  const prompt = isEn
+    ? `You are an expert botanist and plant taxonomist of high precision.
+Your mission is to generate a complete botanical data sheet for the plant named "${plantName}", including detailed care instructions and a guide on HOW TO TAKE CUTTINGS AND PROPAGATE THE PLANT.
+
+Mandatory botanical guidelines (ALL String content in JSON MUST BE WRITTEN IN ENGLISH):
+1. commonName: "${plantName}" (or corrected common name).
+2. scientificName: Binomial Scientific Name (Latin).
+3. origin: Native region where the plant originates in the world.
+4. sunlight: lightType ("direta", "indireta", or "sombra"), period, hoursPerDay, and notes (in English).
+5. watering: frequencyTimesPerWeek, frequencyDays, amountMl, and description (in English).
+6. soilType, idealTemperature, howToCare, fertilizer (type, frequency, notes), careTips, and notes (in English).
+7. propagation: method, bestSeason, rootingTime, difficulty, stepByStep (array with 4 to 5 numbered steps), and proTips (in English).
+
+STRICTLY return pure JSON without extra markdown blocks:
+{
+  "commonName": "${plantName}",
+  "scientificName": "Latin Scientific Name",
+  "origin": "Geographic native origin",
+  "plantType": "Indirect Light / Partial Shade",
+  "sunlight": {
+    "lightType": "indireta",
+    "period": "Filtered Indirect Light",
+    "hoursPerDay": "4 to 6 hours",
+    "notes": "Lighting care instructions"
+  },
+  "watering": {
+    "frequencyTimesPerWeek": 2,
+    "frequencyDays": 3,
+    "amountMl": "150 - 200 ml",
+    "description": "How to water"
+  },
+  "soilType": "Ideal soil mix",
+  "idealTemperature": "18°C to 27°C",
+  "howToCare": "Pruning and dry leaf removal instructions",
+  "fertilizer": {
+    "type": "Recommended fertilizer",
+    "frequency": "Every 30 days",
+    "notes": "Instructions"
+  },
+  "propagation": {
+    "method": "Cutting method",
+    "bestSeason": "Spring and Summer",
+    "rootingTime": "2 to 4 weeks",
+    "difficulty": "Easy",
+    "stepByStep": [
+      "1. Step 1...",
+      "2. Step 2...",
+      "3. Step 3...",
+      "4. Step 4..."
+    ],
+    "proTips": "Botanist tip"
+  },
+  "careTips": ["Tip 1", "Tip 2"],
+  "notes": "General observations"
+}`
+    : `Você é um botânico especialista e taxonomista vegetal de renome, com altíssima precisão botânica.
 Sua missão é gerar a ficha botânica completa para a planta chamada "${plantName}", incluindo cuidados detalhados e o guia de COMO TIRAR MUDAS E PROPAGAR A PLANTA.
 
 Orientações botânicas obrigatórias:
@@ -286,7 +342,7 @@ Retorne ESTRITAMENTE um JSON puro sem blocos markdown extras no seguinte formato
 
       if (parsed) {
         if (!parsed.propagation || !parsed.propagation.method) {
-          parsed.propagation = getDefaultPropagationForPlant(parsed);
+          parsed.propagation = getDefaultPropagationForPlant(parsed, currentLang);
         }
         return parsed;
       }
@@ -295,8 +351,8 @@ Retorne ESTRITAMENTE um JSON puro sem blocos markdown extras no seguinte formato
     }
   }
 
-  const base = simulateSmartAiAnalysis();
-  const propagation = getDefaultPropagationForPlant({ commonName: plantName });
+  const base = simulateSmartAiAnalysis(currentLang);
+  const propagation = getDefaultPropagationForPlant({ commonName: plantName }, currentLang);
   return {
     ...base,
     commonName: plantName,
@@ -304,22 +360,92 @@ Retorne ESTRITAMENTE um JSON puro sem blocos markdown extras no seguinte formato
   };
 }
 
-export async function analyzePlantImage(base64Image, apiKey) {
+export async function analyzePlantImage(base64Image, apiKey, currentLang = 'pt-BR') {
   const normalized = await normalizeImageForAi(base64Image);
   const cleanBase64 = normalized ? normalized.base64 : (base64Image.split(';base64,')[1] || base64Image).trim();
 
   if (apiKey && apiKey.trim() !== '') {
-    return await fetchGeminiVisionApi(cleanBase64, apiKey.trim());
+    return await fetchGeminiVisionApi(cleanBase64, apiKey.trim(), currentLang);
   } else {
     await new Promise(r => setTimeout(r, 1500));
-    return simulateSmartAiAnalysis();
+    return simulateSmartAiAnalysis(currentLang);
   }
 }
 
-async function fetchGeminiVisionApi(base64Data, apiKey) {
+async function fetchGeminiVisionApi(base64Data, apiKey, currentLang = 'pt-BR') {
   let lastError = null;
+  const isEn = currentLang === 'en';
 
-  const prompt = `Você é um botânico especialista e taxonomista vegetal de renome, com altíssima precisão botânica.
+  const prompt = isEn
+    ? `You are an expert botanist and plant taxonomist.
+Your mission is to thoroughly analyze this plant photograph, identify its exact species, and fill in all detailed care fields and the complete guide on HOW TO TAKE CUTTINGS AND PROPAGATE THE PLANT TO GROW.
+
+Mandatory botanical guidelines (ALL string fields in JSON MUST BE WRITTEN IN ENGLISH):
+1. Identify Common Name in English and Scientific Name (Genus and species).
+2. Native origin / region where the plant comes from in the world.
+3. Light Amount: Classify lightType strictly as "direta", "indireta", or "sombra".
+4. Lighting Notes: Detail lighting care.
+5. Watering: Specify frequencyTimesPerWeek, frequencyDays, amountMl, and description in English.
+6. Soil: Specify ideal soil mix and substrate.
+7. Temperature: Recommended temperature range.
+8. Care / Maintenance: Detailed practical instructions (pruning, cleaning, dry leaf removal).
+9. Fertilization: Recommended fertilizer type and frequency.
+10. COMPLETE CUTTING & PROPAGATION GUIDE:
+    - method: Main propagation method in English (e.g. "Stem cuttings in water", "Clump division", "Leaf cuttings", etc.).
+    - bestSeason: Best season of the year (e.g. "Spring & Summer").
+    - rootingTime: Average estimated rooting time (e.g. "2 to 4 weeks").
+    - difficulty: Difficulty ("Easy", "Medium", or "Advanced").
+    - stepByStep: Array with 4 to 5 practical numbered steps teaching exactly how to take cuttings and grow.
+    - proTips: Botanist secret tip for successful rooting.
+
+STRICTLY return pure JSON without extra markdown blocks:
+{
+  "commonName": "Common Name in English",
+  "scientificName": "Scientific Name (Latin)",
+  "origin": "Native geographic origin",
+  "plantType": "Indirect Light / Partial Shade",
+  "healthStatus": "Healthy & Vigorous",
+  "sunlight": {
+    "lightType": "indireta",
+    "period": "Filtered Indirect Light",
+    "hoursPerDay": "4 to 6 hours daily",
+    "notes": "Lighting observations"
+  },
+  "watering": {
+    "frequencyTimesPerWeek": 2,
+    "frequencyDays": 3,
+    "amountMl": "150 - 200 ml",
+    "description": "How and when to water"
+  },
+  "soilType": "Soil type and substrate",
+  "idealTemperature": "18°C to 27°C",
+  "howToCare": "How to care and prune",
+  "fertilizer": {
+    "type": "NPK 10-10-10 or Worm Castings",
+    "frequency": "Every 30 days in Spring/Summer",
+    "notes": "Application method"
+  },
+  "propagation": {
+    "method": "Stem cuttings in water",
+    "bestSeason": "Spring & Summer",
+    "rootingTime": "2 to 3 weeks",
+    "difficulty": "Easy",
+    "stepByStep": [
+      "1. Choose a healthy stem...",
+      "2. Cut 1 cm below node...",
+      "3. Remove bottom leaves...",
+      "4. Place cut end in water...",
+      "5. Change water every 2 days..."
+    ],
+    "proTips": "Botanist tip"
+  },
+  "careTips": [
+    "Additional tip 1",
+    "Additional tip 2"
+  ],
+  "notes": "General care notes"
+}`
+    : `Você é um botânico especialista e taxonomista vegetal de renome, com altíssima precisão botânica.
 Sua missão é analisar minuciosamente a fotografia desta planta e identificar a sua espécie exata, preenchendo todos os campos de cuidados botânicos detalhados e o guia completo de COMO TIRAR MUDAS E PROPAGAR A PLANTA PARA CULTIVAR.
 
 Orientações botânicas obrigatórias:
@@ -498,12 +624,25 @@ Retorne ESTRITAMENTE um JSON puro sem blocos markdown extras:
 /**
  * Gera guia inteligente de mudas para qualquer planta com base em suas características botânicas
  */
-export function getDefaultPropagationForPlant(plant) {
+export function getDefaultPropagationForPlant(plant, currentLang = 'pt-BR') {
+  const isEn = currentLang === 'en';
   const name = (plant?.commonName || plant?.scientificName || '').toLowerCase();
-  const plantType = (plant?.plantType || '').toLowerCase();
 
-  if (name.includes('jiboia') || name.includes('filodendro') || name.includes('monstera') || name.includes('costela')) {
-    return {
+  if (name.includes('jiboia') || name.includes('pothos') || name.includes('filodendro') || name.includes('monstera') || name.includes('costela')) {
+    return isEn ? {
+      method: 'Stem cuttings with node in water',
+      bestSeason: 'Spring & Summer',
+      rootingTime: '10 to 20 days',
+      difficulty: 'Very Easy',
+      stepByStep: [
+        '1. Choose a healthy stem with lush leaves and well-formed nodes (where aerial roots emerge).',
+        '2. Cut about 1 cm below a node using clean shears.',
+        '3. Remove lower leaf so it is not submerged.',
+        '4. Place cut end in container with clean water in bright diffuse light.',
+        '5. Change water every 2-3 days. When roots reach 4 cm, plant in pot with fertile substrate.'
+      ],
+      proTips: 'Water should cover only the node. Do not submerge leaves to avoid rotting.'
+    } : {
       method: 'Estaquia de caule com nó na água',
       bestSeason: 'Primavera e Verão',
       rootingTime: '10 a 20 dias',
@@ -519,8 +658,21 @@ export function getDefaultPropagationForPlant(plant) {
     };
   }
 
-  if (name.includes('suculenta') || name.includes('echeveria') || name.includes('cacto') || name.includes('kalanchoe')) {
-    return {
+  if (name.includes('suculenta') || name.includes('succulent') || name.includes('echeveria') || name.includes('cacto') || name.includes('cactus') || name.includes('kalanchoe')) {
+    return isEn ? {
+      method: 'Leaf cuttings or side shoots',
+      bestSeason: 'Spring & Summer',
+      rootingTime: '2 to 4 weeks',
+      difficulty: 'Easy',
+      stepByStep: [
+        '1. Gently twist a healthy leaf off near the stem base (base of leaf must come off intact).',
+        '2. Let the leaf rest in shade for 2 days to callous over.',
+        '3. Lay leaf flat on dry sandy soil mix, without burying.',
+        '4. Keep in bright location away from harsh sun, mist lightly every 3 to 5 days.',
+        '5. When new plantlet and pink roots sprout, parent leaf will dry and you can plant.'
+      ],
+      proTips: 'Never bury leaf and avoid overwatering before roots sprout to prevent rot.'
+    } : {
       method: 'Estaquia de folhas ou brotações laterais',
       bestSeason: 'Primavera e Verão',
       rootingTime: '2 a 4 semanas',
@@ -536,8 +688,21 @@ export function getDefaultPropagationForPlant(plant) {
     };
   }
 
-  if (name.includes('espada') || name.includes('sansevieria') || name.includes('dracaena')) {
-    return {
+  if (name.includes('espada') || name.includes('snake') || name.includes('sansevieria') || name.includes('dracaena')) {
+    return isEn ? {
+      method: 'Clump division or leaf cuttings',
+      bestSeason: 'Spring & Summer',
+      rootingTime: '4 to 6 weeks',
+      difficulty: 'Easy',
+      stepByStep: [
+        '1. Clump division: when unpotting, separate a side pup with existing roots.',
+        '2. Leaf method: cut a leaf into 8-10 cm segments.',
+        '3. Let callouse in shade for 24 hours.',
+        '4. Plant bottom end of segment 2 cm deep in sandy soil.',
+        '5. Keep soil slightly damp until new pups emerge.'
+      ],
+      proTips: 'Planting leaf upside down prevents rooting. Use clump division for yellow-edged varieties to preserve variegation.'
+    } : {
       method: 'Divisão de touceiras/rizomas ou Pedaços de folha',
       bestSeason: 'Primavera e Verão',
       rootingTime: '4 a 6 semanas',
@@ -553,8 +718,21 @@ export function getDefaultPropagationForPlant(plant) {
     };
   }
 
-  if (name.includes('manjericão') || name.includes('hortelã') || name.includes('alecrim') || name.includes('erva')) {
-    return {
+  if (name.includes('manjericão') || name.includes('basil') || name.includes('hortelã') || name.includes('mint') || name.includes('alecrim') || name.includes('rosemary')) {
+    return isEn ? {
+      method: 'Tip cuttings in water',
+      bestSeason: 'Spring & Summer',
+      rootingTime: '7 to 14 days',
+      difficulty: 'Very Easy',
+      stepByStep: [
+        '1. Cut a healthy non-flowering stem about 10-12 cm long.',
+        '2. Strip leaves from lower 5 cm of stem.',
+        '3. Place stem in glass of fresh water in bright spot.',
+        '4. Change water every 2 days for oxygenation.',
+        '5. When roots reach 2-3 cm, plant in pot with compost-rich soil.'
+      ],
+      proTips: 'Avoid flowering stems as they have less energy to grow new roots.'
+    } : {
       method: 'Estaquia de ponteiros na água',
       bestSeason: 'Primavera e Verão',
       rootingTime: '7 a 14 dias',
@@ -571,7 +749,20 @@ export function getDefaultPropagationForPlant(plant) {
   }
 
   // Padrão universal botânico de alta precisão
-  return {
+  return isEn ? {
+    method: 'Stem cuttings in water or substrate',
+    bestSeason: 'Spring & Summer',
+    rootingTime: '2 to 4 weeks',
+    difficulty: 'Easy',
+    stepByStep: [
+      '1. Choose a healthy stem with 2 to 3 nodes and fresh leaves.',
+      '2. Make diagonal cut 1 cm below node with sterile shears.',
+      '3. Remove lower leaves to focus energy on root formation.',
+      '4. Place cut end in clean water or light perlite mix.',
+      '5. Keep in warm spot with filtered indirect light until rooted.'
+    ],
+    proTips: 'Dust cut edge with cinnamon powder as natural fungicide.'
+  } : {
     method: 'Estaquia de caule / ramos na água ou substrato',
     bestSeason: 'Primavera e Verão',
     rootingTime: '2 a 4 semanas',
@@ -588,8 +779,101 @@ export function getDefaultPropagationForPlant(plant) {
 }
 
 // IA Simulada Inteligente com catálogos botânicos detalhados incluindo Como Tirar Mudas
-export function simulateSmartAiAnalysis() {
-  const SIMULATED_RESULTS = [
+export function simulateSmartAiAnalysis(currentLang = 'pt-BR') {
+  const isEn = currentLang === 'en';
+  const SIMULATED_RESULTS = isEn ? [
+    {
+      commonName: 'Aglaonema (Chinese Evergreen)',
+      scientificName: 'Aglaonema commutatum',
+      origin: 'Tropical Rainforests of Southeast Asia (Thailand, Philippines, Malaysia)',
+      plantType: 'Indirect Light / Shaded Light',
+      idealEnvironment: 'Indoor (Living Room, Bedroom or Office)',
+      healthStatus: 'Healthy & Vibrant',
+      sunlight: {
+        lightType: 'indireta',
+        period: 'Indirect Light / Shaded Light',
+        hoursPerDay: '4 to 6 hours of diffuse light',
+        notes: 'Avoid direct sun to prevent leaf sunburn.'
+      },
+      watering: {
+        frequencyTimesPerWeek: 2,
+        frequencyDays: 3,
+        amountMl: '150 - 200 ml',
+        description: 'Water about 2 times per week. Let top soil dry between waterings.'
+      },
+      soilType: 'Substrate rich in organic matter with good drainage',
+      idealTemperature: '18°C to 27°C (mild to warm climate)',
+      howToCare: 'Remove dry or yellowing leaves at base with clean shears. Wipe dust off leaves.',
+      fertilizer: {
+        type: 'Liquid NPK 10-10-10 or Worm Castings',
+        frequency: 'Every 30 to 45 days in Spring/Summer',
+        notes: 'Apply after normal watering.'
+      },
+      propagation: {
+        method: 'Clump division or stem cuttings with node',
+        bestSeason: 'Spring & Summer',
+        rootingTime: '3 to 5 weeks',
+        difficulty: 'Easy',
+        stepByStep: [
+          '1. Gently separate side shoots with roots when repotting.',
+          '2. If using stem cutting, cut a healthy 10 cm piece with at least 2 nodes.',
+          '3. Apply cinnamon powder to cut edge.',
+          '4. Plant cutting in light potting mix.',
+          '5. Keep in warm diffuse light location until new leaves sprout.'
+        ],
+        proTips: 'Clump division is the most reliable method for Aglaonema.'
+      },
+      careTips: [
+        'Enjoys leaf water misting when air is dry.',
+        'Keep away from cold AC drafts.'
+      ],
+      notes: 'Excellent air-purifying indoor plant.'
+    },
+    {
+      commonName: 'Golden Pothos',
+      scientificName: 'Epipremnum aureum',
+      origin: 'Solomon Islands and French Polynesia',
+      plantType: 'Indirect Light / Partial Shade',
+      idealEnvironment: 'Indoor (Living Room, Bedroom or Office)',
+      healthStatus: 'Vigorous',
+      sunlight: {
+        lightType: 'indireta',
+        period: 'Indirect Light / Morning Sun',
+        hoursPerDay: '4 to 6 hours',
+        notes: 'Enjoys bright indirect light to maintain yellow variegation.'
+      },
+      watering: {
+        frequencyTimesPerWeek: 2,
+        frequencyDays: 3,
+        amountMl: '150 - 250 ml',
+        description: 'Water twice a week. Allow top soil to dry before watering again.'
+      },
+      soilType: 'Fertile and light substrate with perlite',
+      idealTemperature: '18°C to 30°C (protect from frost)',
+      howToCare: 'Trim dry leaves at base. Prune long vines to encourage bushier growth.',
+      fertilizer: {
+        type: 'NPK 10-10-10 or Worm Castings',
+        frequency: 'Every 30 days',
+        notes: 'Apply in Spring/Summer.'
+      },
+      propagation: {
+        method: 'Stem cuttings in water or soil',
+        bestSeason: 'All year round (ideal Spring/Summer)',
+        rootingTime: '10 to 20 days',
+        difficulty: 'Very Easy',
+        stepByStep: [
+          '1. Locate healthy node on vine.',
+          '2. Cut 1 cm below node keeping 2-3 leaves.',
+          '3. Remove lower leaves.',
+          '4. Place cutting in clean water glass.',
+          '5. Change water every 2-3 days until roots reach 4 cm.'
+        ],
+        proTips: 'Pothos roots extremely easily in water.'
+      },
+      careTips: ['Can grow trailing or supported on moss pole.'],
+      notes: 'Classic and easy to grow plant.'
+    }
+  ] : [
     {
       commonName: 'Aglaonema (Café-de-Salão)',
       scientificName: 'Aglaonema commutatum',
@@ -680,100 +964,6 @@ export function simulateSmartAiAnalysis() {
       },
       careTips: ['Pode ser cultivada pendente ou em suporte de fibra de coco.'],
       notes: 'Planta clássica e muito fácil de cultivar.'
-    },
-    {
-      commonName: 'Manjericão Verde',
-      scientificName: 'Ocimum basilicum',
-      origin: 'Regiões Tropicais da Ásia Central e Índia',
-      plantType: 'Sol Pleno (Luz Direta)',
-      idealEnvironment: 'Fora de casa (Quintal, Horta ou Sacada de Sol)',
-      healthStatus: 'Saudável & Vigoroso',
-      sunlight: {
-        lightType: 'direta',
-        period: 'Sol da Manhã Direto',
-        hoursPerDay: '5 a 6 horas de sol direto',
-        notes: 'Necessita de luz solar direta diária para concentrar seus óleos essenciais e manter o aroma intenso.'
-      },
-      watering: {
-        frequencyTimesPerWeek: 3,
-        frequencyDays: 2,
-        amountMl: '150 - 200 ml',
-        description: 'Regar de 3 a 4 vezes por semana no início da manhã. Manter o solo úmido sem encharcar as raízes.'
-      },
-      soilType: 'Solo fértil, fofo, rico em húmus e com boa drenagem',
-      idealTemperature: '20°C a 30°C (muito sensível ao frio e geadas)',
-      howToCare: 'Retirar flores assim que surgirem para manter a força nas folhas. Poda de beliscão (desponte) no topo para ramificar a planta.',
-      fertilizer: {
-        type: 'Húmus de Minhoca ou Adubo Orgânico Bokashi',
-        frequency: 'A cada 20 a 30 dias',
-        notes: 'Incorporar na terra superficial.'
-      },
-      propagation: {
-        method: 'Estaquia de galho na água',
-        bestSeason: 'Primavera e Verão',
-        rootingTime: '7 a 12 dias',
-        difficulty: 'Muito Fácil',
-        stepByStep: [
-          '1. Corte um ramo saudável de 10 a 12 cm de comprimento sem flores.',
-          '2. Remova todas as folhas inferiores, deixando apenas 4 folhas no topo.',
-          '3. Coloque o galho em um copo com água limpa perto de uma janela bem iluminada.',
-          '4. Troque a água a cada 2 dias para manter bem oxigenada.',
-          '5. Assim que as raízes atingirem 3 cm, plante em um vasinho com terra bem adubada.'
-        ],
-        proTips: 'Colher sempre cortando acima de um par de folhas; isso faz a planta soltar dois novos galhos no local!'
-      },
-      careTips: [
-        'Evitar molhar as folhas ao regar no fim da tarde para prevenir fungos.',
-        'Colher as folhas de cima para baixo.'
-      ],
-      notes: 'Planta aromática e culinária essencial.'
-    },
-    {
-      commonName: 'Samambaia Americana',
-      scientificName: 'Nephrolepis exaltata',
-      origin: 'Florestas Tropicais Úmidas das Américas e Polinésia',
-      plantType: 'Sombra / Luz Indireta',
-      idealEnvironment: 'Dentro de casa (Banheiro, Varanda protegida ou Cozinha)',
-      healthStatus: 'Folhagem Verde Vistosa',
-      sunlight: {
-        lightType: 'sombra',
-        period: 'Sombra Luminosa / Luz Filtrada',
-        hoursPerDay: 'Claridade indireta constante',
-        notes: 'Nunca expor ao sol direto! O sol direto queima e seca as frondes rapidamente.'
-      },
-      watering: {
-        frequencyTimesPerWeek: 3,
-        frequencyDays: 2,
-        amountMl: '200 - 300 ml',
-        description: 'Regar cerca de 3 vezes por semana mantendo o solo sempre levemente úmido. Nunca deixar secar por completo.'
-      },
-      soilType: 'Substrato leve com alta retenção de umidade (composto orgânico + fibra de coco + casca de pinus)',
-      idealTemperature: '18°C a 26°C (proteger de vento forte e ar condicionado)',
-      howToCare: 'Podar e retirar folhas e ramos secos na base para dar espaço aos novos brotos. Borrifar água diariamente nas folhas em dias secos.',
-      fertilizer: {
-        type: 'Torta de Mamona com Farinha de Osso ou NPK 05-05-05',
-        frequency: 'A cada 40 dias',
-        notes: 'Aplicar nas laterais do vaso.'
-      },
-      propagation: {
-        method: 'Divisão de touceira ou Estolões (estolhos com mudinhas)',
-        bestSeason: 'Início da Primavera',
-        rootingTime: '3 a 5 semanas',
-        difficulty: 'Médio',
-        stepByStep: [
-          '1. Retire a samambaia do vaso e visualize onde a touceira se divide naturalmente.',
-          '2. Com uma faca limpa, corte a raiz dividindo em 2 ou 3 partes com folhas e raízes saudáveis.',
-          '3. Plante cada divisão em um vaso com substrato rico em fibra de coco e matéria orgânica.',
-          '4. Regue abundantemente e deixe escorrer todo o excesso de água.',
-          '5. Mantenha em local sombreado, quente e sem correntes de vento até novas brotações.'
-        ],
-        proTips: 'Borrifar água diariamente nas frondes das mudas recém-plantadas nos primeiros 15 dias acelera muito o pegamento.'
-      },
-      careTips: [
-        'Ideal para cultivo em vasos suspensos em varandas protegidas ou banheiros bem iluminados.',
-        'Girar o vaso a cada 2 meses para crescimento uniforme.'
-      ],
-      notes: 'Ajuda a umedecer o ar e trazer sensação de frescor ao ambiente.'
     }
   ];
 
