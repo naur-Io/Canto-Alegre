@@ -1,7 +1,6 @@
 /**
  * Servico de Telemetria e Analytics do Canto Alegre
- * Offline-first: registra acessos e interacoes locais no localStorage
- * e encaminha eventos ao Google Analytics (GA4) se disponível.
+ * Rastreamento silencioso em segundo plano de visualizacoes de pagina e cliques
  */
 
 const STORAGE_KEY = 'cantoalegre_telemetry_v1';
@@ -16,6 +15,7 @@ const getInitialData = () => ({
 
 const loadTelemetry = () => {
   try {
+    if (typeof localStorage === 'undefined') return getInitialData();
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return getInitialData();
     const data = JSON.parse(raw);
@@ -33,6 +33,7 @@ const loadTelemetry = () => {
 
 const saveTelemetry = (data) => {
   try {
+    if (typeof localStorage === 'undefined') return;
     data.lastActive = new Date().toISOString();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -42,74 +43,88 @@ const saveTelemetry = (data) => {
 
 export const analyticsService = {
   /**
-   * Inicializa o rastreamento da sessao
+   * Inicializa o rastreamento da sessao de forma segura
    */
   initAnalytics() {
-    const data = loadTelemetry();
-    saveTelemetry(data);
+    try {
+      const data = loadTelemetry();
+      saveTelemetry(data);
+    } catch (e) {}
   },
 
   /**
-   * Rastreia a visualizacao de uma tela/pagina
+   * Rastreia a visualizacao de uma tela/pagina de forma silenciosa
    * @param {string} pageName 
    */
   trackPageView(pageName = 'Jardim') {
-    const data = loadTelemetry();
-    data.totalPageViews = (data.totalPageViews || 0) + 1;
-    data.pageViews[pageName] = (data.pageViews[pageName] || 0) + 1;
-    saveTelemetry(data);
+    try {
+      const data = loadTelemetry();
+      data.totalPageViews = (data.totalPageViews || 0) + 1;
+      data.pageViews[pageName] = (data.pageViews[pageName] || 0) + 1;
+      saveTelemetry(data);
 
-    // Integracao com GA4 se window.gtag existir
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', 'page_view', { page_title: pageName });
-    }
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('event', 'page_view', { page_title: pageName });
+      }
+    } catch (e) {}
   },
 
   /**
-   * Rastreia a interacao com um botao ou recurso
+   * Rastreia a interacao com um botao ou recurso de forma silenciosa
    * @param {string} category 
    * @param {string} action 
    * @param {string} label 
    */
   trackEvent(category, action, label = '') {
-    const data = loadTelemetry();
-    const eventKey = label ? `${category}: ${action} (${label})` : `${category}: ${action}`;
-    data.events[eventKey] = (data.events[eventKey] || 0) + 1;
-    saveTelemetry(data);
+    try {
+      const data = loadTelemetry();
+      const eventKey = label ? `${category}: ${action} (${label})` : `${category}: ${action}`;
+      data.events[eventKey] = (data.events[eventKey] || 0) + 1;
+      saveTelemetry(data);
 
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', action, {
-        event_category: category,
-        event_label: label,
-      });
-    }
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('event', action, {
+          event_category: category,
+          event_label: label,
+        });
+      }
+    } catch (e) {}
   },
 
   /**
-   * Retorna um resumo estruturado para o painel de estatisticas da UI
+   * Retorna um resumo estruturado
    */
   getAnalyticsSummary() {
-    const data = loadTelemetry();
-    
-    // Converter eventos em lista ordenada por cliques
-    const sortedEvents = Object.entries(data.events || {})
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
+    try {
+      const data = loadTelemetry();
+      const sortedEvents = Object.entries(data.events || {})
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
 
-    const sortedPageViews = Object.entries(data.pageViews || {})
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
+      const sortedPageViews = Object.entries(data.pageViews || {})
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
 
-    const totalClicks = sortedEvents.reduce((acc, curr) => acc + curr.count, 0);
+      const totalClicks = sortedEvents.reduce((acc, curr) => acc + curr.count, 0);
 
-    return {
-      totalPageViews: data.totalPageViews || 0,
-      totalClicks,
-      firstSession: data.firstSession,
-      lastActive: data.lastActive,
-      topEvents: sortedEvents.slice(0, 5),
-      pageViewsList: sortedPageViews,
-    };
+      return {
+        totalPageViews: data.totalPageViews || 0,
+        totalClicks,
+        firstSession: data.firstSession,
+        lastActive: data.lastActive,
+        topEvents: sortedEvents.slice(0, 5),
+        pageViewsList: sortedPageViews,
+      };
+    } catch (e) {
+      return {
+        totalPageViews: 0,
+        totalClicks: 0,
+        firstSession: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        topEvents: [],
+        pageViewsList: [],
+      };
+    }
   },
 
   /**
@@ -117,7 +132,9 @@ export const analyticsService = {
    */
   resetAnalytics() {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     } catch (e) {}
   }
 };

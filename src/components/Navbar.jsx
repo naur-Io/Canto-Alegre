@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare, BarChart3 } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
 import { TRANSLATIONS } from '../services/i18n';
 import { analyticsService } from '../services/analyticsService';
 
@@ -103,20 +103,6 @@ export default function Navbar({
 
         {/* Grupo de Ações Secundárias */}
         <div className="nav-secondary-actions">
-          {/* Telemetria & Estatisticas */}
-          <button 
-            className="btn btn-secondary btn-sm nav-btn-analytics"
-            onClick={() => {
-              analyticsService.trackEvent('Navbar', 'click', 'Estatisticas');
-              onOpenAnalytics && onOpenAnalytics();
-            }}
-            title="Estatisticas de Acessos e Uso"
-          >
-            <BarChart3 size={14} />
-            <span className="nav-btn-text-full">Métricas</span>
-            <span className="nav-btn-text-short">Métricas</span>
-          </button>
-
           {/* Feedback & Suporte */}
           <button 
             className="btn btn-secondary btn-sm"
