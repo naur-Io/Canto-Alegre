@@ -27,4 +27,18 @@ describe('PlantCard Component', () => {
 
     expect(handleSelect).toHaveBeenCalledWith(mockPlant);
   });
+
+  it('renders translated badges and buttons when currentLang is en', () => {
+    render(
+      <PlantCard 
+        plant={mockPlant}
+        onWater={vi.fn()}
+        onSelect={vi.fn()}
+        currentLang="en"
+      />
+    );
+
+    expect(screen.getByText('Watered Today')).toBeDefined();
+    expect(screen.getByText('Watered')).toBeDefined();
+  });
 });

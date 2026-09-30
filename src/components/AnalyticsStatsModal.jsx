@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BarChart3, Eye, MousePointerClick, TrendingUp, X, Activity, RotateCcw, ShieldCheck } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 
-export function AnalyticsStatsModal({ isOpen, onClose, t }) {
+export function AnalyticsStatsModal({ isOpen, onClose, currentLang = 'pt-BR' }) {
+  const isEn = currentLang === 'en';
   const [stats, setStats] = useState(null);
 
   useEffect(() => {

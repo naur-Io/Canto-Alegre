@@ -11,7 +11,10 @@ export const TRANSLATIONS = {
       installApp: 'Instalar App',
       openApp: 'Ir para o App',
       settings: 'Configuracoes',
-      feedback: 'Feedback & Suporte'
+      feedback: 'Feedback & Suporte',
+      lixeira: 'Lixeira',
+      novidades: 'Novidades',
+      guia: 'Guia & PWA'
     },
     hero: {
       badge: 'IA Multimodal Google Gemini + PWA 100% Offline',
@@ -71,6 +74,93 @@ export const TRANSLATIONS = {
       inspiration: 'Inspirado pelas experiencias de voluntariado ambiental e jardinagem via Worldpackers.',
       techStack: 'Construido com React 18, Vite, Spring Boot 3, PostgreSQL e Google Gemini AI API.',
       license: 'Licenca Open-Source MIT.'
+    },
+    garden: {
+      searchPlaceholder: 'Buscar por nome, origem, tipo de solo ou cuidados...',
+      filterAll: 'Todas',
+      filterNeedsWater: 'Precisa de Agua',
+      filterDirectSun: 'Sol Pleno',
+      filterIndirectLight: 'Luz Indireta',
+      filterShade: 'Sombra',
+      emptyTitle: 'Seu Jardim esta Vazio',
+      emptySearchTitle: 'Nenhuma planta encontrada',
+      emptyDesc: 'Comece sua colecao botanica inteligente cadastrando sua primeira muda.',
+      emptySearchDesc: 'Tente alterar os termos da busca ou limpar os filtros ativos.',
+      addFirstPlant: 'Cadastrar Primeira Planta'
+    },
+    plantCard: {
+      wateredToday: 'Regada Hoje',
+      needsWaterToday: 'Precisa de Agua Hoje!',
+      waterInDays: 'Regar em {days} dia(s)',
+      overdueDays: 'Atrasada ({days}d)',
+      fullSun: 'Sol Direto',
+      shade: 'Sombra',
+      indirectLight: 'Luz Indireta',
+      locationLabel: 'Onde Fica:',
+      cuttingsLabel: 'Muda:',
+      waterBtn: 'Regar',
+      wateredBtn: 'Regada'
+    },
+    addPlant: {
+      title: 'Adicionar Nova Planta',
+      knowNameTitle: 'Digitar Nome & Auto-completar',
+      photoTitle: 'Identificacao por Foto',
+      formTitle: 'Ficha Completa da Planta',
+      askTitle: 'Voce ja conhece o nome da planta?',
+      askSubtitle: 'Escolha uma das opcoes abaixo para a Inteligencia Artificial gerar a ficha botanica completa e o guia de mudas:',
+      optionKnowsNameTitle: 'Sim, ja sei o nome da planta',
+      optionKnowsNameDesc: 'Digite o nome (ex: Jiboia, Monstera) para a IA dar auto-complete de todos os cuidados',
+      optionPhotoTitle: 'Nao sei o nome da planta',
+      optionPhotoDesc: 'Tire ou envie uma foto para a IA identificar a especie e preencher a ficha',
+      revealTitle: 'Esta e a sua',
+      revealSubtitle: 'Especie identificada com sucesso pela Inteligencia Artificial!',
+      revealBtn: 'Confirmar & Ver Ficha Botanica'
+    },
+    plantDetail: {
+      editTitle: 'Editar Ficha Botanica',
+      editBtn: 'Editar',
+      saveBtn: 'Salvar Alteracoes',
+      cancelBtn: 'Cancelar',
+      removeBtn: 'Remover',
+      waterTodayBtn: 'Marcar como Regada Hoje',
+      changePhotoBtn: 'Alterar / Tirar Foto',
+      originSection: 'Identificacao & Origem',
+      sunSection: 'Iluminacao & Quantidade de Luz',
+      waterSection: 'Rega & Quantidade de Agua',
+      propagationSection: 'Como Tirar Mudas (Propagacao & Cultivo)',
+      soilSection: 'Solo & Temperatura',
+      careSection: 'Como Cuidar & Manutencao',
+      fertilizerSection: 'Adubacao & Observacoes'
+    },
+    trashBin: {
+      title: 'Lixeira do Jardim',
+      itemsCount: '{count} planta(s) removida(s)',
+      emptyTitle: 'Sua lixeira esta vazia',
+      emptyDesc: 'Plantas excluidas aparecerao aqui antes de serem removidas permanentemente.',
+      restoreBtn: 'Restaurar',
+      deleteBtn: 'Excluir',
+      emptyTrashBtn: 'Esvaziar Lixeira',
+      confirmTitle: 'Confirmar exclusao definitiva?',
+      confirmYes: 'Sim, Esvaziar',
+      closeBtn: 'Fechar'
+    },
+    apiKey: {
+      title: 'Conectar IA Gemini do Google',
+      desc: 'Insira sua chave de API gratuita do Google AI Studio para atuar com 100% de precisao na identificacao por foto.',
+      placeholder: 'Cole sua API key aqui (ex: AIzaSy...)',
+      saveBtn: 'Salvar Chave'
+    },
+    settings: {
+      title: 'Configuracoes do Canto Alegre',
+      languageTitle: 'Idioma da Interface',
+      backupTitle: 'Backup & Restauracao',
+      exportBackup: 'Exportar Backup do Jardim',
+      importBackup: 'Importar Backup'
+    },
+    analytics: {
+      title: 'Estatisticas de Uso & Telemetria',
+      pageViews: 'Visualizacoes de Pagina',
+      topClicks: 'Recursos mais Utilizados'
     }
   },
   'en': {
@@ -81,7 +171,10 @@ export const TRANSLATIONS = {
       installApp: 'Install App',
       openApp: 'Launch App',
       settings: 'Settings',
-      feedback: 'Feedback & Support'
+      feedback: 'Feedback & Support',
+      lixeira: 'Trash Bin',
+      novidades: 'Updates',
+      guia: 'Guide & PWA'
     },
     hero: {
       badge: 'Multimodal Google Gemini AI + 100% Offline PWA',
@@ -141,6 +234,93 @@ export const TRANSLATIONS = {
       inspiration: 'Inspired by environmental volunteering and gardening experiences via Worldpackers.',
       techStack: 'Built with React 18, Vite, Spring Boot 3, PostgreSQL, and Google Gemini AI API.',
       license: 'Open-Source MIT License.'
+    },
+    garden: {
+      searchPlaceholder: 'Search by name, origin, soil, or care...',
+      filterAll: 'All',
+      filterNeedsWater: 'Needs Water',
+      filterDirectSun: 'Full Sun',
+      filterIndirectLight: 'Indirect Light',
+      filterShade: 'Shade',
+      emptyTitle: 'Your Garden is Empty',
+      emptySearchTitle: 'No plants found',
+      emptyDesc: 'Start your smart botanical collection by registering your first plant.',
+      emptySearchDesc: 'Try changing your search terms or clearing active filters.',
+      addFirstPlant: 'Add First Plant'
+    },
+    plantCard: {
+      wateredToday: 'Watered Today',
+      needsWaterToday: 'Needs Water Today!',
+      waterInDays: 'Water in {days} day(s)',
+      overdueDays: 'Overdue ({days}d)',
+      fullSun: 'Full Sun',
+      shade: 'Shade',
+      indirectLight: 'Indirect Light',
+      locationLabel: 'Location:',
+      cuttingsLabel: 'Cuttings:',
+      waterBtn: 'Water',
+      wateredBtn: 'Watered'
+    },
+    addPlant: {
+      title: 'Add New Plant',
+      knowNameTitle: 'Type Name & Auto-complete',
+      photoTitle: 'Photo Identification',
+      formTitle: 'Complete Botanical Form',
+      askTitle: 'Do you already know the plant\'s name?',
+      askSubtitle: 'Choose an option below for Artificial Intelligence to generate the complete botanical sheet and cutting guide:',
+      optionKnowsNameTitle: 'Yes, I know the plant\'s name',
+      optionKnowsNameDesc: 'Type the name (e.g. Pothos, Monstera) for AI to auto-complete all care details',
+      optionPhotoTitle: 'I don\'t know the plant\'s name',
+      optionPhotoDesc: 'Take or upload a photo for AI to identify the species and fill out the sheet',
+      revealTitle: 'This is your',
+      revealSubtitle: 'Species successfully identified by Artificial Intelligence!',
+      revealBtn: 'Confirm & View Botanical Sheet'
+    },
+    plantDetail: {
+      editTitle: 'Edit Botanical Sheet',
+      editBtn: 'Edit',
+      saveBtn: 'Save Changes',
+      cancelBtn: 'Cancel',
+      removeBtn: 'Remove',
+      waterTodayBtn: 'Mark Watered Today',
+      changePhotoBtn: 'Change / Take Photo',
+      originSection: 'Identification & Origin',
+      sunSection: 'Sunlight & Lighting',
+      waterSection: 'Watering Schedule',
+      propagationSection: 'How to Take Cuttings (Propagation)',
+      soilSection: 'Soil & Climate',
+      careSection: 'Maintenance & Pruning',
+      fertilizerSection: 'Fertilizer & Notes'
+    },
+    trashBin: {
+      title: 'Garden Trash Bin',
+      itemsCount: '{count} removed item(s)',
+      emptyTitle: 'Your trash bin is empty',
+      emptyDesc: 'Deleted plants will appear here before being permanently removed.',
+      restoreBtn: 'Restore',
+      deleteBtn: 'Delete',
+      emptyTrashBtn: 'Empty Trash Bin',
+      confirmTitle: 'Confirm permanent deletion?',
+      confirmYes: 'Yes, Empty All',
+      closeBtn: 'Close'
+    },
+    apiKey: {
+      title: 'Connect Google Gemini AI',
+      desc: 'Enter your free Google AI Studio API key for 100% precision in photo identification.',
+      placeholder: 'Paste your API key here (e.g. AIzaSy...)',
+      saveBtn: 'Save Key'
+    },
+    settings: {
+      title: 'Canto Alegre Settings',
+      languageTitle: 'Interface Language',
+      backupTitle: 'Backup & Restore',
+      exportBackup: 'Export Garden Backup',
+      importBackup: 'Import Backup'
+    },
+    analytics: {
+      title: 'Usage & Analytics Stats',
+      pageViews: 'Page Views',
+      topClicks: 'Top Used Features'
     }
   }
 };

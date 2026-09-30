@@ -3,7 +3,8 @@ import { X, Key, Check, ExternalLink, ShieldCheck, CheckCircle2, AlertCircle, Lo
 import { getStoredApiKey, saveApiKey } from '../services/storageService';
 import { validateGeminiApiKey, sanitizeGeminiApiKey } from '../services/geminiService';
 
-export default function ApiKeyModal({ onClose, onKeySaved }) {
+export default function ApiKeyModal({ onClose, onKeySaved, currentLang = 'pt-BR' }) {
+  const isEn = currentLang === 'en';
   const [key, setKey] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -85,7 +86,7 @@ export default function ApiKeyModal({ onClose, onKeySaved }) {
         <div className="modal-header">
           <div className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Key size={20} color="var(--primary-600)" />
-            <span>Configurar Chave API Gemini</span>
+            <span>{isEn ? 'Configure Gemini AI Key' : 'Configurar Chave API Gemini'}</span>
           </div>
           <button className="modal-close" onClick={onClose}>
             <X size={20} />
@@ -94,20 +95,22 @@ export default function ApiKeyModal({ onClose, onKeySaved }) {
 
         <div className="modal-body">
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-            O Canto Alegre utiliza a IA multimodal gratuita <strong>Google Gemini Flash</strong> para reconhecer espécies de plantas por foto, indicar cuidados completos e gerar o guia de mudas e cultivo.
+            {isEn
+              ? 'Canto Alegre uses free multimodal Google Gemini Flash AI to identify plant species by photo, provide complete care guidelines, and generate step-by-step cutting propagation instructions.'
+              : 'O Canto Alegre utiliza a IA multimodal gratuita Google Gemini Flash para reconhecer espécies de plantas por foto, indicar cuidados completos e gerar o guia de mudas e cultivo.'}
           </p>
 
           <form onSubmit={handleValidateAndSave}>
             <div className="form-group">
               <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Sua Chave de API (Google AI Studio)</span>
+                <span>{isEn ? 'Your API Key (Google AI Studio)' : 'Sua Chave de API (Google AI Studio)'}</span>
                 <a 
                   href="https://aistudio.google.com/app/apikey" 
                   target="_blank" 
                   rel="noreferrer"
                   style={{ fontSize: '0.8rem', color: 'var(--primary-600)', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontWeight: '600' }}
                 >
-                  <span>Gerar chave grátis</span>
+                  <span>{isEn ? 'Get free key' : 'Gerar chave grátis'}</span>
                   <ExternalLink size={11} />
                 </a>
               </label>

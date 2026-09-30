@@ -25,17 +25,22 @@ import {
   CheckCircle2,
   ArrowLeft
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import CameraCapture from './CameraCapture';
 import { analyzePlantImage, autoCompletePlantByName, getDefaultPropagationForPlant, normalizeImageForAi } from '../services/geminiService';
 import { getStoredApiKey } from '../services/storageService';
 import { analyticsService } from '../services/analyticsService';
+import { TRANSLATIONS } from '../services/i18n';
 
-export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyModal, hasApiKey }) {
+export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyModal, hasApiKey, currentLang = 'pt-BR' }) {
+  const isEn = currentLang === 'en';
+  const t = TRANSLATIONS[currentLang]?.addPlant || TRANSLATIONS['pt-BR'].addPlant;
+
   const [photo, setPhoto] = useState(null);
   const [inputPlantName, setInputPlantName] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [step, setStep] = useState('ask_known_name'); // 'ask_known_name' | 'knows_name' | 'choose_photo' | 'form'
+  const [step, setStep] = useState('ask_known_name'); // 'ask_known_name' | 'knows_name' | 'choose_photo' | 'reveal' | 'form'
   const [aiNotice, setAiNotice] = useState(null);
   const nativeCameraInputRef = useRef(null);
   
@@ -201,7 +206,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
         notes: result.notes || prev.notes
       }));
 
-      setStep('form');
+      setStep('reveal');
+      try {
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      } catch (e) {}
     } catch (err) {
       alert(`Não foi possível conectar à IA Gemini (${err.message || 'Erro de conexão'}).\n\nCarregamos os campos para preenchimento manual.`);
       setStep('form');
@@ -254,7 +262,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
         notes: result.notes || prev.notes
       }));
 
-      setStep('form');
+      setStep('reveal');
+      try {
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      } catch (e) {}
     } catch (err) {
       alert(`Não foi possível auto-completar com IA: ${err.message || 'Erro'}.\nCampos liberados para preenchimento manual.`);
       setPlantData(prev => ({ ...prev, commonName: inputPlantName.trim() }));
@@ -300,12 +311,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
           <div className="modal-header">
             <h3 className="modal-title">
               {step === 'ask_known_name'
-                ? 'Adicionar Nova Planta'
+                ? (t.title || 'Adicionar Nova Planta')
                 : step === 'knows_name'
-                ? 'Digitar Nome & Auto-completar'
+                ? (t.knowNameTitle || 'Digitar Nome & Auto-completar')
                 : step === 'choose_photo'
-                ? 'Identificação por Foto'
-                : 'Ficha Completa da Planta'}
+                ? (t.photoTitle || 'Identificação por Foto')
+                : step === 'reveal'
+                ? (t.revealTitle || 'Esta é a sua')
+                : (t.formTitle || 'Ficha Completa da Planta')}
             </h3>
             <button className="modal-close" onClick={onClose} aria-label="Fechar">
               <X size={20} />
@@ -331,10 +344,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 </div>
 
                 <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--primary-900)', marginBottom: '8px' }}>
-                  Você já conhece o nome da planta?
+                  {t.askTitle || 'Você já conhece o nome da planta?'}
                 </h3>
                 <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: 1.5 }}>
-                  Escolha uma das opções abaixo para a Inteligência Artificial gerar a ficha botânica completa e o guia de mudas:
+                  {t.askSubtitle || 'Escolha uma das opções abaixo para a Inteligência Artificial gerar a ficha botânica completa e o guia de mudas:'}
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
@@ -359,10 +372,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                     <CheckCircle2 size={24} style={{ flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 700, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                        Sim, já sei o nome da planta
+                        {t.optionKnowsNameTitle || 'Sim, já sei o nome da planta'}
                       </div>
                       <div style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: 400, whiteSpace: 'normal', wordBreak: 'break-word', marginTop: '3px', lineHeight: 1.4 }}>
-                        Digite o nome (ex: Jiboia, Monstera) para a IA dar auto-complete de todos os cuidados
+                        {t.optionKnowsNameDesc || 'Digite o nome (ex: Jiboia, Monstera) para a IA dar auto-complete de todos os cuidados'}
                       </div>
                     </div>
                   </button>
@@ -388,10 +401,10 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                     <Camera size={24} color="var(--primary-600)" style={{ flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 700, color: 'var(--text-main)', whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                        Não sei o nome da planta
+                        {t.optionPhotoTitle || 'Não sei o nome da planta'}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400, whiteSpace: 'normal', wordBreak: 'break-word', marginTop: '3px', lineHeight: 1.4 }}>
-                        Tire ou envie uma foto para a IA identificar a espécie e preencher a ficha
+                        {t.optionPhotoDesc || 'Tire ou envie uma foto para a IA identificar a espécie e preencher a ficha'}
                       </div>
                     </div>
                   </button>
@@ -684,6 +697,81 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ETAPA REVELAÇÃO DA ANIMAÇÃO DA PLANTA IDENTIFICADA */}
+            {step === 'reveal' && (
+              <div style={{ textAlign: 'center', padding: '16px 8px' }}>
+                <div 
+                  className="reveal-image-wrapper"
+                  style={{
+                    position: 'relative',
+                    width: '170px',
+                    height: '170px',
+                    margin: '0 auto 16px',
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    boxShadow: '0 12px 32px rgba(16, 185, 129, 0.35), 0 0 0 4px var(--primary-500)',
+                    transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                  }}
+                >
+                  <img 
+                    src={photo || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80'} 
+                    alt={plantData.commonName} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'var(--primary-50, rgba(16, 185, 129, 0.12))',
+                  color: 'var(--primary-700, #047857)',
+                  padding: '6px 16px',
+                  borderRadius: '50px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  marginBottom: '12px',
+                  border: '1px solid var(--border-color)'
+                }}>
+                  <Sparkles size={15} color="var(--primary-600)" />
+                  <span>{t.revealSubtitle || 'Espécie identificada com sucesso pela Inteligência Artificial!'}</span>
+                </div>
+
+                <h2 style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary-900)', marginBottom: '4px' }}>
+                  {isEn ? `This is your ${plantData.commonName}!` : `Esta é a sua ${plantData.commonName}!`}
+                </h2>
+
+                {plantData.scientificName && (
+                  <p style={{ fontSize: '1.05rem', fontStyle: 'italic', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                    {plantData.scientificName}
+                  </p>
+                )}
+
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', maxWidth: '440px', margin: '0 auto 24px', lineHeight: 1.5 }}>
+                  {isEn 
+                    ? 'We generated the complete care plan, ideal environment, watering schedule, and cutting propagation guide for this species.' 
+                    : 'Geramos o plano de regas, ambiente ideal, temperatura recomendada e o guia completo para você tirar mudas com segurança.'}
+                </p>
+
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setStep('form')}
+                  style={{
+                    padding: '14px 28px',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    borderRadius: 'var(--radius-full)',
+                    margin: '0 auto',
+                    boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)'
+                  }}
+                >
+                  <Sparkles size={18} />
+                  <span>{t.revealBtn || 'Confirmar & Ver Ficha Botânica'}</span>
+                </button>
               </div>
             )}
 

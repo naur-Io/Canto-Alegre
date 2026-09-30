@@ -60,7 +60,8 @@ const compressImage = (file) => {
   });
 };
 
-export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onWater }) {
+export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onWater, currentLang = 'pt-BR' }) {
+  const isEn = currentLang === 'en';
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -822,7 +823,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   style={{ color: 'var(--accent-danger)', borderColor: '#fca5a5' }}
                 >
                   <Trash2 size={16} />
-                  <span>Remover</span>
+                  <span>{isEn ? 'Remove' : 'Remover'}</span>
                 </button>
 
                 <button 
@@ -833,7 +834,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   }}
                 >
                   <Droplets size={16} />
-                  <span>Marcar como Regada Hoje</span>
+                  <span>{isEn ? 'Mark Watered Today' : 'Marcar como Regada Hoje'}</span>
                 </button>
               </div>
             </div>

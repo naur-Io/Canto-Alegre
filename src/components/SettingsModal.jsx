@@ -24,8 +24,10 @@ export default function SettingsModal({
   onOpenGuide,
   isInstallable,
   onInstallApp,
-  onReloadPlants
+  onReloadPlants,
+  currentLang = 'pt-BR'
 }) {
+  const isEn = currentLang === 'en';
   const [exportSuccess, setExportSuccess] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
 
@@ -72,13 +74,13 @@ export default function SettingsModal({
               <Settings size={20} color="var(--primary-600)" />
             </div>
             <div>
-              <div className="modal-title">Configurações</div>
+              <div className="modal-title">{isEn ? 'Settings' : 'Configurações'}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Personalize tema, inteligência artificial e preferências
+                {isEn ? 'Customize AI, backups, and preferences' : 'Personalize tema, inteligência artificial e preferências'}
               </div>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose} title="Fechar configurações">
+          <button className="modal-close" onClick={onClose} title={isEn ? "Close settings" : "Fechar configurações"}>
             <X size={20} />
           </button>
         </div>

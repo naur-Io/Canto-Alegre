@@ -23,8 +23,10 @@ export default function UpdatesNotificationModal({
   isOpen, 
   onClose, 
   swUpdateAvailable, 
-  onReloadApp 
+  onReloadApp,
+  currentLang = 'pt-BR'
 }) {
+  const isEn = currentLang === 'en';
   useEffect(() => {
     if (isOpen) {
       markVersionAsSeen(LATEST_VERSION);
