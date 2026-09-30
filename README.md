@@ -1,70 +1,105 @@
-# Canto Alegre - Guia de Plantas, Mudas & Jardinagem Inteligente
-
-> **Assistente botânico inteligente com PWA Offline-First no Frontend (React 18 + Vite) e API de Microsserviços no Backend (Java 21 + Spring Boot 3 + PostgreSQL 16 + Google Gemini LLM).**
+[English Version / Versao em Ingles](./README.en.md)
 
 ---
 
-## Guia de Estudos & Documentacao Arquitetural
+# CANTO ALEGRE - GUIA DE PLANTAS & JARDINAGEM INTELIGENTE
 
-Para entender detalhadamente a arquitetura do sistema, a comunicacao entre o PWA e a API REST, o fluxo de sincronizacao offline-first, o funcionamento das anotações Java/Spring e a integracao com AWS, consulte a pasta de estudos dedicada:
-
-- **[Indice de Estudos (studies/README.md)](studies/README.md)**
-  - **[Roadmap & Arquitetura de Comunicacao (studies/01-ROADMAP_E_ARQUITETURA.md)](studies/01-ROADMAP_E_ARQUITETURA.md)**: Visao geral da evolucao do escopo, diagramas de sequencia e sincronizacao hibrida offline-first.
-  - **[Manual de Anotacoes Java/Spring (studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)](studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)**: Guia completo de anotações ("decoradores") Spring Boot, JPA/Hibernate, Validation, Lombok e Testes (JUnit 5, Mockito e Testcontainers).
-  - **[Rastreabilidade, Evolução & Guia Cloud AWS (studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)](studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)**: Rastreabilidade de cada funcionalidade (como fazer/desfazer), história da evolução do projeto e visão geral dos serviços em nuvem AWS.
-  - **[Guia Passo a Passo AWS Cloud (studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md)](studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md)**: Passo a passo visual de configuração AWS (Console IAM, S3 Bucket, RDS PostgreSQL, S3StorageService.java e Deploy).
+### ACESSE O APLICATIVO PUBLICO NO AR AGORA:
+### [HTTPS://CANTO-ALEGRE-NINE.VERCEL.APP](https://canto-alegre-nine.vercel.app)
 
 ---
 
-## Inspiração & Origem
-
-Este projeto nasceu da vivência prática durante **voluntariados no Worldpackers** atuando como jardineiro e cuidador de espaços verdes em eco-pousadas, hostels e fazendas agroecológicas. No campo, identificar plantas nativas, entender ciclos de rega sob climas variados e tirar mudas para multiplicar os canteiros eram desafios diários. 
-
-O **Canto Alegre** foi criado para conectar esse aprendizado prático da terra com o que há de mais avançado em IA e tecnologias web/cloud modernas.
+<!-- Espaco reservado para imagem de capa do projeto -->
+<div align="center">
+  <img src="./public/icons/icon-512.png" alt="Canto Alegre App Banner" width="180" style="border-radius: 36px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Canto Alegre - Assistente botanico inteligente com IA Google Gemini, PWA 100% Offline e Nuvem AWS.</em></p>
+</div>
 
 ---
 
-## Arquitetura do Ecossistema
+## 1. O que e o Canto Alegre?
 
-O sistema adota uma arquitetura descentralizada e resiliente dividida em duas grandes camadas:
+O **Canto Alegre** e um assistente pessoal de jardinagem e identificacao botanica desenvolvido com arquitetura descentralizada e resiliente. O projeto combina um **PWA Client (React 18 + Vite + IndexedDB)** com funcionamento 100% offline a uma **REST API de Microsservicos em Java 21 / Spring Boot 3** integrada ao banco de dados relacional **AWS RDS PostgreSQL 16.9**, armazenamento de fotos no **AWS S3** e Inteligencia Artificial Multimodal **Google Gemini LLM**.
 
+Com o Canto Alegre, o usuario pode:
+- Fotografar ou digitar o nome de qualquer especie para receber diagnósticos completos de cultivo.
+- Saber a frequencia e volume exatos de agua, quantidade de sol e **Ambiente Ideal** onde posicionar o vaso (ex.: sala, quarto, varanda, banheiro ou quintal).
+- Aprender o passo a passo seguro para multiplicar a planta através do **Guia de Mudas & Estaquia**.
+- Manter seu diário de cultivo salvo localmente sem precisar de internet, sincronizando na nuvem assim que reconectar.
+
+---
+
+## 2. Inspiracao & Origem
+
+Este projeto nasceu da vivencia pratica durante **voluntariados no Worldpackers** atuando como jardineiro e cuidador de espaços verdes em eco-pousadas, hostels e fazendas agroecologicas. No campo, identificar plantas nativas, entender ciclos de rega sob climas variados e tirar mudas para multiplicar os canteiros eram desafios diarios. 
+
+O **Canto Alegre** foi criado para conectar esse aprendizado pratico da terra com o que ha de mais avancado em IA e tecnologias web/cloud modernas.
+
+---
+
+## 3. Funcionalidades Principais
+
+- **Identificacao Botanica por Foto & IA Multimodal**: Aponte a camera ou escolha uma foto da galeria. A IA analisa folhas, nervuras e flores para identificar nome popular/cientifico, origem, solo e cuidados.
+- **Ambiente Ideal da Planta ("Onde Fica")**: Classificacao automatica se a especie prefere interior (sala, quarto, banheiro) ou exterior (varanda, quintal), com filtro instantâneo no jardim.
+- **Novo Fluxo de Adicao com Pergunta Inicial**: Fluxo interativo *"Voce ja conhece o nome da planta?"* com auto-complete inteligente de cuidados e guia de mudas via IA Gemini.
+- **Guia Completo de Mudas & Estaquia**: Passo a passo botanico de multiplicacao por estaca de caule, folha ou divisao de touceiras com dicas profissionais.
+- **Arquitetura Offline-First & Sincronizacao Cloud**: Armazenamento instantâneo no IndexedDB local com fila offline (`syncService.js`) que descarrega os dados na REST API ao reconectar a rede.
+- **Spotlight Tour Interativo**: Tour guiado com destaque iluminado nos botoes principais para novos usuarios.
+- **Social Meta Tags & Telemetria Silenciosa**: Suporte a Open Graph e Twitter Cards para compartilhamento em redes sociais e rastreamento seguro de engajamento.
+
+---
+
+## 4. Arquitetura do Ecossistema & Tecnologias
+
+```mermaid
+flowchart TD
+    subgraph Client["Frontend PWA (Vercel)"]
+        UI["React 18 + Vite"] --> IDB["IndexedDB (idb-keyval)"]
+        UI --> Sync["syncService.js (Fila Offline)"]
+    end
+
+    subgraph Backend["REST API (Render Web Service)"]
+        Sync -- "HTTP REST (X-Guest-Id)" --> Controller["Spring Boot 3 REST Controllers"]
+        Controller --> Service["Botanical / Plant Services"]
+        Service --> Gemini["Google Gemini AI API"]
+    end
+
+    subgraph Cloud["Infraestrutura Nuvem AWS"]
+        Service --> RDS["AWS RDS PostgreSQL 16.9"]
+        Service --> S3["AWS S3 Bucket (Fotos)"]
+    end
 ```
-[ PWA Client (React 18 + IndexedDB) ] <---> [ REST API (Spring Boot 3 + Java 21) ] <---> [ PostgreSQL 16 ]
-                                                     |
-                                                     +---> [ Google Gemini LLM ]
-```
 
-### 1. Backend REST API (`canto-alegre-api`)
-- **Linguagem & Framework**: Java 21 e Spring Boot 3.x (Spring Web, Spring Data JPA, Spring Security, Validation).
-- **Banco de Dados Relacional**: PostgreSQL 16 (executado via Docker Compose ou AWS RDS) com controle de versoes de schema via **Flyway Migration** (`V1__create_initial_schema.sql`, `V2__add_ideal_environment.sql`).
-- **Respostas de Erro Padronizadas**: Mapeamento global de exceções via `@RestControllerAdvice` seguindo a **RFC 7807 (ProblemDetail)**.
-- **Enriquecimento via IA Botânica**: `GeminiService` realiza a busca e enriquecimento de novas especies com fallback automatico e persistência no banco de dados como **cache canonico**.
-- **Multi-Tenancy Anônimo (Guest-First)**: Seguranca stateless isolada por `X-Guest-Id` via cabeçalho HTTP, permitindo que cada usuario tenha seu jardim isolado sem barreiras de login.
-- **Suíte de Testes Automatizados**: 20 testes automatizados divididos em testes unitarios com JUnit 5 + Mockito e testes de integracao com **Testcontainers** subindo container PostgreSQL `16-alpine` real.
-
-### 2. Frontend PWA (`Canto Alegre`)
-- **Tecnologias**: React 18, Vite 5, CSS3 com tokens de Design System em Tema Botânico Único Claro de alto contraste.
-- **Resiliencia Offline-First**: Persistencia instantânea via IndexedDB (`idb-keyval`) e Service Worker nativo.
-- **Sincronizacao Hibrida Cloud**: Cliente HTTP (`apiService.js`) integrado com fila offline de operacoes pendentes (`syncService.js`) que envia as alteracoes para a API assim que a conexao de rede e restabelecida.
+| Camada | Tecnologia / Servico | Finalidade no Ecossistema |
+| :--- | :--- | :--- |
+| **Frontend PWA** | React 18, Vite 5, Lucide Icons | Interface do usuario responsiva, instalável em Android/iOS e offline-first. |
+| **Hospedagem Web** | Vercel | Deploy continuo do frontend com SSL HTTPS e dominio publico. |
+| **Backend REST API** | Java 21, Spring Boot 3 | API de microsservicos stateless com tratamento de erro RFC 7807 (ProblemDetail). |
+| **API Web Hosting** | Render.com | Hospedagem 24/7 do container Docker Spring Boot. |
+| **Banco de Dados** | AWS RDS PostgreSQL 16.9 | Armazenamento de usuarios, especies botanicas e historico de regas com Flyway Migrations. |
+| **Storage de Imagens** | AWS S3 Bucket | Armazenamento de fotos de plantas enviadas pelos usuarios via upload multipart. |
+| **Inteligencia Artificial** | Google Gemini LLM API | Reconhecimento visual de especies e geracao automatica do guia botanico. |
 
 ---
 
-## Funcionalidades Principais
+## 5. Guia de Estudos & Documentacao Dedicada
 
-- **Identificação Botânica por Foto & IA Multimodal**: Use a câmera ou fotos da galeria. A IA Google Gemini extrai nome popular/cientifico, rega, sol, solo, ambiente ideal e diagnostico de saude.
-- **Novo Fluxo de Adição (Pergunta Inicial & Auto-Complete)**: Pergunta *"Você já conhece o nome da planta?"* com auto-complete inteligente de cuidados e guia de mudas por IA ou foto.
-- **Ambiente Ideal / Onde Fica a Planta**: Especificação do local ideal (sala, quarto, terraço, banheiro ou quintal) com filtro dinâmico na barra de busca do jardim.
-- **Tour Guiado com Spotlight Ring**: Guia interativo passo a passo que ilumina os botões principais do aplicativo para novos usuários.
-- **Guia Completo de Mudas & Estaquia**: Passo a passo de multiplicacao por estaca de caule, folha ou divisao de touceiras.
-- **Sincronizacao Hibrida Cloud + Offline-First**: Funciona perfeitamente sem internet e sincroniza os dados com o PostgreSQL na nuvem quando online.
-- **Dashboard do Jardim & Alerta de Sede**: Gerenciamento de plantas, historico de regas e lembretes diarios.
-- **Botão Flutuante (+)**: Acesso rápido no canto inferior direito para cadastrar plantas em qualquer dispositivo.
+Para uma imersao aprofundada na arquitetura, anotações Java/Spring, comandos AWS e guia de deploy, consulte os documentos na pasta `studies/`:
+
+| Documento | Conteudo e Descricao |
+| :--- | :--- |
+| **[studies/README.md](studies/README.md)** | Indice completo de todos os manuais de estudo arquiteturais. |
+| **[studies/01-ROADMAP_E_ARQUITETURA.md](studies/01-ROADMAP_E_ARQUITETURA.md)** | Roadmap de desenvolvimento, diagramas de sequencia e sincronizacao hibrida. |
+| **[studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md](studies/02-GUIA_DE_ANOTACOES_JAVA_SPRING.md)** | Guia completo de anotações Spring Boot, JPA/Hibernate, Validation, Lombok e Testes. |
+| **[studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](studies/03-RASTREABILIDADE_E_ETAPA2_STORAGE.md)** | Rastreabilidade de recursos (como fazer/desfazer) e visao geral do storage. |
+| **[studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md](studies/04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md)** | Passo a passo de configuracao AWS (Console IAM, S3 Bucket, RDS PostgreSQL e Deploy). |
+| **[studies/05-GUIA_DE_LANCAMENTO_E_TELEMETRIA.md](studies/05-GUIA_DE_LANCAMENTO_E_TELEMETRIA.md)** | Manual de lancamento publico, deploy na Vercel/Netlify, Open Graph e Telemetria. |
 
 ---
 
-## Como Executar o Projeto Localmente
+## 6. Como Executar o Projeto Localmente
 
-### 1. Executando o Backend REST API (`canto-alegre-api`)
+### 6.1. Executando o Backend REST API (`api/`)
 
 ```bash
 # 1. Navegue para a pasta da API
@@ -73,14 +108,14 @@ cd api
 # 2. Inicie o container PostgreSQL via Docker Compose
 docker-compose up -d
 
-# 3. Compilar e executar os testes unitarios e de integracao (Testcontainers)
+# 3. Executar os testes unitarios e de integracao (Testcontainers)
 ./mvnw test
 
 # 4. Iniciar a aplicacao Spring Boot (Porta 8080)
 ./mvnw spring-boot:run
 ```
 
-### 2. Executando o Frontend PWA
+### 6.2. Executando o Frontend PWA
 
 ```bash
 # 1. Na raiz do projeto, instale as dependencias
@@ -89,20 +124,20 @@ npm install
 # 2. Inicie o servidor de desenvolvimento Vite
 npm run dev
 
-# 3. Executar o build de producao
+# 3. Gerar o build de producao
 npm run build
 ```
 
 ---
 
-## Como Contribuir (Forks & Pull Requests)
+## 7. Como Contribuir
 
-Contribuições da comunidade sao muito bem-vindas. Para instruções de como configurar seu ambiente local, criar branches e enviar um Pull Request, consulte os guias dedicados:  
-- [Guia de Contribuicao (CONTRIBUTING.md)](CONTRIBUTING.md)
-- [Estudos de Arquitetura & Anotacoes (studies/README.md)](studies/README.md)
+Contribuições da comunidade sao muito bem-vindas. Consulte os guias:
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Regras de contribuicao e padroes de codigo.
+- **[CHANGELOG.md](CHANGELOG.md)**: Historico de versoes e melhorias do projeto.
 
 ---
 
-## Licença
+## 8. Licença
 
-Distribuído sob a Licença MIT.
+Distribuido sob a Licença MIT.
