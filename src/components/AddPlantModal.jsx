@@ -303,6 +303,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
         <CameraCapture 
           onCapture={handleCameraCapture}
           onClose={() => setShowCamera(false)}
+          currentLang={currentLang}
         />
       )}
 
@@ -417,14 +418,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
               <div>
                 <div className="form-group" style={{ marginBottom: '18px' }}>
                   <label className="form-label" style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', display: 'block' }}>
-                    Nome da Planta / Nome Popular *
+                    {isEn ? 'Plant Name / Common Name *' : 'Nome da Planta / Nome Popular *'}
                   </label>
                   <input 
                     type="text" 
                     className="form-input" 
                     value={inputPlantName}
                     onChange={e => setInputPlantName(e.target.value)}
-                    placeholder="Ex: Jiboia, Manjericão, Monstera, Samambaia..."
+                    placeholder={isEn ? "e.g. Pothos, Basil, Monstera, Fern..." : "Ex: Jiboia, Manjericão, Monstera, Samambaia..."}
                     autoFocus
                     required
                     style={{ padding: '12px 14px', fontSize: '1rem' }}
@@ -434,7 +435,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 {/* Foto Opcional */}
                 <div style={{ marginBottom: '20px' }}>
                   <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', display: 'block' }}>
-                    Foto da Planta (Opcional)
+                    {isEn ? 'Plant Photo (Optional)' : 'Foto da Planta (Opcional)'}
                   </label>
                   {photo ? (
                     <div className="preview-img-container" style={{ maxHeight: '180px', marginBottom: '10px' }}>
@@ -445,14 +446,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         onClick={() => setPhoto(null)}
                         style={{ marginTop: '8px' }}
                       >
-                        Trocar Foto
+                        {isEn ? 'Change Photo' : 'Trocar Foto'}
                       </button>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <label className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', padding: '10px', cursor: 'pointer' }}>
                         <Camera size={16} />
-                        <span>Adicionar Foto (Opcional)</span>
+                        <span>{isEn ? 'Add Photo (Optional)' : 'Adicionar Foto (Opcional)'}</span>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -475,12 +476,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                   {isAnalyzing ? (
                     <>
                       <div className="spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }} />
-                      <span>Consultando Guia Botânico & Auto-completando...</span>
+                      <span>{isEn ? 'Consulting Botanical AI & Auto-completing...' : 'Consultando Guia Botânico & Auto-completando...'}</span>
                     </>
                   ) : (
                     <>
                       <Sparkles size={18} />
-                      <span>Auto-completar Ficha com IA</span>
+                      <span>{isEn ? 'Auto-complete Sheet with AI' : 'Auto-completar Ficha com IA'}</span>
                     </>
                   )}
                 </button>
@@ -492,7 +493,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                     onClick={() => setStep('ask_known_name')}
                     style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)' }}
                   >
-                    Voltar para a Pergunta Inicial
+                    {isEn ? 'Back to Initial Question' : 'Voltar para a Pergunta Inicial'}
                   </button>
                 </div>
               </div>
@@ -616,21 +617,21 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
 
                     <div className="upload-zone" onClick={handleCameraZoneClick} style={{ cursor: 'pointer' }}>
                       <Camera className="upload-icon" />
-                      <h4 style={{ color: 'var(--primary-900)', marginBottom: '4px' }}>Tirar Foto da Planta</h4>
+                      <h4 style={{ color: 'var(--primary-900)', marginBottom: '4px' }}>{isEn ? 'Take Plant Photo' : 'Tirar Foto da Planta'}</h4>
                       <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        Toque para abrir a câmera do seu celular ou webcam
+                        {isEn ? 'Tap to open your phone camera or webcam' : 'Toque para abrir a câmera do seu celular ou webcam'}
                       </p>
                     </div>
 
                     <div style={{ textAlign: 'center', margin: '16px 0', color: 'var(--text-light)', fontSize: '0.85rem' }}>
-                      OU ESCOLHA UMA OPÇÃO
+                      {isEn ? 'OR CHOOSE AN OPTION' : 'OU ESCOLHA UMA OPÇÃO'}
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       {/* Botão Câmera do Aparelho (100% nativa) */}
                       <label className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', cursor: 'pointer' }}>
                         <Camera size={18} />
-                        <span>Tirar Foto com a Câmera</span>
+                        <span>{isEn ? 'Take Photo with Camera' : 'Tirar Foto com a Câmera'}</span>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -643,7 +644,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                       {/* Botão Escolher da Galeria */}
                       <label className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '12px', cursor: 'pointer' }}>
                         <Upload size={18} />
-                        <span>Escolher Imagem da Galeria</span>
+                        <span>{isEn ? 'Choose Image from Gallery' : 'Escolher Imagem da Galeria'}</span>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -660,7 +661,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: '8px' }}
                       >
                         <Camera size={16} />
-                        <span>Abrir Câmera ao Vivo na Tela</span>
+                        <span>{isEn ? 'Open Live Camera View' : 'Abrir Câmera ao Vivo na Tela'}</span>
                       </button>
 
                       {/* Google Lens */}
@@ -671,7 +672,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: '8px' }}
                       >
                         <Search size={16} color="#4285F4" />
-                        <span>Abrir Google Lens</span>
+                        <span>{isEn ? 'Open Google Lens' : 'Abrir Google Lens'}</span>
                         <ExternalLink size={14} style={{ opacity: 0.6 }} />
                       </button>
                     </div>
@@ -683,7 +684,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         onClick={handleManualEntry}
                         style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)' }}
                       >
-                        Cadastrar Planta Manualmente sem Foto
+                        {isEn ? 'Register Plant Manually Without Photo' : 'Cadastrar Planta Manualmente sem Foto'}
                       </button>
 
                       <button
@@ -692,7 +693,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         onClick={() => setStep('ask_known_name')}
                         style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)' }}
                       >
-                        Voltar para a Pergunta Inicial
+                        {isEn ? 'Back to Initial Question' : 'Voltar para a Pergunta Inicial'}
                       </button>
                     </div>
                   </div>
@@ -789,24 +790,24 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Globe size={18} className="section-icon" />
-                    <h4>Identificação & Origem</h4>
+                    <h4>{isEn ? 'Identification & Origin' : 'Identificação & Origem'}</h4>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Nome da Planta / Nome Popular *</label>
+                      <label className="form-label">{isEn ? 'Plant Name / Common Name *' : 'Nome da Planta / Nome Popular *'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
                         value={plantData.commonName} 
                         onChange={e => setPlantData({ ...plantData, commonName: e.target.value })}
-                        placeholder="Ex: Aglaonema, Jiboia Amarela, Espada de São Jorge"
+                        placeholder={isEn ? "e.g. Pothos, Yellow Pothos, Snake Plant" : "Ex: Aglaonema, Jiboia Amarela, Espada de São Jorge"}
                         required
                       />
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Nome Científico (Botânico)</label>
+                      <label className="form-label">{isEn ? 'Scientific Name (Botanical)' : 'Nome Científico (Botânico)'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -818,24 +819,24 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">De Onde Vem a Planta (Origem Nativa)</label>
+                    <label className="form-label">{isEn ? 'Plant Origin (Native Country/Region)' : 'De Onde Vem a Planta (Origem Nativa)'}</label>
                     <input 
                       type="text" 
                       className="form-input" 
                       value={plantData.origin || ''} 
                       onChange={e => setPlantData({ ...plantData, origin: e.target.value })}
-                      placeholder="Ex: Florestas Tropicais do Sudeste Asiático (Tailândia, Filipinas)"
+                      placeholder={isEn ? "e.g. Tropical Rainforests of Southeast Asia (Thailand, Philippines)" : "Ex: Florestas Tropicais do Sudeste Asiático (Tailândia, Filipinas)"}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Ambiente Ideal / Onde Fica a Planta *</label>
+                    <label className="form-label">{isEn ? 'Ideal Environment / Location *' : 'Ambiente Ideal / Onde Fica a Planta *'}</label>
                     <input 
                       type="text" 
                       className="form-input" 
                       value={plantData.idealEnvironment || ''} 
                       onChange={e => setPlantData({ ...plantData, idealEnvironment: e.target.value })}
-                      placeholder="Ex: Dentro de casa (Sala, Quarto), Fora de casa (Quintal), Terraço, Banheiro..."
+                      placeholder={isEn ? "e.g. Indoor (Living Room, Bedroom), Outdoor (Yard), Balcony, Bathroom..." : "Ex: Dentro de casa (Sala, Quarto), Fora de casa (Quintal), Terraço, Banheiro..."}
                       required
                     />
                   </div>
@@ -845,12 +846,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Sun size={18} className="section-icon" color="#d97706" />
-                    <h4>Iluminação & Quantidade de Luz</h4>
+                    <h4>{isEn ? 'Sunlight & Lighting' : 'Iluminação & Quantidade de Luz'}</h4>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Quantidade de Luz *</label>
+                      <label className="form-label">{isEn ? 'Light Amount *' : 'Quantidade de Luz *'}</label>
                       <select 
                         className="form-select"
                         value={plantData.sunlight?.lightType || 'indireta'}
@@ -859,14 +860,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           sunlight: { ...plantData.sunlight, lightType: e.target.value }
                         })}
                       >
-                        <option value="direta">Luz Direta (Sol Pleno / Sol Forte)</option>
-                        <option value="indireta">Luz Indireta (Meia Sombra / Luz Difusa)</option>
-                        <option value="sombra">Sombra (Luz Baixa / Filtrada)</option>
+                        <option value="direta">{isEn ? 'Direct Light (Full Sun)' : 'Luz Direta (Sol Pleno / Sol Forte)'}</option>
+                        <option value="indireta">{isEn ? 'Indirect Light (Partial Shade)' : 'Luz Indireta (Meia Sombra / Luz Difusa)'}</option>
+                        <option value="sombra">{isEn ? 'Shade (Low Light / Filtered)' : 'Sombra (Luz Baixa / Filtrada)'}</option>
                       </select>
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Horas / Período de Exposição</label>
+                      <label className="form-label">{isEn ? 'Hours / Exposure Period' : 'Horas / Período de Exposição'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -875,13 +876,13 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           sunlight: { ...plantData.sunlight, hoursPerDay: e.target.value }
                         })}
-                        placeholder="Ex: 4 a 6 horas de claridade difusa"
+                        placeholder={isEn ? "e.g. 4 to 6 hours of filtered light" : "Ex: 4 a 6 horas de claridade difusa"}
                       />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Observações sobre a Iluminação</label>
+                    <label className="form-label">{isEn ? 'Lighting Notes' : 'Observações sobre a Iluminação'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="2"
@@ -890,7 +891,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         ...plantData,
                         sunlight: { ...plantData.sunlight, notes: e.target.value }
                       })}
-                      placeholder="Ex: Não usar luz natural direta, evitar sol direto porque queima as folhas..."
+                      placeholder={isEn ? "e.g. Avoid harsh direct sun to prevent leaf sunburn..." : "Ex: Não usar luz natural direta, evitar sol direto porque queima as folhas..."}
                     />
                   </div>
                 </div>
@@ -899,26 +900,26 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Droplets size={18} className="section-icon" color="#0284c7" />
-                    <h4>Rega & Quantidade de Água</h4>
+                    <h4>{isEn ? 'Watering Schedule & Water' : 'Rega & Quantidade de Água'}</h4>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Frequência (Vezes por semana)</label>
+                      <label className="form-label">{isEn ? 'Frequency (Times per week)' : 'Frequência (Vezes por semana)'}</label>
                       <select 
                         className="form-select"
                         value={plantData.watering?.frequencyTimesPerWeek || 2}
                         onChange={e => handleFrequencyTimesChange(e.target.value)}
                       >
-                        <option value="1">1 vez por semana (~ a cada 7 dias)</option>
-                        <option value="2">2 vezes por semana (~ a cada 3-4 dias)</option>
-                        <option value="3">3 vezes por semana (~ a cada 2 dias)</option>
-                        <option value="4">4 vezes por semana ou diária</option>
+                        <option value="1">{isEn ? '1 time per week (~ every 7 days)' : '1 vez por semana (~ a cada 7 dias)'}</option>
+                        <option value="2">{isEn ? '2 times per week (~ every 3-4 days)' : '2 vezes por semana (~ a cada 3-4 dias)'}</option>
+                        <option value="3">{isEn ? '3 times per week (~ every 2 days)' : '3 vezes por semana (~ a cada 2 dias)'}</option>
+                        <option value="4">{isEn ? '4 times per week or daily' : '4 vezes por semana ou diária'}</option>
                       </select>
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Quantidade de Água por Rega</label>
+                      <label className="form-label">{isEn ? 'Water Volume per Watering' : 'Quantidade de Água por Rega'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -933,7 +934,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Observações e Modo de Rega</label>
+                    <label className="form-label">{isEn ? 'Watering Notes & Method' : 'Observações e Modo de Rega'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="2"
@@ -942,7 +943,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         ...plantData,
                         watering: { ...plantData.watering, description: e.target.value }
                       })}
-                      placeholder="Ex: Regar quando os primeiros 2cm de solo secarem. Não deixar água acumulada no prato..."
+                      placeholder={isEn ? "e.g. Water when top 2cm of soil dries out..." : "Ex: Regar quando os primeiros 2cm de solo secarem. Não deixar água acumulada no prato..."}
                     />
                   </div>
                 </div>
@@ -951,12 +952,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Sprout size={18} className="section-icon" />
-                    <h4>Como Tirar Mudas (Propagação & Cultivo)</h4>
+                    <h4>{isEn ? 'How to Take Cuttings (Propagation)' : 'Como Tirar Mudas (Propagação & Cultivo)'}</h4>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Método Principal de Fazer Muda</label>
+                      <label className="form-label">{isEn ? 'Primary Propagation Method' : 'Método Principal de Fazer Muda'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -965,12 +966,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           propagation: { ...plantData.propagation, method: e.target.value }
                         })}
-                        placeholder="Ex: Estaquia de caule na água, Divisão de touceiras..."
+                        placeholder={isEn ? "e.g. Stem cuttings in water, Clump division..." : "Ex: Estaquia de caule na água, Divisão de touceiras..."}
                       />
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Melhor Época do Ano</label>
+                      <label className="form-label">{isEn ? 'Best Season of the Year' : 'Melhor Época do Ano'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -979,14 +980,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           propagation: { ...plantData.propagation, bestSeason: e.target.value }
                         })}
-                        placeholder="Ex: Primavera e Verão"
+                        placeholder={isEn ? "e.g. Spring & Summer" : "Ex: Primavera e Verão"}
                       />
                     </div>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Tempo para Enraizar</label>
+                      <label className="form-label">{isEn ? 'Time to Root' : 'Tempo para Enraizar'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -995,12 +996,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           propagation: { ...plantData.propagation, rootingTime: e.target.value }
                         })}
-                        placeholder="Ex: 2 a 4 semanas"
+                        placeholder={isEn ? "e.g. 2 to 4 weeks" : "Ex: 2 a 4 semanas"}
                       />
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Nível de Dificuldade</label>
+                      <label className="form-label">{isEn ? 'Difficulty Level' : 'Nível de Dificuldade'}</label>
                       <select 
                         className="form-select"
                         value={plantData.propagation?.difficulty || 'Fácil'}
@@ -1009,27 +1010,27 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           propagation: { ...plantData.propagation, difficulty: e.target.value }
                         })}
                       >
-                        <option value="Muito Fácil">Muito Fácil</option>
-                        <option value="Fácil">Fácil</option>
-                        <option value="Médio">Médio</option>
-                        <option value="Avançado">Avançado</option>
+                        <option value="Muito Fácil">{isEn ? 'Very Easy' : 'Muito Fácil'}</option>
+                        <option value="Fácil">{isEn ? 'Easy' : 'Fácil'}</option>
+                        <option value="Médio">{isEn ? 'Medium' : 'Médio'}</option>
+                        <option value="Avançado">{isEn ? 'Advanced' : 'Avançado'}</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Passo a Passo para Tirar a Muda (um por linha)</label>
+                    <label className="form-label">{isEn ? 'Step-by-step Cutting Guide (one per line)' : 'Passo a Passo para Tirar a Muda (um por linha)'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="4"
                       value={Array.isArray(plantData.propagation?.stepByStep) ? plantData.propagation.stepByStep.join('\n') : (plantData.propagation?.stepByStep || '')} 
                       onChange={e => handlePropagationStepsChange(e.target.value)}
-                      placeholder="1. Escolha um ramo saudável...&#10;2. Corte 1 cm abaixo do nó...&#10;3. Coloque em água limpa..."
+                      placeholder={isEn ? "1. Select a healthy stem...&#10;2. Cut 1cm below node...&#10;3. Place in clean water..." : "1. Escolha um ramo saudável...&#10;2. Corte 1 cm abaixo do nó...&#10;3. Coloque em água limpa..."}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Dica de Ouro / Segredo do Botânico</label>
+                    <label className="form-label">{isEn ? 'Botanist Secret Tip' : 'Dica de Ouro / Segredo do Botânico'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="2"
@@ -1038,7 +1039,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                         ...plantData,
                         propagation: { ...plantData.propagation, proTips: e.target.value }
                       })}
-                      placeholder="Ex: Usar canela em pó na cicatriz para não dar fungo, manter na água fresca..."
+                      placeholder={isEn ? "e.g. Dust cut stem with cinnamon powder to prevent fungus..." : "Ex: Usar canela em pó na cicatriz para não dar fungo, manter na água fresca..."}
                     />
                   </div>
                 </div>
@@ -1047,28 +1048,28 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Layers size={18} className="section-icon" color="#795548" />
-                    <h4>Solo & Temperatura</h4>
+                    <h4>{isEn ? 'Soil & Climate' : 'Solo & Temperatura'}</h4>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Tipo de Solo que ela mais gosta</label>
+                    <label className="form-label">{isEn ? 'Preferred Soil Type' : 'Tipo de Solo que ela mais gosta'}</label>
                     <input 
                       type="text" 
                       className="form-input" 
                       value={plantData.soilType || ''} 
                       onChange={e => setPlantData({ ...plantData, soilType: e.target.value })}
-                      placeholder="Ex: Solo rico em matéria orgânica, bem drenado, com terra vegetal e perlita"
+                      placeholder={isEn ? "e.g. Soil rich in organic matter, well draining..." : "Ex: Solo rico em matéria orgânica, bem drenado, com terra vegetal e perlita"}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Temperatura que a planta gosta (Clima)</label>
+                    <label className="form-label">{isEn ? 'Preferred Temperature & Climate' : 'Temperatura que a planta gosta (Clima)'}</label>
                     <input 
                       type="text" 
                       className="form-input" 
                       value={plantData.idealTemperature || ''} 
                       onChange={e => setPlantData({ ...plantData, idealTemperature: e.target.value })}
-                      placeholder="Ex: 18°C a 27°C (clima quente e úmido, não tolera frio abaixo de 15°C)"
+                      placeholder={isEn ? "e.g. 18°C to 27°C (mild to warm climate)" : "Ex: 18°C a 27°C (clima quente e úmido, não tolera frio abaixo de 15°C)"}
                     />
                   </div>
                 </div>
@@ -1077,17 +1078,17 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Scissors size={18} className="section-icon" color="#059669" />
-                    <h4>Como Cuidar & Manutenção</h4>
+                    <h4>{isEn ? 'Care & Maintenance' : 'Como Cuidar & Manutenção'}</h4>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Como cuidar (Tirar folhas secas, podas, limpeza)</label>
+                    <label className="form-label">{isEn ? 'Care guide (Pruning, dry leaves, cleaning)' : 'Como cuidar (Tirar folhas secas, podas, limpeza)'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="3"
                       value={plantData.howToCare || ''} 
                       onChange={e => setPlantData({ ...plantData, howToCare: e.target.value })}
-                      placeholder="Ex: Retirar folhas secas ou amareladas cortando na base com tesoura limpa. Limpar o pó das folhas com pano úmido..."
+                      placeholder={isEn ? "e.g. Trim dry leaves at base with clean shears..." : "Ex: Retirar folhas secas ou amareladas cortando na base com tesoura limpa. Limpar o pó das folhas com pano úmido..."}
                     />
                   </div>
                 </div>
@@ -1096,12 +1097,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                 <div className="form-section">
                   <div className="form-section-header">
                     <Flower size={18} className="section-icon" color="#9333ea" />
-                    <h4>Adubação & Observações Gerais</h4>
+                    <h4>{isEn ? 'Fertilization & General Notes' : 'Adubação & Observações Gerais'}</h4>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Tipo de Adubo</label>
+                      <label className="form-label">{isEn ? 'Fertilizer Type' : 'Tipo de Adubo'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -1110,12 +1111,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           fertilizer: { ...plantData.fertilizer, type: e.target.value }
                         })}
-                        placeholder="Ex: NPK 10-10-10, Húmus de Minhoca, Bokashi"
+                        placeholder={isEn ? "e.g. NPK 10-10-10, Worm Castings" : "Ex: NPK 10-10-10, Húmus de Minhoca, Bokashi"}
                       />
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label">Frequência de Adubação</label>
+                      <label className="form-label">{isEn ? 'Fertilization Frequency' : 'Frequência de Adubação'}</label>
                       <input 
                         type="text" 
                         className="form-input" 
@@ -1124,19 +1125,19 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                           ...plantData,
                           fertilizer: { ...plantData.fertilizer, frequency: e.target.value }
                         })}
-                        placeholder="Ex: A cada 30 dias na Primavera/Verão"
+                        placeholder={isEn ? "e.g. Every 30 days in Spring/Summer" : "Ex: A cada 30 dias na Primavera/Verão"}
                       />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Observações Adicionais</label>
+                    <label className="form-label">{isEn ? 'Additional Notes' : 'Observações Adicionais'}</label>
                     <textarea 
                       className="form-textarea" 
                       rows="2"
                       value={plantData.notes || ''} 
                       onChange={e => setPlantData({ ...plantData, notes: e.target.value })}
-                      placeholder="Ex: Evitar correntes de ar, excelente para purificar o ambiente..."
+                      placeholder={isEn ? "e.g. Avoid cold drafts, great for air purification..." : "Ex: Evitar correntes de ar, excelente para purificar o ambiente..."}
                     />
                   </div>
                 </div>
@@ -1148,12 +1149,12 @@ export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyM
                     className="btn btn-secondary"
                     onClick={() => setStep('ask_known_name')}
                   >
-                    Voltar
+                    {isEn ? 'Back' : 'Voltar'}
                   </button>
 
                   <button type="submit" className="btn btn-primary">
                     <Check size={16} />
-                    <span>Salvar no Meu Jardim</span>
+                    <span>{isEn ? 'Save to My Garden' : 'Salvar no Meu Jardim'}</span>
                   </button>
                 </div>
               </form>

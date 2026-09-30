@@ -82,7 +82,7 @@ export default function Navbar({
             <button 
               className="btn btn-secondary btn-sm nav-btn-settings"
               onClick={onOpenSettings}
-              title="Configuracoes do Canto Alegre"
+              title={currentLang === 'en' ? "Canto Alegre Settings" : "Configuracoes do Canto Alegre"}
               aria-label="Configuracoes"
             >
               <Settings size={15} />
@@ -93,11 +93,11 @@ export default function Navbar({
               <button 
                 className="btn btn-primary btn-sm nav-btn-add"
                 onClick={onAddClick}
-                title="Adicionar nova planta ao jardim"
+                title={currentLang === 'en' ? "Add new plant to garden" : "Adicionar nova planta ao jardim"}
               >
                 <Plus size={16} />
-                <span className="nav-btn-text-full">Nova Planta</span>
-                <span className="nav-btn-text-short">Planta</span>
+                <span className="nav-btn-text-full">{currentLang === 'en' ? 'New Plant' : 'Nova Planta'}</span>
+                <span className="nav-btn-text-short">{currentLang === 'en' ? 'Plant' : 'Planta'}</span>
               </button>
             )}
           </div>
@@ -116,7 +116,7 @@ export default function Navbar({
           >
             <MessageSquare size={14} />
             <span className="nav-btn-text-full">{t.feedback}</span>
-            <span className="nav-btn-text-short">Suporte</span>
+            <span className="nav-btn-text-short">{currentLang === 'en' ? 'Support' : 'Suporte'}</span>
           </button>
 
           {/* Notificacoes / Atualizacoes */}
@@ -126,15 +126,15 @@ export default function Navbar({
               analyticsService.trackEvent('Navbar', 'click', 'Novidades');
               onOpenUpdates && onOpenUpdates();
             }}
-            title="Novidades & Atualizacoes do Canto Alegre"
+            title={currentLang === 'en' ? "Canto Alegre News & Updates" : "Novidades & Atualizacoes do Canto Alegre"}
             style={{ position: 'relative' }}
           >
             <Bell size={14} />
             {hasUnreadUpdates && (
               <span className="unread-dot-badge" />
             )}
-            <span className="nav-btn-text-full">Novidades</span>
-            <span className="nav-btn-text-short">Novidades</span>
+            <span className="nav-btn-text-full">{currentLang === 'en' ? 'Updates' : 'Novidades'}</span>
+            <span className="nav-btn-text-short">{currentLang === 'en' ? 'Updates' : 'Novidades'}</span>
           </button>
 
           {/* Lixeira */}
@@ -144,15 +144,15 @@ export default function Navbar({
               analyticsService.trackEvent('Navbar', 'click', 'Lixeira');
               onOpenTrashBin && onOpenTrashBin();
             }}
-            title="Lixeira do Jardim"
+            title={currentLang === 'en' ? "Garden Trash Bin" : "Lixeira do Jardim"}
             style={{ position: 'relative' }}
           >
             <Trash2 size={14} color={trashCount > 0 ? '#ef4444' : 'currentColor'} />
             {trashCount > 0 && (
               <span className="unread-dot-badge" style={{ background: '#ef4444' }} />
             )}
-            <span className="nav-btn-text-full">Lixeira {trashCount > 0 ? `(${trashCount})` : ''}</span>
-            <span className="nav-btn-text-short">Lixeira</span>
+            <span className="nav-btn-text-full">{currentLang === 'en' ? `Trash Bin ${trashCount > 0 ? `(${trashCount})` : ''}` : `Lixeira ${trashCount > 0 ? `(${trashCount})` : ''}`}</span>
+            <span className="nav-btn-text-short">{currentLang === 'en' ? 'Trash' : 'Lixeira'}</span>
           </button>
 
           {/* Guia & PWA */}
@@ -162,11 +162,11 @@ export default function Navbar({
               analyticsService.trackEvent('Navbar', 'click', 'Guia_PWA');
               onOpenGuide && onOpenGuide();
             }}
-            title="Como Funciona o Canto Alegre & Instalar PWA"
+            title={currentLang === 'en' ? "How Canto Alegre Works & PWA Install" : "Como Funciona o Canto Alegre & Instalar PWA"}
           >
             <HelpCircle size={14} />
-            <span className="nav-btn-text-full">Guia & PWA</span>
-            <span className="nav-btn-text-short">Guia</span>
+            <span className="nav-btn-text-full">{currentLang === 'en' ? 'Guide & PWA' : 'Guia & PWA'}</span>
+            <span className="nav-btn-text-short">{currentLang === 'en' ? 'Guide' : 'Guia'}</span>
           </button>
 
           {/* Instalar App */}
@@ -177,11 +177,11 @@ export default function Navbar({
                 analyticsService.trackEvent('Navbar', 'click', 'Instalar_PWA');
                 onInstallApp && onInstallApp();
               }}
-              title="Instalar Canto Alegre no seu dispositivo"
+              title={currentLang === 'en' ? "Install Canto Alegre on your device" : "Instalar Canto Alegre no seu dispositivo"}
             >
               <Download size={14} />
               <span className="nav-btn-text-full">{t.installApp}</span>
-              <span className="nav-btn-text-short">Instalar</span>
+              <span className="nav-btn-text-short">{currentLang === 'en' ? 'Install' : 'Instalar'}</span>
             </button>
           )}
 
@@ -192,21 +192,21 @@ export default function Navbar({
               analyticsService.trackEvent('Navbar', 'click', 'Config_IA_Gemini');
               onOpenKeyModal && onOpenKeyModal();
             }}
-            title={hasApiKey ? "Chave API Gemini Conectada (Clique para alterar)" : "Modo Simulacao Ativo (Clique para configurar chave)"}
+            title={hasApiKey ? (currentLang === 'en' ? "Gemini API Key Connected (Click to change)" : "Chave API Gemini Conectada (Clique para alterar)") : (currentLang === 'en' ? "Simulation Mode Active (Click to set key)" : "Modo Simulacao Ativo (Clique para configurar chave)")}
           >
             {hasApiKey ? (
               <>
                 <span className="status-dot online" />
                 <Sparkles size={14} />
-                <span className="nav-btn-text-full">IA Gemini Conectada</span>
-                <span className="nav-btn-text-short">IA Gemini</span>
+                <span className="nav-btn-text-full">{currentLang === 'en' ? 'Gemini AI Active' : 'IA Gemini Conectada'}</span>
+                <span className="nav-btn-text-short">{currentLang === 'en' ? 'Gemini AI' : 'IA Gemini'}</span>
               </>
             ) : (
               <>
                 <span className="status-dot demo" />
                 <Key size={14} />
-                <span className="nav-btn-text-full">Modo Simulado</span>
-                <span className="nav-btn-text-short">Simulado</span>
+                <span className="nav-btn-text-full">{currentLang === 'en' ? 'Demo Mode' : 'Modo Simulado'}</span>
+                <span className="nav-btn-text-short">{currentLang === 'en' ? 'Demo' : 'Simulado'}</span>
               </>
             )}
           </button>

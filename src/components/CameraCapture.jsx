@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Camera, RefreshCw, X, Check } from 'lucide-react';
 import { normalizeImageForAi } from '../services/geminiService';
 
-export default function CameraCapture({ onCapture, onClose }) {
+export default function CameraCapture({ onCapture, onClose, currentLang = 'pt-BR' }) {
+  const isEn = currentLang === 'en';
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -41,7 +42,7 @@ export default function CameraCapture({ onCapture, onClose }) {
     setIsLoading(true);
 
     if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setErrorMsg('Seu navegador não suporta visualização de câmera ao vivo.');
+      setErrorMsg(isEn ? 'Your browser does not support live camera view.' : 'Seu navegador não suporta visualização de câmera ao vivo.');
       setIsLoading(false);
       return;
     }
@@ -78,7 +79,7 @@ export default function CameraCapture({ onCapture, onClose }) {
           });
         } catch (err3) {
           console.error('Todas as tentativas WebRTC falharam:', err3);
-          setErrorMsg('Não foi possível iniciar o vídeo da câmera. Verifique as permissões ou use a câmera do sistema.');
+          setErrorMsg(isEn ? 'Unable to start camera video. Check permissions or use native device camera.' : 'Não foi possível iniciar o vídeo da câmera. Verifique as permissões ou use a câmera do sistema.');
           setIsLoading(false);
           return;
         }
@@ -164,7 +165,7 @@ export default function CameraCapture({ onCapture, onClose }) {
     <div className="modal-overlay">
       <div className="modal-container" style={{ maxWidth: '520px', background: '#0f271b', color: '#fff' }}>
         <div className="modal-header" style={{ background: '#0f271b', borderBottomColor: 'rgba(255,255,255,0.1)' }}>
-          <span style={{ fontWeight: '700', color: '#fff' }}>Tirar Foto da Planta</span>
+          <span style={{ fontWeight: '700', color: '#fff' }}>{isEn ? 'Take Plant Photo' : 'Tirar Foto da Planta'}</span>
           <button className="modal-close" onClick={onClose} style={{ color: '#fff' }}>
             <X size={20} />
           </button>
@@ -191,10 +192,10 @@ export default function CameraCapture({ onCapture, onClose }) {
                   style={{ justifyContent: 'center' }}
                 >
                   <Camera size={18} />
-                  <span>Abrir Câmera do Aparelho</span>
+                  <span>{isEn ? 'Open Device Camera' : 'Abrir Câmera do Aparelho'}</span>
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={onClose} style={{ justifyContent: 'center' }}>
-                  Voltar
+                  {isEn ? 'Back' : 'Voltar'}
                 </button>
               </div>
             </div>
@@ -206,11 +207,11 @@ export default function CameraCapture({ onCapture, onClose }) {
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                 <button className="btn btn-secondary" onClick={retakePhoto}>
                   <RefreshCw size={16} />
-                  <span>Tirar Outra</span>
+                  <span>{isEn ? 'Retake Photo' : 'Tirar Outra'}</span>
                 </button>
                 <button className="btn btn-primary" onClick={confirmPhoto}>
                   <Check size={16} />
-                  <span>Usar Esta Foto</span>
+                  <span>{isEn ? 'Use This Photo' : 'Usar Esta Foto'}</span>
                 </button>
               </div>
             </div>
@@ -227,7 +228,7 @@ export default function CameraCapture({ onCapture, onClose }) {
 
                 {isLoading && (
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '0.9rem' }}>
-                    Iniciando câmera...
+                    {isEn ? 'Starting camera...' : 'Iniciando câmera...'}
                   </div>
                 )}
 
@@ -248,7 +249,7 @@ export default function CameraCapture({ onCapture, onClose }) {
                     justifyContent: 'center',
                     cursor: 'pointer'
                   }}
-                  title="Alternar Câmera"
+                  title={isEn ? 'Switch Camera' : 'Alternar Câmera'}
                 >
                   <RefreshCw size={18} />
                 </button>
@@ -263,7 +264,7 @@ export default function CameraCapture({ onCapture, onClose }) {
                   style={{ padding: '14px 28px', fontSize: '1rem', width: '100%', maxWidth: '280px', justifyContent: 'center' }}
                 >
                   <Camera size={20} />
-                  <span>Capturar Foto</span>
+                  <span>{isEn ? 'Capture Photo' : 'Capturar Foto'}</span>
                 </button>
 
                 <button 
@@ -272,7 +273,7 @@ export default function CameraCapture({ onCapture, onClose }) {
                   onClick={() => nativeInputRef.current?.click()}
                   style={{ border: 'none', background: 'transparent', color: '#a7f3d0' }}
                 >
-                  Ou tirar foto com a câmera do aparelho
+                  {isEn ? 'Or snap photo with native device camera' : 'Ou tirar foto com a câmera do aparelho'}
                 </button>
               </div>
             </div>

@@ -405,6 +405,7 @@ export default function App() {
           onSave={handleSavePlant}
           onDelete={handleDeletePlant}
           onWater={handleWaterPlant}
+          currentLang={currentLang}
         />
       )}
 
@@ -425,6 +426,7 @@ export default function App() {
           isOpen={showKeyModal}
           onClose={() => setShowKeyModal(false)}
           onKeySaved={() => setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''))}
+          currentLang={currentLang}
         />
       )}
 
@@ -434,6 +436,7 @@ export default function App() {
           onClose={() => setShowGuideModal(false)}
           isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
+          currentLang={currentLang}
         />
       )}
 
@@ -441,6 +444,7 @@ export default function App() {
         <UpdatesNotificationModal 
           isOpen={showUpdatesModal}
           onClose={() => setShowUpdatesModal(false)}
+          currentLang={currentLang}
         />
       )}
 
@@ -454,6 +458,8 @@ export default function App() {
           isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
           onReloadPlants={loadPlants}
+          currentLang={currentLang}
+          onLanguageChange={handleLanguageChange}
         />
       )}
 
