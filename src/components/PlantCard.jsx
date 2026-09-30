@@ -1,7 +1,11 @@
 import React from 'react';
 import { Droplets, Sun, AlertCircle, CheckCircle2, Clock, Globe, Sprout, Home } from 'lucide-react';
 
-export default function PlantCard({ plant, onWater, onClick }) {
+export default function PlantCard({ plant, onWater, onSelect, onClick }) {
+  const handleCardClick = () => {
+    const selectFn = onSelect || onClick;
+    if (selectFn) selectFn(plant);
+  };
   // Cálculo de dias até a próxima rega
   const lastWateredDate = new Date(plant.lastWatered);
   const freqDays = plant.watering?.frequencyDays || 3;
@@ -51,7 +55,7 @@ export default function PlantCard({ plant, onWater, onClick }) {
   const environmentText = plant.idealEnvironment || (lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)');
 
   return (
-    <div className="plant-card" onClick={() => onClick(plant)}>
+    <div className="plant-card" onClick={handleCardClick}>
       <div className="card-img-wrapper">
         <img 
           src={plant.photoUrl || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80'} 
