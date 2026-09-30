@@ -1,6 +1,7 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare, BarChart3 } from 'lucide-react';
 import { TRANSLATIONS } from '../services/i18n';
+import { analyticsService } from '../services/analyticsService';
 
 export default function Navbar({ 
   hasApiKey, 
@@ -16,7 +17,8 @@ export default function Navbar({
   onSwitchView,
   currentLang = 'pt-BR',
   onLanguageChange,
-  onOpenFeedback
+  onOpenFeedback,
+  onOpenAnalytics
 }) {
   const t = TRANSLATIONS[currentLang]?.nav || TRANSLATIONS['pt-BR'].nav;
 
@@ -101,10 +103,27 @@ export default function Navbar({
 
         {/* Grupo de Ações Secundárias */}
         <div className="nav-secondary-actions">
+          {/* Telemetria & Estatisticas */}
+          <button 
+            className="btn btn-secondary btn-sm nav-btn-analytics"
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Estatisticas');
+              onOpenAnalytics && onOpenAnalytics();
+            }}
+            title="Estatisticas de Acessos e Uso"
+          >
+            <BarChart3 size={14} />
+            <span className="nav-btn-text-full">Métricas</span>
+            <span className="nav-btn-text-short">Métricas</span>
+          </button>
+
           {/* Feedback & Suporte */}
           <button 
             className="btn btn-secondary btn-sm"
-            onClick={onOpenFeedback}
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Feedback');
+              onOpenFeedback && onOpenFeedback();
+            }}
             title={t.feedback}
           >
             <MessageSquare size={14} />
@@ -115,7 +134,10 @@ export default function Navbar({
           {/* Notificacoes / Atualizacoes */}
           <button 
             className="btn btn-secondary btn-sm nav-btn-updates"
-            onClick={onOpenUpdates}
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Novidades');
+              onOpenUpdates && onOpenUpdates();
+            }}
             title="Novidades & Atualizacoes do Canto Alegre"
             style={{ position: 'relative' }}
           >
@@ -130,7 +152,10 @@ export default function Navbar({
           {/* Guia & PWA */}
           <button 
             className="btn btn-secondary btn-sm nav-btn-guide"
-            onClick={onOpenGuide}
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Guia_PWA');
+              onOpenGuide && onOpenGuide();
+            }}
             title="Como Funciona o Canto Alegre & Instalar PWA"
           >
             <HelpCircle size={14} />
@@ -142,7 +167,10 @@ export default function Navbar({
           {isInstallable && (
             <button 
               className="btn btn-install btn-sm nav-btn-install"
-              onClick={onInstallApp}
+              onClick={() => {
+                analyticsService.trackEvent('Navbar', 'click', 'Instalar_PWA');
+                onInstallApp && onInstallApp();
+              }}
               title="Instalar Canto Alegre no seu dispositivo"
             >
               <Download size={14} />
@@ -154,7 +182,10 @@ export default function Navbar({
           {/* Status IA Gemini */}
           <button 
             className={`btn ${hasApiKey ? 'btn-key-active' : 'btn-secondary'} btn-sm nav-btn-key`}
-            onClick={onOpenKeyModal}
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Config_IA_Gemini');
+              onOpenKeyModal && onOpenKeyModal();
+            }}
             title={hasApiKey ? "Chave API Gemini Conectada (Clique para alterar)" : "Modo Simulacao Ativo (Clique para configurar chave)"}
           >
             {hasApiKey ? (

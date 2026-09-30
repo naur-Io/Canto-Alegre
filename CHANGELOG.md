@@ -16,6 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push Notifications & Care Reminders: Browser-based notifications for watering and fertilizing schedules.
 - Growth Journal & History Log: Timeline tracking plant growth with historic photo check-ins.
 
+## [1.7.0] - 2026-09-30
+
+### Added & Changed
+- **Painel de Métricas & Telemetria (`analyticsService.js` & `AnalyticsStatsModal.jsx`)**:
+  - Novo serviço de telemetria offline-first para contagem de acessos globais e ranking dos botões mais clicados (hotspots: Nova Planta, Identificação IA, Troca de Tema, Instalar PWA).
+  - Modal visual discreto de estatísticas acessível diretamente pela barra de navegação ("Métricas").
+- **Meta Tags de Compartilhamento Social (Open Graph & Twitter Cards)**:
+  - Adicionadas tags `og:title`, `og:description`, `og:image`, `og:type` e `twitter:card` em `index.html` para exibição de pré-cards ao compartilhar o link do aplicativo no WhatsApp, Instagram e Telegram.
+- **Guia de Deploy & Lançamento na Pasta de Estudos (`studies/05-GUIA_DE_LANCAMENTO_E_TELEMETRIA.md`)**:
+  - Manual exaustivo detalhando o deploy do frontend PWA na Vercel e Netlify, configuração de variáveis de ambiente (`VITE_API_URL`) e integração GA4.
+
 ## [1.6.0] - 2026-09-27
 
 ### Added & Changed

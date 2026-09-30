@@ -12,6 +12,7 @@ Este diretório contem o material de estudo detalhado sobre a evolucao arquitetu
 | [02-GUIA_DE_ANOTACOES_JAVA_SPRING.md](./02-GUIA_DE_ANOTACOES_JAVA_SPRING.md) | Manual exaustivo de todas as anotações Java (Spring, JPA/Hibernate, Lombok, Validation, JUnit 5, Mockito e Testcontainers), detalhando utilidade, localizacao no codigo, dependencias Maven e impacto no software/banco de dados. |
 | [03-RASTREABILIDADE_E_ETAPA2_STORAGE.md](./03-RASTREABILIDADE_E_ETAPA2_STORAGE.md) | Guia contextualizado de rastreabilidade de recursos (como fazer/desfazer cada funcionalidade), história da evolução do projeto e visão geral dos serviços em nuvem. |
 | [04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md](./04-GUIA_PASSO_A_PASSO_AWS_CLOUD.md) | Passo a passo prático de configuração AWS: onde clicar no Console, criação de credenciais IAM, bucket S3 para fotos, banco PostgreSQL no RDS, classe Java S3StorageService e deploy do ecossistema. |
+| [05-GUIA_DE_LANCAMENTO_E_TELEMETRIA.md](./05-GUIA_DE_LANCAMENTO_E_TELEMETRIA.md) | Manual de preparacao para distribuicao publica, deploy do frontend React PWA na Vercel/Netlify, meta tags Open Graph de compartilhamento social e modulo de telemetria/analytics. |
 
 ---
 

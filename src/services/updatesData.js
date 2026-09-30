@@ -1,5 +1,31 @@
 export const APP_UPDATES = [
   {
+    id: 'v1.7.0',
+    version: 'v1.7.0',
+    date: '30 de Setembro de 2026',
+    title: 'Canto Alegre - Métricas, Telemetria & Preparação para Lançamento Público',
+    isMajor: true,
+    badges: ['Telemetria', 'Analytics', 'Social Meta Tags', 'Vercel / Netlify'],
+    summary: 'Novo módulo de telemetria e analytics de uso, painel de estatísticas dos recursos mais clicados, meta tags Open Graph e Twitter Cards para redes sociais e guia de hospedagem do frontend.',
+    items: [
+      {
+        type: 'analytics',
+        title: 'Painel de Métricas & Telemetria',
+        desc: 'Acompanhe em tempo real o total de acessos do app e o ranking dos botões mais clicados (hotspots) com total privacidade offline.'
+      },
+      {
+        type: 'social',
+        title: 'Meta Tags de Compartilhamento Social',
+        desc: 'Suporte a Open Graph e Twitter Cards para exibição de cards visuais com capa e resumo ao compartilhar o link do aplicativo no WhatsApp ou redes sociais.'
+      },
+      {
+        type: 'guide',
+        title: 'Guia de Lançamento & Hospedagem Web',
+        desc: 'Documentação completa com o passo a passo para deploy do frontend PWA na Vercel e Netlify conectando com a API em nuvem.'
+      }
+    ]
+  },
+  {
     id: 'v1.6.0',
     version: 'v1.6.0',
     date: '27 de Setembro de 2026',

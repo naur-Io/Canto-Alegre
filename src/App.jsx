@@ -12,6 +12,8 @@ import SettingsModal from './components/SettingsModal';
 import PresentationLanding from './components/PresentationLanding';
 import FeedbackSupportModal from './components/FeedbackSupportModal';
 import GardenTourWalkthrough from './components/GardenTourWalkthrough';
+import { AnalyticsStatsModal } from './components/AnalyticsStatsModal';
+import { analyticsService } from './services/analyticsService';
 
 import { 
   getStoredPlants, 
@@ -44,6 +46,7 @@ export default function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showGardenTourModal, setShowGardenTourModal] = useState(false);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
   const [unreadUpdates, setUnreadUpdates] = useState(false);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
@@ -52,6 +55,7 @@ export default function App() {
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
+    analyticsService.initAnalytics();
     saveTheme('light');
     loadPlants();
     initLanguage();
@@ -78,6 +82,10 @@ export default function App() {
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
+
+  useEffect(() => {
+    analyticsService.trackPageView(currentView === 'landing' ? 'LandingPage' : 'Jardim');
+  }, [currentView]);
 
   const initLanguage = async () => {
     const lang = await getStoredLanguage();
@@ -218,6 +226,7 @@ export default function App() {
         currentLang={currentLang}
         onLanguageChange={handleLanguageChange}
         onOpenFeedback={() => setShowFeedbackModal(true)}
+        onOpenAnalytics={() => setShowAnalyticsModal(true)}
       />
 
       {currentView === 'landing' ? (
@@ -390,11 +399,20 @@ export default function App() {
         />
       )}
 
+      {showAnalyticsModal && (
+        <AnalyticsStatsModal 
+          isOpen={showAnalyticsModal}
+          onClose={() => setShowAnalyticsModal(false)}
+          currentLang={currentLang}
+        />
+      )}
+
       {/* Botao Flutuante (FAB) para Adicionar Nova Planta no Jardim */}
       {currentView === 'garden' && (
         <button 
           className="fab-add-plant"
           onClick={() => {
+            analyticsService.trackEvent('FAB', 'click', 'Nova_Planta');
             handleSwitchView('garden');
             setShowAddModal(true);
           }}

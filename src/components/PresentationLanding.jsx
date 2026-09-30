@@ -17,6 +17,7 @@ import {
   Globe
 } from 'lucide-react';
 import { TRANSLATIONS } from '../services/i18n';
+import { analyticsService } from '../services/analyticsService';
 
 export default function PresentationLanding({ 
   currentLang = 'pt-BR', 
@@ -26,6 +27,25 @@ export default function PresentationLanding({
   onOpenFeedback 
 }) {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS['pt-BR'];
+
+  const handleLaunchApp = () => {
+    analyticsService.trackEvent('LandingPage', 'click', 'Usar_Aplicativo');
+    onLaunchApp && onLaunchApp();
+  };
+
+  const handleInstallApp = () => {
+    analyticsService.trackEvent('LandingPage', 'click', 'Instalar_PWA');
+    onInstallApp && onInstallApp();
+  };
+
+  const handleOpenFeedback = () => {
+    analyticsService.trackEvent('LandingPage', 'click', 'Abrir_Feedback');
+    onOpenFeedback && onOpenFeedback();
+  };
+
+  const handleGithubClick = () => {
+    analyticsService.trackEvent('LandingPage', 'click', 'Ver_GitHub');
+  };
 
   return (
     <div className="presentation-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -79,7 +99,7 @@ export default function PresentationLanding({
         <div className="hero-buttons" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
           <button 
             className="btn btn-primary" 
-            onClick={onLaunchApp}
+            onClick={handleLaunchApp}
             style={{ fontSize: '1.05rem', padding: '14px 28px', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
           >
             <span>{t.hero.useAppCta}</span>
@@ -88,7 +108,7 @@ export default function PresentationLanding({
 
           <button 
             className="btn btn-install" 
-            onClick={onInstallApp}
+            onClick={handleInstallApp}
             style={{ fontSize: '1.05rem', padding: '14px 28px', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
           >
             <Download size={18} />
@@ -100,6 +120,7 @@ export default function PresentationLanding({
             target="_blank" 
             rel="noreferrer" 
             className="btn btn-secondary"
+            onClick={handleGithubClick}
             style={{ fontSize: '1.05rem', padding: '14px 24px', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
           >
             <Github size={18} />
@@ -214,7 +235,7 @@ export default function PresentationLanding({
             <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-900)', marginBottom: '6px' }}>{t.feedback.title}</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '600px' }}>{t.feedback.subtitle}</p>
           </div>
-          <button className="btn btn-primary" onClick={onOpenFeedback} style={{ padding: '12px 24px', fontSize: '0.95rem' }}>
+          <button className="btn btn-primary" onClick={handleOpenFeedback} style={{ padding: '12px 24px', fontSize: '0.95rem' }}>
             <MessageSquare size={18} />
             <span>{t.feedback.btnOpen}</span>
           </button>
@@ -233,7 +254,7 @@ export default function PresentationLanding({
           </p>
 
           <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
-            <button className="btn btn-secondary btn-sm" onClick={onLaunchApp}>
+            <button className="btn btn-secondary btn-sm" onClick={handleLaunchApp}>
               <span>{t.nav.myGarden}</span>
             </button>
             <a href="https://github.com/naur-Io/FloraCare" target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">

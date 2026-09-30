@@ -38,12 +38,13 @@ flowchart TD
         C1["Spring Security OAuth2 Resource Server"] --> C2["Migracao Guest UUID -> Google Account"]
     end
 
-    subgraph E4["Etapa 4: Busca Semantica & Infra"]
-        D1["Redis Cache em Species"] --> D2["Extensao pgvector para Busca Semantica"]
-        D2 --> D3["Deploy AWS via Terraform"]
+    subgraph E4["Etapa 4: Lancamento Publico, Telemetria & Deploy (CONCLUIDO)"]
+        D1["Open Graph & Twitter Meta Tags"] --> D2["Modulo Telemetria & Analytics (analyticsService)"]
+        D2 --> D3["Modal de Estatisticas & Hotspots (AnalyticsStatsModal)"]
+        D3 --> D4["Guia & Pipeline de Deploy Frontend Vercel/Netlify"]
     end
 
-    E1 --> E2 --> E3 --> E4
+    E1 --> E2 --> E4
 ```
 
 ---
