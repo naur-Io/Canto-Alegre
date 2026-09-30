@@ -31,7 +31,7 @@ export async function persistToAllStorages(plants) {
 // Carregar todas as plantas salvas pelo usuario
 export async function getStoredPlants() {
   const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true' || localStorage.getItem('floracare_has_initialized_v1') === 'true';
-  let localPlants = [];
+  let localPlants = null;
 
   // 1. Tentar ler do IndexedDB (chave nova ou antiga)
   try {
@@ -43,22 +43,20 @@ export async function getStoredPlants() {
       }
     }
     if (idbData !== undefined && idbData !== null && Array.isArray(idbData)) {
-      const cleaned = idbData.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
-      localPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
+      localPlants = idbData;
     }
   } catch (error) {
     console.warn('IndexedDB nao disponivel, verificando localStorage:', error);
   }
 
-  // 2. Tentar ler do LocalStorage caso o IndexedDB falhe
-  if (localPlants.length === 0) {
+  // 2. Tentar ler do LocalStorage caso o IndexedDB falhe ou retorne nulo
+  if (!localPlants || localPlants.length === 0) {
     try {
       let localData = localStorage.getItem(PLANTS_STORAGE_KEY) || localStorage.getItem(LEGACY_PLANTS_KEY);
       if (localData) {
         const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed)) {
-          const cleaned = parsed.filter(p => p.id !== 'plant-aglaonema-01' && p.id !== 'plant-espada-03' && p.id !== 'plant-suculenta-04');
-          localPlants = cleaned.length > 0 ? cleaned : INITIAL_PLANTS;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          localPlants = parsed;
         }
       }
     } catch (error) {
@@ -66,13 +64,16 @@ export async function getStoredPlants() {
     }
   }
 
-  if (localPlants.length === 0 && !hasInitialized) {
+  // 3. Se for primeira execucao absoluta, carregar INITIAL_PLANTS
+  if ((!localPlants || localPlants.length === 0) && !hasInitialized) {
     localPlants = INITIAL_PLANTS;
     await persistToAllStorages(localPlants);
+  } else if (!localPlants) {
+    localPlants = [];
   }
 
   // Tentar sincronizacao assincrona com o backend Spring Boot em segundo plano
-  if (navigator.onLine) {
+  if (navigator.onLine && localPlants.length > 0) {
     syncWithCloud(localPlants, persistToAllStorages).catch(err => 
       console.warn('Sincronizacao em segundo plano falhou:', err)
     );
@@ -108,14 +109,20 @@ export async function savePlant(plantData) {
     targetPlant = newPlant;
   }
 
+  // Garante a gravacao imediata e persistente no IndexedDB e LocalStorage
   await persistToAllStorages(updatedPlants);
 
   if (navigator.onLine) {
     apiService.createPlant({
-      nickname: targetPlant.name || targetPlant.commonName || targetPlant.nickname || 'Nova Planta',
-      customLocation: targetPlant.customLocation || targetPlant.location || '',
-      photoUrl: targetPlant.image || targetPlant.photoUrl || '',
+      nickname: targetPlant.commonName || targetPlant.name || targetPlant.nickname || 'Nova Planta',
+      customLocation: targetPlant.idealEnvironment || targetPlant.customLocation || targetPlant.location || '',
+      photoUrl: targetPlant.photoUrl || targetPlant.image || '',
       notes: targetPlant.notes || ''
+    }).then(remoteCreated => {
+      if (remoteCreated && remoteCreated.id) {
+        targetPlant.remoteId = remoteCreated.id;
+        persistToAllStorages(updatedPlants);
+      }
     }).catch(err => {
       console.warn('Backend cloud offline, enfileirando plantio para sincronizacao futura:', err);
       addToPendingQueue('CREATE_PLANT', targetPlant);

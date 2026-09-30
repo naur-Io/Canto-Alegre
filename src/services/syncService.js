@@ -86,6 +86,8 @@ export async function syncWithCloud(localPlants = [], persistToAllStorages = nul
       commonName: rp.species ? rp.species.commonName : (rp.nickname || 'Planta'),
       scientificName: rp.species ? rp.species.scientificName : '',
       customLocation: rp.customLocation || '',
+      idealEnvironment: rp.customLocation || rp.idealEnvironment || '',
+      photoUrl: rp.photoUrl || '',
       image: rp.photoUrl || '',
       lastWatered: rp.lastWateredAt || rp.updatedAt || new Date().toISOString(),
       nextWateringAt: rp.nextWateringAt,
@@ -99,7 +101,26 @@ export async function syncWithCloud(localPlants = [], persistToAllStorages = nul
     localPlants.forEach(lp => mergedMap.set(lp.id, lp));
 
     normalizedRemote.forEach(rp => {
-      mergedMap.set(rp.id, rp);
+      const existingLp = localPlants.find(lp => lp.id === rp.id || (lp.commonName && rp.commonName && lp.commonName.toLowerCase() === rp.commonName.toLowerCase()));
+      if (existingLp) {
+        const mergedPlant = {
+          ...existingLp,
+          ...rp,
+          id: existingLp.id,
+          photoUrl: rp.photoUrl || existingLp.photoUrl || existingLp.image || '',
+          image: rp.photoUrl || existingLp.photoUrl || existingLp.image || '',
+          idealEnvironment: rp.customLocation || rp.idealEnvironment || existingLp.idealEnvironment || '',
+          sunlight: existingLp.sunlight || rp.sunlight,
+          watering: existingLp.watering || rp.watering,
+          propagation: existingLp.propagation || rp.propagation,
+          howToCare: existingLp.howToCare || rp.howToCare,
+          careTips: existingLp.careTips || rp.careTips,
+          fertilizer: existingLp.fertilizer || rp.fertilizer
+        };
+        mergedMap.set(existingLp.id, mergedPlant);
+      } else {
+        mergedMap.set(rp.id, rp);
+      }
     });
 
     const mergedList = Array.from(mergedMap.values());
