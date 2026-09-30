@@ -30,7 +30,7 @@ import { analyzePlantImage, autoCompletePlantByName, getDefaultPropagationForPla
 import { getStoredApiKey } from '../services/storageService';
 import { analyticsService } from '../services/analyticsService';
 
-export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, hasApiKey }) {
+export default function AddPlantModal({ onClose, onSavePlant, onSave, onOpenKeyModal, hasApiKey }) {
   const [photo, setPhoto] = useState(null);
   const [inputPlantName, setInputPlantName] = useState('');
   const [showCamera, setShowCamera] = useState(false);
@@ -275,11 +275,14 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
   const handleSubmit = (e) => {
     e.preventDefault();
     analyticsService.trackEvent('Jardim', 'add_plant', plantData.commonName || 'Nova Planta');
-    onSavePlant({
-      ...plantData,
-      photoUrl: photo || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80',
-      lastWatered: new Date().toISOString()
-    });
+    const saveFn = onSavePlant || onSave;
+    if (saveFn) {
+      saveFn({
+        ...plantData,
+        photoUrl: photo || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80',
+        lastWatered: new Date().toISOString()
+      });
+    }
     onClose();
   };
 

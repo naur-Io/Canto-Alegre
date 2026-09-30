@@ -413,6 +413,7 @@ export default function App() {
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           onSave={handleSavePlant}
+          onSavePlant={handleSavePlant}
           hasApiKey={hasApiKey}
           onOpenKeyModal={() => setShowKeyModal(true)}
           currentLang={currentLang}
