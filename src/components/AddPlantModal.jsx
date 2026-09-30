@@ -334,7 +334,7 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                   Escolha uma das opções abaixo para a Inteligência Artificial gerar a ficha botânica completa e o guia de mudas:
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
                   {/* Opção 1: Sim, já sei o nome */}
                   <button
                     type="button"
@@ -348,13 +348,17 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                       borderRadius: 'var(--radius-md)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '14px'
+                      gap: '14px',
+                      width: '100%',
+                      whiteSpace: 'normal'
                     }}
                   >
                     <CheckCircle2 size={24} style={{ flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontWeight: 700 }}>Sim, já sei o nome da planta</div>
-                      <div style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: 400 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                        Sim, já sei o nome da planta
+                      </div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: 400, whiteSpace: 'normal', wordBreak: 'break-word', marginTop: '3px', lineHeight: 1.4 }}>
                         Digite o nome (ex: Jiboia, Monstera) para a IA dar auto-complete de todos os cuidados
                       </div>
                     </div>
@@ -373,13 +377,17 @@ export default function AddPlantModal({ onClose, onSavePlant, onOpenKeyModal, ha
                       borderRadius: 'var(--radius-md)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '14px'
+                      gap: '14px',
+                      width: '100%',
+                      whiteSpace: 'normal'
                     }}
                   >
                     <Camera size={24} color="var(--primary-600)" style={{ flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>Não sei o nome da planta</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)', whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                        Não sei o nome da planta
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400, whiteSpace: 'normal', wordBreak: 'break-word', marginTop: '3px', lineHeight: 1.4 }}>
                         Tire ou envie uma foto para a IA identificar a espécie e preencher a ficha
                       </div>
                     </div>
