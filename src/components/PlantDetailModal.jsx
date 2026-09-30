@@ -26,6 +26,15 @@ import {
   Upload
 } from 'lucide-react';
 import { getDefaultPropagationForPlant } from '../services/geminiService';
+import { 
+  translateEnvironment, 
+  translateSoil, 
+  translateTemperature, 
+  translateMethod, 
+  translateDifficulty, 
+  translateBestSeason, 
+  translateRootingTime 
+} from '../services/i18n';
 
 const compressImage = (file) => {
   return new Promise((resolve, reject) => {
@@ -154,12 +163,21 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
   const getLightInfo = (lightType, period) => {
     const type = lightType || (period?.toLowerCase().includes('direto') ? 'direta' : period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
     if (type === 'direta') {
-      return { label: 'Luz Direta (Sol Pleno)', badgeClass: 'badge-sun-direct' };
+      return { 
+        label: isEn ? 'Full Sun (Direct Light)' : 'Luz Direta (Sol Pleno)', 
+        badgeClass: 'badge-sun-direct' 
+      };
     }
     if (type === 'sombra') {
-      return { label: 'Sombra (Luz Baixa / Filtrada)', badgeClass: 'badge-shade' };
+      return { 
+        label: isEn ? 'Shade (Filtered / Low Light)' : 'Sombra (Luz Baixa / Filtrada)', 
+        badgeClass: 'badge-shade' 
+      };
     }
-    return { label: 'Luz Indireta (Meia Sombra / Difusa)', badgeClass: 'badge-sun-indirect' };
+    return { 
+      label: isEn ? 'Indirect Light (Partial Shade)' : 'Luz Indireta (Meia Sombra / Difusa)', 
+      badgeClass: 'badge-sun-indirect' 
+    };
   };
 
   const lightStyle = getLightInfo(plant.sunlight?.lightType, plant.sunlight?.period);
@@ -577,7 +595,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   }}
                 >
                   <Camera size={15} />
-                  <span>{uploadingPhoto ? 'Carregando...' : 'Alterar / Tirar Foto'}</span>
+                  <span>{uploadingPhoto ? (isEn ? 'Loading...' : 'Carregando...') : (isEn ? 'Change / Take Photo' : 'Alterar / Tirar Foto')}</span>
                 </button>
               </div>
 
@@ -598,7 +616,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 {plant.origin && (
                   <div className="plant-origin-badge">
                     <Globe size={14} />
-                    <span><strong>Origem:</strong> {plant.origin}</span>
+                    <span><strong>{isEn ? 'Origin:' : 'Origem:'}</strong> {plant.origin}</span>
                   </div>
                 )}
 
@@ -606,10 +624,13 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   <Home size={18} color="#047857" style={{ flexShrink: 0 }} />
                   <div>
                     <span style={{ display: 'block', fontSize: '0.75rem', color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '700' }}>
-                      Onde Fica / Ambiente Ideal
+                      {isEn ? 'Location / Ideal Environment' : 'Onde Fica / Ambiente Ideal'}
                     </span>
                     <span style={{ fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: '600' }}>
-                      {plant.idealEnvironment || (plant.sunlight?.lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : plant.sunlight?.lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)')}
+                      {translateEnvironment(
+                        plant.idealEnvironment || (plant.sunlight?.lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : plant.sunlight?.lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)'),
+                        currentLang
+                      )}
                     </span>
                   </div>
                 </div>
@@ -622,7 +643,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 <div className="detail-card detail-card-sun">
                   <div className="detail-card-header sun-header">
                     <Sun size={18} />
-                    <span>Iluminação & Luz</span>
+                    <span>{isEn ? 'Sunlight & Lighting' : 'Iluminação & Luz'}</span>
                   </div>
                   
                   <div style={{ marginBottom: '8px' }}>
@@ -639,7 +660,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
 
                   {(plant.sunlight?.hoursPerDay || plant.sunlight?.period) && (
                     <p className="detail-field">
-                      <strong>Exposição:</strong> {plant.sunlight?.hoursPerDay || plant.sunlight?.period}
+                      <strong>{isEn ? 'Exposure:' : 'Exposição:'}</strong> {plant.sunlight?.hoursPerDay || plant.sunlight?.period}
                     </p>
                   )}
 
@@ -655,19 +676,19 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 <div className="detail-card detail-card-water">
                   <div className="detail-card-header water-header">
                     <Droplets size={18} />
-                    <span>Plano de Rega & Água</span>
+                    <span>{isEn ? 'Watering Plan & Water' : 'Plano de Rega & Água'}</span>
                   </div>
 
                   <p className="detail-field">
-                    <strong>Frequência:</strong> {
+                    <strong>{isEn ? 'Frequency:' : 'Frequência:'}</strong> {
                       plant.watering?.frequencyTimesPerWeek 
-                        ? `${plant.watering.frequencyTimesPerWeek}x por semana (a cada ~${plant.watering?.frequencyDays || 3} dias)` 
-                        : `A cada ${plant.watering?.frequencyDays || 3} dias`
+                        ? (isEn ? `${plant.watering.frequencyTimesPerWeek}x per week (every ~${plant.watering?.frequencyDays || 3} days)` : `${plant.watering.frequencyTimesPerWeek}x por semana (a cada ~${plant.watering?.frequencyDays || 3} dias)`)
+                        : (isEn ? `Every ${plant.watering?.frequencyDays || 3} days` : `A cada ${plant.watering?.frequencyDays || 3} dias`)
                     }
                   </p>
 
                   <p className="detail-field">
-                    <strong>Volume de Água:</strong> {plant.watering?.amountMl || '150 - 200 ml'}
+                    <strong>{isEn ? 'Water Volume:' : 'Volume de Água:'}</strong> {plant.watering?.amountMl || '150 - 200 ml'}
                   </p>
 
                   {plant.watering?.description && (
@@ -681,10 +702,10 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 <div className="detail-card detail-card-soil">
                   <div className="detail-card-header soil-header">
                     <Layers size={18} />
-                    <span>Solo & Substrato Ideal</span>
+                    <span>{isEn ? 'Ideal Soil & Substrate' : 'Solo & Substrato Ideal'}</span>
                   </div>
                   <p className="detail-subtext soil-subtext">
-                    {plant.soilType || 'Substrato leve, rico em matéria orgânica com boa drenagem.'}
+                    {translateSoil(plant.soilType || 'Substrato leve, rico em matéria orgânica com boa drenagem.', currentLang)}
                   </p>
                 </div>
 
@@ -692,10 +713,10 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 <div className="detail-card detail-card-temp">
                   <div className="detail-card-header temp-header">
                     <Thermometer size={18} />
-                    <span>Temperatura & Clima</span>
+                    <span>{isEn ? 'Temperature & Climate' : 'Temperatura & Clima'}</span>
                   </div>
                   <p className="detail-subtext temp-subtext">
-                    {plant.idealTemperature || '18°C a 28°C (proteger de geadas e frio excessivo)'}
+                    {translateTemperature(plant.idealTemperature || '18°C a 28°C (proteger de geadas e frio excessivo)', currentLang)}
                   </p>
                 </div>
 
@@ -704,7 +725,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   <div className="detail-card-header propagation-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Sprout size={20} color="#059669" />
-                      <span>Como Tirar Mudas & Cultivar (Propagação)</span>
+                      <span>{isEn ? 'How to Take Cuttings & Grow (Propagation)' : 'Como Tirar Mudas & Cultivar (Propagação)'}</span>
                     </div>
                     {activePropagation?.difficulty && (
                       <span 
@@ -719,7 +740,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                           border: '1px solid currentColor'
                         }}
                       >
-                        {activePropagation.difficulty}
+                        {translateDifficulty(activePropagation.difficulty, currentLang)}
                       </span>
                     )}
                   </div>
@@ -727,16 +748,16 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   {/* Metadados rápidos de Propagação */}
                   <div className="propagation-meta-grid">
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">Método Recomendado</span>
-                      <span className="prop-meta-value">{activePropagation.method || 'Estaquia de caule / folha'}</span>
+                      <span className="prop-meta-label">{isEn ? 'Recommended Method' : 'Método Recomendado'}</span>
+                      <span className="prop-meta-value">{translateMethod(activePropagation.method || 'Estaquia de caule / folha', currentLang)}</span>
                     </div>
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">Melhor Época</span>
-                      <span className="prop-meta-value">{activePropagation.bestSeason || 'Primavera e Verão'}</span>
+                      <span className="prop-meta-label">{isEn ? 'Best Season' : 'Melhor Época'}</span>
+                      <span className="prop-meta-value">{translateBestSeason(activePropagation.bestSeason || 'Primavera e Verão', currentLang)}</span>
                     </div>
                     <div className="prop-meta-item">
-                      <span className="prop-meta-label">Tempo de Enraizamento</span>
-                      <span className="prop-meta-value">{activePropagation.rootingTime || '2 a 4 semanas'}</span>
+                      <span className="prop-meta-label">{isEn ? 'Rooting Time' : 'Tempo de Enraizamento'}</span>
+                      <span className="prop-meta-value">{translateRootingTime(activePropagation.rootingTime || '2 a 4 semanas', currentLang)}</span>
                     </div>
                   </div>
 
@@ -745,7 +766,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                     <div style={{ marginTop: '14px' }}>
                       <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary-900)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Sparkles size={15} color="#059669" />
-                        <span>Passo a Passo Prático para Fazer a Muda:</span>
+                        <span>{isEn ? 'Step-by-Step Propagation Guide:' : 'Passo a Passo Prático para Fazer a Muda:'}</span>
                       </div>
                       <div className="propagation-steps-list">
                         {activePropagation.stepByStep.map((step, idx) => (
@@ -763,7 +784,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                     <div className="propagation-pro-tip">
                       <Lightbulb size={18} style={{ flexShrink: 0, marginTop: '2px', color: '#d97706' }} />
                       <div>
-                        <strong>Segredo do Botânico:</strong> {activePropagation.proTips}
+                        <strong>{isEn ? 'Botanist Tip:' : 'Segredo do Botânico:'}</strong> {activePropagation.proTips}
                       </div>
                     </div>
                   )}
@@ -773,10 +794,10 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                 <div className="detail-card detail-card-care" style={{ gridColumn: '1 / -1' }}>
                   <div className="detail-card-header care-header">
                     <Scissors size={18} />
-                    <span>Como Cuidar & Manutenção (Podas / Folhas Secas)</span>
+                    <span>{isEn ? 'Care & Maintenance (Pruning / Dry Leaves)' : 'Como Cuidar & Manutenção (Podas / Folhas Secas)'}</span>
                   </div>
                   <p className="detail-subtext care-subtext" style={{ whiteSpace: 'pre-line' }}>
-                    {plant.howToCare || (Array.isArray(plant.careTips) && plant.careTips.length > 0 ? plant.careTips.join('\n') : 'Retirar folhas secas ou amareladas na base para estimular novos brotos e manter a planta saudável.')}
+                    {plant.howToCare || (Array.isArray(plant.careTips) && plant.careTips.length > 0 ? plant.careTips.join('\n') : (isEn ? 'Remove dry or yellowing leaves at base to stimulate new shoots.' : 'Retirar folhas secas ou amareladas na base para estimular novos brotos e manter a planta saudável.'))}
                   </p>
                 </div>
 
@@ -785,13 +806,13 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   <div className="detail-card detail-card-fertilizer" style={{ gridColumn: '1 / -1' }}>
                     <div className="detail-card-header fertilizer-header">
                       <Flower size={18} />
-                      <span>Adubação & Nutrição</span>
+                      <span>{isEn ? 'Fertilization & Nutrition' : 'Adubação & Nutrição'}</span>
                     </div>
                     <p className="detail-field">
-                      <strong>Tipo de Adubo:</strong> {plant.fertilizer?.type || 'NPK 10-10-10 ou Húmus de Minhoca'}
+                      <strong>{isEn ? 'Fertilizer Type:' : 'Tipo de Adubo:'}</strong> {plant.fertilizer?.type || (isEn ? 'NPK 10-10-10 or Worm Castings' : 'NPK 10-10-10 ou Húmus de Minhoca')}
                     </p>
                     <p className="detail-field">
-                      <strong>Periodicidade:</strong> {plant.fertilizer?.frequency || 'A cada 30 dias na Primavera/Verão'}
+                      <strong>{isEn ? 'Frequency:' : 'Periodicidade:'}</strong> {plant.fertilizer?.frequency || (isEn ? 'Every 30 days in Spring/Summer' : 'A cada 30 dias na Primavera/Verão')}
                     </p>
                     {plant.fertilizer?.notes && (
                       <p className="detail-subtext fertilizer-subtext">
@@ -806,7 +827,7 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
                   <div className="detail-card detail-card-notes" style={{ gridColumn: '1 / -1' }}>
                     <div className="detail-card-header notes-header">
                       <FileText size={18} />
-                      <span>Observações Gerais</span>
+                      <span>{isEn ? 'General Notes' : 'Observações Gerais'}</span>
                     </div>
                     <p className="detail-subtext">
                       {plant.notes}

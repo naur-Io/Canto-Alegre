@@ -343,3 +343,94 @@ export async function saveLanguage(lang) {
   localStorage.setItem(LANGUAGE_KEY, selected);
   return selected;
 }
+
+export function translateEnvironment(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+
+  const exactMap = {
+    'Dentro de casa (Sala, Quarto ou Escritório)': 'Indoor (Living Room, Bedroom or Office)',
+    'Dentro de casa (Banheiro, Varanda protegida ou Cozinha)': 'Indoor (Bathroom, Protected Balcony or Kitchen)',
+    'Dentro de casa (Banheiro ou Cômodo de Sombra)': 'Indoor (Bathroom or Shaded Room)',
+    'Dentro de casa': 'Indoor',
+    'Fora de casa (Quintal, Horta ou Sacada de Sol)': 'Outdoor (Yard, Garden or Sun Balcony)',
+    'Fora de casa (Quintal ou Sacada Ensolarada)': 'Outdoor (Full Sun Yard or Balcony)',
+    'Fora de casa': 'Outdoor',
+    'Dentro/Fora de casa': 'Indoor/Outdoor'
+  };
+
+  if (exactMap[text]) return exactMap[text];
+
+  let result = text;
+  result = result.replace(/Dentro de casa/gi, 'Indoor');
+  result = result.replace(/Fora de casa/gi, 'Outdoor');
+  result = result.replace(/Sala, Quarto ou Escritório/gi, 'Living Room, Bedroom or Office');
+  result = result.replace(/Quintal ou Sacada Ensolarada/gi, 'Full Sun Yard or Balcony');
+  result = result.replace(/Banheiro ou Cômodo de Sombra/gi, 'Bathroom or Shaded Room');
+  result = result.replace(/Banheiro, Varanda protegida ou Cozinha/gi, 'Bathroom, Protected Balcony or Kitchen');
+  result = result.replace(/Quintal, Horta ou Sacada de Sol/gi, 'Yard, Garden or Sun Balcony');
+  return result;
+}
+
+export function translateSoil(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  const exactMap = {
+    'Solo rico em matéria orgânica, leve e com boa drenagem': 'Soil rich in organic matter, light and well-draining',
+    'Substrato leve, rico em matéria orgânica com boa drenagem.': 'Light substrate, rich in organic matter with good drainage.',
+    'Substrato arenoso e muito bem drenado (cactos e suculentas)': 'Sandy and well-drained substrate (cacti and succulents)',
+    'Substrato para orquídeas (casca de pínus e carvão)': 'Orchid substrate (pine bark and charcoal)'
+  };
+  return exactMap[text] || text;
+}
+
+export function translateTemperature(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  const exactMap = {
+    '18°C a 27°C (clima ameno a quente)': '18°C to 27°C (mild to warm climate)',
+    '18°C a 28°C (proteger de geadas e frio excessivo)': '18°C to 28°C (protect from frost and severe cold)',
+    '15°C a 30°C (resistente ao calor)': '15°C to 30°C (heat resistant)'
+  };
+  return exactMap[text] || text;
+}
+
+export function translateMethod(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  const exactMap = {
+    'Estaquia de caule na água ou solo': 'Stem cuttings in water or soil',
+    'Estaquia de caule / folha': 'Stem / leaf cuttings',
+    'Estaquia de caule': 'Stem cuttings',
+    'Estaquia de folha': 'Leaf cuttings',
+    'Divisão de touceira': 'Clump division',
+    'Divisão de touceira / separação de mudas com raiz': 'Clump division / root separation',
+    'Brotos laterais / mudas': 'Side shoots / offsets'
+  };
+  return exactMap[text] || text;
+}
+
+export function translateDifficulty(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  if (/fácil/i.test(text)) return 'Easy';
+  if (/médio/i.test(text)) return 'Medium';
+  if (/difícil/i.test(text)) return 'Hard';
+  return text;
+}
+
+export function translateBestSeason(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  if (/Primavera/i.test(text) && /Verão/i.test(text)) return 'Spring & Summer';
+  if (/Outono/i.test(text) && /Inverno/i.test(text)) return 'Autumn & Winter';
+  if (/Ano todo/i.test(text)) return 'All year round';
+  return text;
+}
+
+export function translateRootingTime(text, currentLang = 'pt-BR') {
+  if (!text) return '';
+  if (currentLang !== 'en') return text;
+  let res = text.replace(/semanas/gi, 'weeks').replace(/dias/gi, 'days').replace(/a/g, 'to');
+  return res;
+}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Droplets, Sun, AlertCircle, CheckCircle2, Clock, Globe, Sprout, Home } from 'lucide-react';
+import { translateEnvironment, translateMethod } from '../services/i18n';
 
 export default function PlantCard({ plant, onWater, onSelect, onClick, currentLang = 'pt-BR' }) {
   const isEn = currentLang === 'en';
@@ -57,15 +58,17 @@ export default function PlantCard({ plant, onWater, onSelect, onClick, currentLa
   };
   const lightBadge = getLightBadge();
 
-  const propagationMethod = plant.propagation?.method || plant.propagationMethod || '';
+  const rawPropMethod = plant.propagation?.method || plant.propagationMethod || '';
+  const propagationMethod = translateMethod(rawPropMethod, currentLang);
 
-  const environmentText = plant.idealEnvironment || (
+  const rawEnv = plant.idealEnvironment || (
     lightType === 'direta' 
-      ? (isEn ? 'Outdoor (Full Sun Patio or Balcony)' : 'Fora de casa (Quintal ou Sacada Ensolarada)')
+      ? 'Fora de casa (Quintal ou Sacada Ensolarada)'
       : lightType === 'sombra' 
-      ? (isEn ? 'Indoor (Bathroom or Shaded Room)' : 'Dentro de casa (Banheiro ou Cômodo de Sombra)')
-      : (isEn ? 'Indoor (Living Room, Bedroom or Office)' : 'Dentro de casa (Sala, Quarto ou Escritório)')
+      ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)'
+      : 'Dentro de casa (Sala, Quarto ou Escritório)'
   );
+  const environmentText = translateEnvironment(rawEnv, currentLang);
 
   return (
     <div className="plant-card" onClick={handleCardClick}>

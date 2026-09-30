@@ -29,9 +29,14 @@ describe('PlantCard Component', () => {
   });
 
   it('renders translated badges and buttons when currentLang is en', () => {
+    const indoorPlant = {
+      ...mockPlant,
+      idealEnvironment: 'Dentro de casa (Sala, Quarto ou Escritório)'
+    };
+
     render(
       <PlantCard 
-        plant={mockPlant}
+        plant={indoorPlant}
         onWater={vi.fn()}
         onSelect={vi.fn()}
         currentLang="en"
@@ -40,5 +45,6 @@ describe('PlantCard Component', () => {
 
     expect(screen.getByText('Watered Today')).toBeDefined();
     expect(screen.getByText('Watered')).toBeDefined();
+    expect(screen.getAllByText(/Indoor \(Living Room, Bedroom or Office\)/i).length).toBeGreaterThan(0);
   });
 });
