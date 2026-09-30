@@ -31,8 +31,21 @@ import {
 import { getStoredLanguage, saveLanguage } from './services/i18n';
 import { LATEST_VERSION } from './services/updatesData';
 
+const CURRENT_VIEW_KEY = 'cantoalegre_user_current_view';
+
+const getInitialView = () => {
+  try {
+    const saved = localStorage.getItem(CURRENT_VIEW_KEY);
+    if (saved === 'garden' || saved === 'landing') return saved;
+    const hasInitialized = localStorage.getItem('cantoalegre_has_initialized_v1') === 'true';
+    return hasInitialized ? 'garden' : 'landing';
+  } catch (e) {
+    return 'landing';
+  }
+};
+
 export default function App() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'garden'
+  const [currentView, setCurrentView] = useState(getInitialView); // 'landing' | 'garden'
   const [currentLang, setCurrentLang] = useState('pt-BR');
   const [plants, setPlants] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,11 +132,19 @@ export default function App() {
     }
   };
 
-
-
   const loadPlants = async () => {
     const data = await getStoredPlants();
     setPlants(data);
+    if (data && data.length > 0) {
+      const savedView = localStorage.getItem(CURRENT_VIEW_KEY);
+      if (!savedView) {
+        setCurrentView('garden');
+        try {
+          localStorage.setItem(CURRENT_VIEW_KEY, 'garden');
+          localStorage.setItem('cantoalegre_has_initialized_v1', 'true');
+        } catch (e) {}
+      }
+    }
   };
 
   const handleWaterPlant = async (plantId) => {
@@ -144,6 +165,7 @@ export default function App() {
   const handleSavePlant = async (plantData) => {
     const updated = await savePlant(plantData);
     setPlants(updated);
+    handleSwitchView('garden');
     if (selectedPlant && selectedPlant.id === plantData.id) {
       setSelectedPlant(plantData);
     }
@@ -197,6 +219,10 @@ export default function App() {
 
   const handleSwitchView = (view) => {
     setCurrentView(view);
+    try {
+      localStorage.setItem(CURRENT_VIEW_KEY, view);
+      localStorage.setItem('cantoalegre_has_initialized_v1', 'true');
+    } catch (e) {}
     if (view === 'garden' && !hasCompletedGardenTour()) {
       setShowGardenTourModal(true);
     }
