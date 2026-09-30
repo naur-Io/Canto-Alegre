@@ -12,6 +12,7 @@ import SettingsModal from './components/SettingsModal';
 import PresentationLanding from './components/PresentationLanding';
 import FeedbackSupportModal from './components/FeedbackSupportModal';
 import GardenTourWalkthrough from './components/GardenTourWalkthrough';
+import TrashBinModal from './components/TrashBinModal';
 import { AnalyticsStatsModal } from './components/AnalyticsStatsModal';
 import { analyticsService } from './services/analyticsService';
 
@@ -26,7 +27,11 @@ import {
   hasUnreadUpdates,
   markVersionAsSeen,
   getStoredTheme,
-  saveTheme
+  saveTheme,
+  getTrashBinPlants,
+  restorePlantFromTrash,
+  permanentlyDeletePlant,
+  emptyTrashBin
 } from './services/storageService';
 import { getStoredLanguage, saveLanguage } from './services/i18n';
 import { LATEST_VERSION } from './services/updatesData';
@@ -48,6 +53,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState(getInitialView); // 'landing' | 'garden'
   const [currentLang, setCurrentLang] = useState('pt-BR');
   const [plants, setPlants] = useState([]);
+  const [trashPlants, setTrashPlants] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
 
@@ -60,6 +66,7 @@ export default function App() {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showGardenTourModal, setShowGardenTourModal] = useState(false);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [showTrashModal, setShowTrashModal] = useState(false);
 
   const [unreadUpdates, setUnreadUpdates] = useState(false);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
@@ -71,6 +78,7 @@ export default function App() {
     analyticsService.initAnalytics();
     saveTheme('light');
     loadPlants();
+    loadTrash();
     initLanguage();
     setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''));
     setUnreadUpdates(hasUnreadUpdates(LATEST_VERSION));
@@ -89,6 +97,11 @@ export default function App() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     window.addEventListener('appinstalled', handleAppInstalled);
+
+    // Tour guiado automatico apenas na primeira visita absoluta se estiver na tela do jardim
+    if (getInitialView() === 'garden' && !hasCompletedGardenTour()) {
+      setShowGardenTourModal(true);
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -147,6 +160,11 @@ export default function App() {
     }
   };
 
+  const loadTrash = async () => {
+    const trash = await getTrashBinPlants();
+    setTrashPlants(trash);
+  };
+
   const handleWaterPlant = async (plantId) => {
     const updated = await markAsWatered(plantId);
     setPlants(updated);
@@ -174,6 +192,23 @@ export default function App() {
   const handleDeletePlant = async (plantId) => {
     const updated = await deletePlant(plantId);
     setPlants(updated);
+    loadTrash();
+  };
+
+  const handleRestorePlant = async (plantId) => {
+    const result = await restorePlantFromTrash(plantId);
+    setPlants(result.plants);
+    setTrashPlants(result.trash);
+  };
+
+  const handlePermanentDeletePlant = async (plantId) => {
+    const updatedTrash = await permanentlyDeletePlant(plantId);
+    setTrashPlants(updatedTrash);
+  };
+
+  const handleEmptyTrash = async () => {
+    const empty = await emptyTrashBin();
+    setTrashPlants(empty);
   };
 
   const totalCount = plants.length;
@@ -223,9 +258,6 @@ export default function App() {
       localStorage.setItem(CURRENT_VIEW_KEY, view);
       localStorage.setItem('cantoalegre_has_initialized_v1', 'true');
     } catch (e) {}
-    if (view === 'garden' && !hasCompletedGardenTour()) {
-      setShowGardenTourModal(true);
-    }
   };
 
   return (
@@ -238,7 +270,7 @@ export default function App() {
           setShowAddModal(true);
         }}
         onOpenKeyModal={() => setShowKeyModal(true)}
-        onOpenGuide={() => setShowGuideModal(true)}
+        onOpenGuide={() => setShowGardenTourModal(true)}
         onOpenUpdates={() => {
           setShowUpdatesModal(true);
           setUnreadUpdates(false);
@@ -254,6 +286,8 @@ export default function App() {
         onLanguageChange={handleLanguageChange}
         onOpenFeedback={() => setShowFeedbackModal(true)}
         onOpenAnalytics={() => setShowAnalyticsModal(true)}
+        trashCount={trashPlants.length}
+        onOpenTrashBin={() => setShowTrashModal(true)}
       />
 
       {currentView === 'landing' ? (
@@ -299,7 +333,7 @@ export default function App() {
                 onClick={() => setActiveFilter('direct_sun')}
               >
                 <Sun size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                {currentLang === 'en' ? 'Full Sun' : 'Luz Direta'}
+                {currentLang === 'en' ? "Full Sun" : "Sol Pleno"}
               </button>
 
               <button 
@@ -307,7 +341,7 @@ export default function App() {
                 onClick={() => setActiveFilter('indirect_light')}
               >
                 <CloudSun size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                {currentLang === 'en' ? 'Indirect Light' : 'Luz Indireta'}
+                {currentLang === 'en' ? "Indirect Light" : "Luz Indireta"}
               </button>
 
               <button 
@@ -315,42 +349,55 @@ export default function App() {
                 onClick={() => setActiveFilter('shade')}
               >
                 <Moon size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                {currentLang === 'en' ? 'Shade' : 'Sombra'}
+                {currentLang === 'en' ? "Shade" : "Sombra"}
               </button>
             </div>
           </section>
 
-          {/* Galeria de Cartões de Plantas */}
-          {filteredPlants.length > 0 ? (
-            <div className="plant-grid">
-              {filteredPlants.map(plant => (
-                <PlantCard 
-                  key={plant.id} 
-                  plant={plant} 
-                  onWater={handleWaterPlant}
-                  onClick={setSelectedPlant}
-                />
-              ))}
+          {/* Grid de Plantas do Jardim */}
+          {filteredPlants.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">
+                <Leaf size={40} color="#10b981" />
+              </div>
+              <h3 className="empty-title">
+                {searchTerm || activeFilter !== 'all' 
+                  ? (currentLang === 'en' ? "No plants found" : "Nenhuma planta encontrada")
+                  : (currentLang === 'en' ? "Your Garden is Empty" : "Seu Jardim esta Vazio")}
+              </h3>
+              <p className="empty-description">
+                {searchTerm || activeFilter !== 'all'
+                  ? (currentLang === 'en' ? "Try changing your search terms or clearing active filters." : "Tente alterar os termos da busca ou limpar os filtros ativos.")
+                  : (currentLang === 'en' ? "Start your smart botanical collection by registering your first plant." : "Comece sua colecao botanica inteligente cadastrando sua primeira muda.")}
+              </p>
+              {(!searchTerm && activeFilter === 'all') && (
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowAddModal(true)}
+                  style={{ marginTop: '16px' }}
+                >
+                  <Plus size={18} />
+                  <span>{currentLang === 'en' ? "Add First Plant" : "Cadastrar Primeira Planta"}</span>
+                </button>
+              )}
             </div>
           ) : (
-            <div className="empty-state">
-              <Leaf className="empty-icon" />
-              <h3>{currentLang === 'en' ? 'No plants found' : 'Nenhuma planta encontrada'}</h3>
-              <p>
-                {currentLang === 'en' 
-                  ? 'Add a plant manually or take a photo with AI to start your garden journal.'
-                  : 'Adicione uma planta manualmente ou tire uma foto com a IA para iniciar seu diario de cultivo.'}
-              </p>
-              <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                <Plus size={18} />
-                <span>{currentLang === 'en' ? 'Add First Plant' : 'Adicionar Primeira Planta'}</span>
-              </button>
+            <div className="plants-grid">
+              {filteredPlants.map(plant => (
+                <PlantCard 
+                  key={plant.id}
+                  plant={plant}
+                  onWater={handleWaterPlant}
+                  onSelect={setSelectedPlant}
+                  currentLang={currentLang}
+                />
+              ))}
             </div>
           )}
         </main>
       )}
 
-      {/* Modais */}
+      {/* Modais da Aplicacao */}
       {selectedPlant && (
         <PlantDetailModal 
           plant={selectedPlant}
@@ -363,17 +410,20 @@ export default function App() {
 
       {showAddModal && (
         <AddPlantModal 
-          hasApiKey={hasApiKey}
+          isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
-          onSavePlant={handleSavePlant}
+          onSave={handleSavePlant}
+          hasApiKey={hasApiKey}
           onOpenKeyModal={() => setShowKeyModal(true)}
+          currentLang={currentLang}
         />
       )}
 
       {showKeyModal && (
         <ApiKeyModal 
+          isOpen={showKeyModal}
           onClose={() => setShowKeyModal(false)}
-          onKeySaved={(hasKey) => setHasApiKey(hasKey)}
+          onKeySaved={() => setHasApiKey(Boolean(getStoredApiKey() && getStoredApiKey().trim() !== ''))}
         />
       )}
 
@@ -381,9 +431,7 @@ export default function App() {
         <IntroGuideModal 
           isOpen={showGuideModal}
           onClose={() => setShowGuideModal(false)}
-          hasApiKey={hasApiKey}
-          onKeySaved={(hasKey) => setHasApiKey(hasKey)}
-          installPrompt={deferredPrompt}
+          isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
         />
       )}
@@ -392,8 +440,6 @@ export default function App() {
         <UpdatesNotificationModal 
           isOpen={showUpdatesModal}
           onClose={() => setShowUpdatesModal(false)}
-          swUpdateAvailable={swUpdateAvailable}
-          onReloadApp={() => window.location.reload()}
         />
       )}
 
@@ -403,7 +449,7 @@ export default function App() {
           onClose={() => setShowSettingsModal(false)}
           hasApiKey={hasApiKey}
           onOpenKeyModal={() => setShowKeyModal(true)}
-          onOpenGuide={() => setShowGuideModal(true)}
+          onOpenGuide={() => setShowGardenTourModal(true)}
           isInstallable={isInstallable}
           onInstallApp={handleInstallPwa}
           onReloadPlants={loadPlants}
@@ -430,6 +476,18 @@ export default function App() {
         <AnalyticsStatsModal 
           isOpen={showAnalyticsModal}
           onClose={() => setShowAnalyticsModal(false)}
+          currentLang={currentLang}
+        />
+      )}
+
+      {showTrashModal && (
+        <TrashBinModal 
+          isOpen={showTrashModal}
+          onClose={() => setShowTrashModal(false)}
+          trashPlants={trashPlants}
+          onRestore={handleRestorePlant}
+          onPermanentDelete={handlePermanentDeletePlant}
+          onEmptyTrash={handleEmptyTrash}
           currentLang={currentLang}
         />
       )}

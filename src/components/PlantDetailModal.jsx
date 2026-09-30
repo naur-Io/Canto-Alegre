@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   X, 
   Edit3, 
@@ -21,12 +21,49 @@ import {
   Info,
   Sprout,
   Lightbulb,
-  Home
+  Home,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { getDefaultPropagationForPlant } from '../services/geminiService';
 
+const compressImage = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 800;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onWater }) {
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   
   // Garantir que a planta possua guia de mudas mesmo se for importada ou de versão antiga
   const initialPropagation = plant.propagation && plant.propagation.method 
@@ -37,6 +74,24 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
     ...plant,
     propagation: initialPropagation
   });
+
+  const handlePhotoSelect = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      setUploadingPhoto(true);
+      const compressed = await compressImage(file);
+      const updatedForm = { ...formData, photoUrl: compressed };
+      setFormData(updatedForm);
+      if (onSave) {
+        onSave(updatedForm);
+      }
+    } catch (err) {
+      console.warn('Erro ao processar imagem:', err);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -484,12 +539,45 @@ export default function PlantDetailModal({ plant, onClose, onSave, onDelete, onW
           ) : (
             /* MODO VISUALIZAÇÃO DETALHADA BOTÂNICA */
             <div>
-              <div className="preview-img-container">
+              <div className="preview-img-container" style={{ position: 'relative' }}>
                 <img 
-                  src={plant.photoUrl || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80'} 
+                  src={formData.photoUrl || plant.photoUrl || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80'} 
                   alt={plant.commonName} 
                   className="preview-img"
                 />
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  accept="image/*" 
+                  onChange={handlePhotoSelect} 
+                  style={{ display: 'none' }} 
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  disabled={uploadingPhoto}
+                  style={{
+                    position: 'absolute',
+                    bottom: '12px',
+                    right: '12px',
+                    background: 'rgba(255, 255, 255, 0.92)',
+                    backdropFilter: 'blur(4px)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    padding: '6px 14px',
+                    borderRadius: '50px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    zIndex: 2,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Camera size={15} />
+                  <span>{uploadingPhoto ? 'Carregando...' : 'Alterar / Tirar Foto'}</span>
+                </button>
               </div>
 
               {/* Título & Origem */}

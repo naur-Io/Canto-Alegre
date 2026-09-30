@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare } from 'lucide-react';
+import { Leaf, Plus, Key, Sparkles, HelpCircle, Download, Bell, Settings, Globe, Layout, BookOpen, MessageSquare, Trash2 } from 'lucide-react';
 import { TRANSLATIONS } from '../services/i18n';
 import { analyticsService } from '../services/analyticsService';
 
@@ -18,7 +18,9 @@ export default function Navbar({
   currentLang = 'pt-BR',
   onLanguageChange,
   onOpenFeedback,
-  onOpenAnalytics
+  onOpenAnalytics,
+  trashCount = 0,
+  onOpenTrashBin
 }) {
   const t = TRANSLATIONS[currentLang]?.nav || TRANSLATIONS['pt-BR'].nav;
 
@@ -133,6 +135,24 @@ export default function Navbar({
             )}
             <span className="nav-btn-text-full">Novidades</span>
             <span className="nav-btn-text-short">Novidades</span>
+          </button>
+
+          {/* Lixeira */}
+          <button 
+            className="btn btn-secondary btn-sm nav-btn-trash"
+            onClick={() => {
+              analyticsService.trackEvent('Navbar', 'click', 'Lixeira');
+              onOpenTrashBin && onOpenTrashBin();
+            }}
+            title="Lixeira do Jardim"
+            style={{ position: 'relative' }}
+          >
+            <Trash2 size={14} color={trashCount > 0 ? '#ef4444' : 'currentColor'} />
+            {trashCount > 0 && (
+              <span className="unread-dot-badge" style={{ background: '#ef4444' }} />
+            )}
+            <span className="nav-btn-text-full">Lixeira {trashCount > 0 ? `(${trashCount})` : ''}</span>
+            <span className="nav-btn-text-short">Lixeira</span>
           </button>
 
           {/* Guia & PWA */}

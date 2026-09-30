@@ -5,30 +5,91 @@ import { addToPendingQueue, syncWithCloud } from './syncService';
 
 const PLANTS_STORAGE_KEY = 'cantoalegre_user_plants_v1';
 const LEGACY_PLANTS_KEY = 'floracare_user_plants_v1';
+const DELETED_PLANTS_KEY = 'cantoalegre_deleted_plant_ids_v1';
+const TRASH_BIN_KEY = 'cantoalegre_trash_bin_plants_v1';
 const API_KEY_STORAGE_KEY = 'cantoalegre_gemini_api_key';
 const LEGACY_API_KEY = 'floracare_gemini_api_key';
 const INITIALIZED_FLAG_KEY = 'cantoalegre_has_initialized_v1';
 const INTRO_COMPLETED_KEY = 'cantoalegre_intro_completed';
+const GARDEN_TOUR_COMPLETED_KEY = 'cantoalegre_garden_tour_completed_v1';
+const LAST_SEEN_VERSION_KEY = 'cantoalegre_last_seen_version';
+const THEME_STORAGE_KEY = 'cantoalegre_theme';
+
+// Helper para gerenciar IDs de plantas excluidas persistentemente
+export async function getDeletedPlantIds() {
+  let ids = [];
+  try {
+    const local = localStorage.getItem(DELETED_PLANTS_KEY);
+    if (local) ids = JSON.parse(local);
+  } catch (e) {}
+
+  try {
+    const idb = await get(DELETED_PLANTS_KEY);
+    if (Array.isArray(idb)) {
+      const merged = new Set([...ids, ...idb]);
+      ids = Array.from(merged);
+    }
+  } catch (e) {}
+
+  return Array.isArray(ids) ? ids : [];
+}
+
+export async function saveDeletedPlantIds(ids) {
+  const cleanIds = Array.isArray(ids) ? Array.from(new Set(ids)) : [];
+  try {
+    localStorage.setItem(DELETED_PLANTS_KEY, JSON.stringify(cleanIds));
+  } catch (e) {}
+  try {
+    await set(DELETED_PLANTS_KEY, cleanIds);
+  } catch (e) {}
+  return cleanIds;
+}
+
+// Helper para gerenciar Lixeira (Trash Bin)
+export async function getTrashBinPlants() {
+  let trash = [];
+  try {
+    const local = localStorage.getItem(TRASH_BIN_KEY);
+    if (local) trash = JSON.parse(local);
+  } catch (e) {}
+
+  try {
+    const idb = await get(TRASH_BIN_KEY);
+    if (Array.isArray(idb) && idb.length > 0) {
+      trash = idb;
+    }
+  } catch (e) {}
+
+  return Array.isArray(trash) ? trash : [];
+}
+
+export async function saveTrashBinPlants(trash) {
+  const cleanTrash = Array.isArray(trash) ? trash : [];
+  try {
+    localStorage.setItem(TRASH_BIN_KEY, JSON.stringify(cleanTrash));
+  } catch (e) {}
+  try {
+    await set(TRASH_BIN_KEY, cleanTrash);
+  } catch (e) {}
+  return cleanTrash;
+}
 
 // Sincroniza dados em ambos os armazenamentos (IndexedDB + LocalStorage)
 export async function persistToAllStorages(plants) {
   if (!Array.isArray(plants)) return;
 
-  // 1. Salvar no IndexedDB (Suporta grandes volumes e imagens comprimidas)
   try {
     await set(PLANTS_STORAGE_KEY, plants);
   } catch (err) {
     console.warn('Falha ao salvar no IndexedDB:', err);
   }
 
-  // 2. Salvar copia redundante no LocalStorage com protecao de cota
   try {
     localStorage.setItem(PLANTS_STORAGE_KEY, JSON.stringify(plants));
     localStorage.setItem(INITIALIZED_FLAG_KEY, 'true');
   } catch (err) {
     console.warn('LocalStorage quota excedida, gerando backup leve:', err);
     try {
-      // Se estourar a cota de 5MB do LocalStorage, salva versao com imagem otimizada para backup
       const lightweight = plants.map(p => ({
         ...p,
         photoUrl: p.photoUrl && p.photoUrl.startsWith('data:') && p.photoUrl.length > 50000 
@@ -48,6 +109,7 @@ export async function persistToAllStorages(plants) {
 // Carregar todas as plantas salvas pelo usuario
 export async function getStoredPlants() {
   const hasInitialized = localStorage.getItem(INITIALIZED_FLAG_KEY) === 'true' || localStorage.getItem('floracare_has_initialized_v1') === 'true';
+  const deletedIds = await getDeletedPlantIds();
   let localPlants = null;
 
   // 1. Tentar ler do IndexedDB (banco principal de alta capacidade)
@@ -89,9 +151,16 @@ export async function getStoredPlants() {
     localPlants = [];
   }
 
+  // Filtrar plantas cujo ID esteja na lista de excluidos
+  if (deletedIds.length > 0 && Array.isArray(localPlants)) {
+    localPlants = localPlants.filter(p => 
+      !deletedIds.includes(String(p.id)) && (!p.remoteId || !deletedIds.includes(String(p.remoteId)))
+    );
+  }
+
   // Tentar sincronizacao assincrona com o backend Spring Boot em segundo plano
   if (navigator.onLine && localPlants.length > 0) {
-    syncWithCloud(localPlants, persistToAllStorages).catch(err => 
+    syncWithCloud(localPlants, persistToAllStorages, deletedIds).catch(err => 
       console.warn('Sincronizacao em segundo plano falhou:', err)
     );
   }
@@ -126,7 +195,6 @@ export async function savePlant(plantData) {
     targetPlant = newPlant;
   }
 
-  // Garante a gravacao imediata e persistente no IndexedDB e LocalStorage
   await persistToAllStorages(updatedPlants);
 
   if (navigator.onLine) {
@@ -151,12 +219,74 @@ export async function savePlant(plantData) {
   return updatedPlants;
 }
 
-// Excluir Planta
+// Excluir Planta (move para Lixeira e persiste exclusao)
 export async function deletePlant(plantId) {
   const currentPlants = await getStoredPlants();
-  const updatedPlants = currentPlants.filter(p => p.id !== plantId);
+  const plantToDelete = currentPlants.find(p => p.id === plantId || String(p.id) === String(plantId));
+
+  const updatedPlants = currentPlants.filter(p => p.id !== plantId && String(p.id) !== String(plantId));
   await persistToAllStorages(updatedPlants);
+
+  // 1. Adicionar ID na lista de excluídos
+  const deletedIds = await getDeletedPlantIds();
+  const idsToAdd = [String(plantId)];
+  if (plantToDelete && plantToDelete.remoteId) {
+    idsToAdd.push(String(plantToDelete.remoteId));
+  }
+  await saveDeletedPlantIds([...deletedIds, ...idsToAdd]);
+
+  // 2. Mover para a Lixeira
+  if (plantToDelete) {
+    const currentTrash = await getTrashBinPlants();
+    const trashedItem = {
+      ...plantToDelete,
+      deletedAt: new Date().toISOString()
+    };
+    await saveTrashBinPlants([trashedItem, ...currentTrash.filter(t => t.id !== plantId)]);
+  }
+
   return updatedPlants;
+}
+
+// Restaurar Planta da Lixeira para o Jardim
+export async function restorePlantFromTrash(plantId) {
+  const trash = await getTrashBinPlants();
+  const plantToRestore = trash.find(p => p.id === plantId || String(p.id) === String(plantId));
+
+  if (!plantToRestore) {
+    return { plants: await getStoredPlants(), trash };
+  }
+
+  // 1. Remover da Lixeira
+  const updatedTrash = trash.filter(p => p.id !== plantId && String(p.id) !== String(plantId));
+  await saveTrashBinPlants(updatedTrash);
+
+  // 2. Remover ID da lista de excluidos
+  const deletedIds = await getDeletedPlantIds();
+  const cleanDeleted = deletedIds.filter(id => id !== String(plantId) && (!plantToRestore.remoteId || id !== String(plantToRestore.remoteId)));
+  await saveDeletedPlantIds(cleanDeleted);
+
+  // 3. Adicionar de volta ao Jardim
+  const { deletedAt, ...cleanPlant } = plantToRestore;
+  const currentPlants = await getStoredPlants();
+  const updatedPlants = [cleanPlant, ...currentPlants.filter(p => p.id !== plantId)];
+  await persistToAllStorages(updatedPlants);
+
+  return { plants: updatedPlants, trash: updatedTrash };
+}
+
+// Excluir Definitivamente da Lixeira
+export async function permanentlyDeletePlant(plantId) {
+  const trash = await getTrashBinPlants();
+  const updatedTrash = trash.filter(p => p.id !== plantId && String(p.id) !== String(plantId));
+  await saveTrashBinPlants(updatedTrash);
+  return updatedTrash;
+}
+
+// Esvaziar Lixeira por completo
+export async function emptyTrashBin() {
+  await saveTrashBinPlants([]);
+  return [];
 }
 
 // Marcar como Regada Hoje
@@ -219,8 +349,6 @@ export function markIntroGuideSeen() {
 }
 
 // Controle do Tour Guiado Interativo do Jardim
-const GARDEN_TOUR_COMPLETED_KEY = 'cantoalegre_garden_tour_completed_v1';
-
 export function hasCompletedGardenTour() {
   return localStorage.getItem(GARDEN_TOUR_COMPLETED_KEY) === 'true';
 }
@@ -230,8 +358,6 @@ export function markGardenTourCompleted() {
 }
 
 // Controle de Notificacoes de Atualizacoes / Novidades
-const LAST_SEEN_VERSION_KEY = 'cantoalegre_last_seen_version';
-
 export function getLastSeenVersion() {
   return localStorage.getItem(LAST_SEEN_VERSION_KEY) || '';
 }
@@ -265,8 +391,6 @@ export async function importGardenBackup(jsonString) {
 }
 
 // Gerenciamento de Tema Visual (Tema Botânico Único Claro)
-const THEME_STORAGE_KEY = 'cantoalegre_theme';
-
 export function getStoredTheme() {
   return 'light';
 }

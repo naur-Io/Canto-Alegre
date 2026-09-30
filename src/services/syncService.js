@@ -66,7 +66,7 @@ export async function processPendingQueue() {
   await set(QUEUE_STORAGE_KEY, remaining);
 }
 
-export async function syncWithCloud(localPlants = [], persistToAllStorages = null) {
+export async function syncWithCloud(localPlants = [], persistToAllStorages = null, deletedPlantIds = []) {
   if (!navigator.onLine) {
     return { synced: false, reason: 'offline', plants: localPlants };
   }
@@ -80,25 +80,31 @@ export async function syncWithCloud(localPlants = [], persistToAllStorages = nul
       return { synced: false, reason: 'invalid_response', plants: localPlants };
     }
 
-    const normalizedRemote = remotePlants.map(rp => ({
-      id: rp.id,
-      name: rp.nickname || (rp.species ? rp.species.commonName : 'Planta'),
-      commonName: rp.species ? rp.species.commonName : (rp.nickname || 'Planta'),
-      scientificName: rp.species ? rp.species.scientificName : '',
-      customLocation: rp.customLocation || '',
-      idealEnvironment: rp.customLocation || rp.idealEnvironment || '',
-      photoUrl: rp.photoUrl || '',
-      image: rp.photoUrl || '',
-      lastWatered: rp.lastWateredAt || rp.updatedAt || new Date().toISOString(),
-      nextWateringAt: rp.nextWateringAt,
-      notes: rp.notes || '',
-      createdAt: rp.createdAt,
-      updatedAt: rp.updatedAt,
-      species: rp.species
-    }));
+    const cleanDeleted = Array.isArray(deletedPlantIds) ? deletedPlantIds.map(id => String(id)) : [];
+
+    const normalizedRemote = remotePlants
+      .filter(rp => !cleanDeleted.includes(String(rp.id)))
+      .map(rp => ({
+        id: rp.id,
+        name: rp.nickname || (rp.species ? rp.species.commonName : 'Planta'),
+        commonName: rp.species ? rp.species.commonName : (rp.nickname || 'Planta'),
+        scientificName: rp.species ? rp.species.scientificName : '',
+        customLocation: rp.customLocation || '',
+        idealEnvironment: rp.customLocation || rp.idealEnvironment || '',
+        photoUrl: rp.photoUrl || '',
+        image: rp.photoUrl || '',
+        lastWatered: rp.lastWateredAt || rp.updatedAt || new Date().toISOString(),
+        nextWateringAt: rp.nextWateringAt,
+        notes: rp.notes || '',
+        createdAt: rp.createdAt,
+        updatedAt: rp.updatedAt,
+        species: rp.species
+      }));
 
     const mergedMap = new Map();
-    localPlants.forEach(lp => mergedMap.set(lp.id, lp));
+    localPlants
+      .filter(lp => !cleanDeleted.includes(String(lp.id)) && (!lp.remoteId || !cleanDeleted.includes(String(lp.remoteId))))
+      .forEach(lp => mergedMap.set(lp.id, lp));
 
     normalizedRemote.forEach(rp => {
       const existingLp = localPlants.find(lp => lp.id === rp.id || (lp.commonName && rp.commonName && lp.commonName.toLowerCase() === rp.commonName.toLowerCase()));
