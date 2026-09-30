@@ -1,4 +1,4 @@
-[English Version / Versao em Ingles](./README.en.md)
+[English Version / Versao em Ingles](./README.en.md) | [Modelos de Publicacao para o LinkedIn](./LINKEDIN_POSTS.md)
 
 ---
 

@@ -1,4 +1,4 @@
-[Versao em Portugues / Portuguese Version](./README.md)
+[Versao em Portugues / Portuguese Version](./README.md) | [LinkedIn Announcement Templates](./LINKEDIN_POSTS.md)
 
 ---
 
