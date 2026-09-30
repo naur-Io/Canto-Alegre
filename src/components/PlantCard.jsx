@@ -33,7 +33,8 @@ export default function PlantCard({ plant, onWater, onClick }) {
   };
 
   // Determinar rótulo de luz
-  const lightType = plant.sunlight?.lightType || (plant.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : plant.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
+  const periodStr = typeof plant.sunlight?.period === 'string' ? plant.sunlight.period.toLowerCase() : '';
+  const lightType = plant.sunlight?.lightType || (periodStr.includes('direto') ? 'direta' : periodStr.includes('sombra') ? 'sombra' : 'indireta');
   const getLightBadge = () => {
     if (lightType === 'direta') {
       return { text: 'Sol Direto', className: 'badge-sun-direct' };
@@ -43,6 +44,9 @@ export default function PlantCard({ plant, onWater, onClick }) {
     }
     return { text: 'Luz Indireta', className: 'badge-sun-indirect' };
   };
+  const lightBadge = getLightBadge();
+
+  const propagationMethod = plant.propagation?.method || plant.propagationMethod || '';
 
   const environmentText = plant.idealEnvironment || (lightType === 'direta' ? 'Fora de casa (Quintal ou Sacada Ensolarada)' : lightType === 'sombra' ? 'Dentro de casa (Banheiro ou Cômodo de Sombra)' : 'Dentro de casa (Sala, Quarto ou Escritório)');
 

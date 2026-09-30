@@ -185,7 +185,8 @@ export default function App() {
       return diffHours >= (freq * 24 - 12);
     }
 
-    const lightType = p.sunlight?.lightType || (p.sunlight?.period?.toLowerCase().includes('direto') ? 'direta' : p.sunlight?.period?.toLowerCase().includes('sombra') ? 'sombra' : 'indireta');
+    const periodStr = typeof p.sunlight?.period === 'string' ? p.sunlight.period.toLowerCase() : '';
+    const lightType = p.sunlight?.lightType || (periodStr.includes('direto') ? 'direta' : periodStr.includes('sombra') ? 'sombra' : 'indireta');
 
     if (activeFilter === 'direct_sun') return lightType === 'direta';
     if (activeFilter === 'indirect_light') return lightType === 'indireta';
