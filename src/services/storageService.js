@@ -292,6 +292,8 @@ export async function emptyTrashBin() {
 // Marcar como Regada Hoje
 export async function markAsWatered(plantId) {
   const currentPlants = await getStoredPlants();
+  const targetPlant = currentPlants.find(p => p.id === plantId);
+  const cloudPlantId = targetPlant?.remoteId || plantId;
   const updatedPlants = currentPlants.map(p => {
     if (p.id === plantId) {
       return {
@@ -305,12 +307,12 @@ export async function markAsWatered(plantId) {
   await persistToAllStorages(updatedPlants);
 
   if (navigator.onLine) {
-    apiService.waterPlant(plantId).catch(err => {
+    apiService.waterPlant(cloudPlantId).catch(err => {
       console.warn('Backend cloud offline, enfileirando rega para sincronizacao futura:', err);
-      addToPendingQueue('WATER_PLANT', { plantId });
+      addToPendingQueue('WATER_PLANT', { plantId: cloudPlantId });
     });
   } else {
-    addToPendingQueue('WATER_PLANT', { plantId });
+    await addToPendingQueue('WATER_PLANT', { plantId: cloudPlantId });
   }
 
   return updatedPlants;
